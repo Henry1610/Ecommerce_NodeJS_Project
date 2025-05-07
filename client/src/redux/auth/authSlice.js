@@ -17,7 +17,9 @@ export const register = createAsyncThunk(
 
             }
             localStorage.setItem('token', data.token);
-            return data.token;
+            localStorage.setItem('user',  JSON.stringify(data.user));
+
+            return {token:data.token,user:data.user};
         }
         catch (error) {
             return thunkAPI.rejectWithValue('Lỗi kết nối server');  // Nếu có lỗi kết nối, trả về thông báo lỗi
@@ -42,7 +44,9 @@ export const login = createAsyncThunk(
                 return thunkAPI.rejectWithValue(data.message || 'Đăng nhập thất bại');
             }
             localStorage.setItem('token', data.token);
-            return data.token;
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            return {token:data.token,user:data.user};
 
 
         } catch (error) {
@@ -61,8 +65,11 @@ const authSlice = createSlice({
     },
     reducers: {
         logout: (state) => {
+            state.user = null;
             state.token = null;
             localStorage.removeItem('token')
+            localStorage.removeItem('user')
+
         }
     }
     , extraReducers: (builder) => {
@@ -73,7 +80,8 @@ const authSlice = createSlice({
             })
             .addCase(register.fulfilled, (state, action) => {
                 state.loading = false;
-                state.token = action.payload;
+                state.token = action.payload.token;
+                state.user=action.payload.user
             })
             .addCase(register.rejected, (state, action) => {
                 state.loading = false;
@@ -85,7 +93,9 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.token = action.payload;
+                state.token = action.payload.token;
+                state.user=action.payload.user
+
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;

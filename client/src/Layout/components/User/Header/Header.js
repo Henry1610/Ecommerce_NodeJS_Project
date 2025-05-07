@@ -11,8 +11,7 @@ function Header() {
   const isAuthenticated = !!token;
 
   const handleLogout = () => {
-    dispatch(logout()); // Xóa token trong Redux
-    localStorage.removeItem('token'); // Nếu có dùng localStorage thì xóa luôn
+    dispatch(logout()); 
     navigate('/login');
   };
     return (
@@ -37,7 +36,7 @@ function Header() {
 
                                     
 
-                                    {isAuthenticated ? (<button className="d-block text-center p-2 border  shadow text-decoration-none fw-bold fs-4 bg-light" onClick={handleLogout}>Log out</button>
+                                    {isAuthenticated ? (<button className="d-block text-center border   text-decoration-none fw-bold  bg-light" onClick={handleLogout}>Log out</button>
                                     ) : (<></>)}
 
                                 </ul>
@@ -209,7 +208,7 @@ function Header() {
                                        
                                             <Link
                                                 to="/login"
-                                                className="text-center  border  shadow text-decoration-none fw-bold col-md-6 bg-light"
+                                                className="text-center   text-dark  fw-bold opacity-50 text-decoration-none  col-md-6 bg-light"
                                             >
                                                 Login
                                             </Link>
@@ -218,7 +217,7 @@ function Header() {
                                       
                                             <Link
                                                 to="/register"
-                                                className="text-center   border  shadow text-decoration-none fw-bold  col-md-6  bg-light"
+                                                className="text-center    text-dark  fw-bold opacity-50 text-decoration-none   col-md-6  bg-light"
                                             >
                                                 Register
                                             </Link>

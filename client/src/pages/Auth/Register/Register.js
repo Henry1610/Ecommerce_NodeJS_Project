@@ -3,6 +3,8 @@ import React, { useState,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../../redux/auth/authSlice';
+import Swal from 'sweetalert2';
+
 function Register() {
 
     const [username, setUsername] = useState('');
@@ -16,16 +18,37 @@ function Register() {
     const handleRegister = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-          alert("Password and confirm password don't match");
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            text: 'Mật khẩu xác nhận không khớp',
+            confirmButtonText: 'Thử lại'
+          });
           return;
         }
-        dispatch(register({ username, email, password }));
-      };
-      useEffect(() => {
-        if (token) {
-          navigate('/');
+        try {
+            const result = await dispatch(register({ username, email, password })).unwrap();
+            if (result) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng ký thành công!',
+                    
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        navigate('/login');
+                    }
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error || 'Đăng ký thất bại',
+                confirmButtonText: 'Thử lại'
+            });
         }
-      }, [token, navigate]);
+    };
+      
         return (
             <div>
                 <div class="breadcrumb-area">

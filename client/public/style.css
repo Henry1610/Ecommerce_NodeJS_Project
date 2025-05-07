@@ -2455,6 +2455,9 @@ textarea:focus {
 .product-active .owl-nav .owl-next,.product-active-2 .owl-nav .owl-next {
   right: 0;
 }
+a {
+	text-decoration: none !important;
+  }
 .product-active:hover .owl-nav button, .product-active-2:hover .owl-nav button{
   visibility: visible;
   opacity: 1;

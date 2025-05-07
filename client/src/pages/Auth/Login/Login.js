@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../../redux/auth/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
 function Login() {
 
     const dispatch = useDispatch();
@@ -11,10 +13,34 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        dispatch(login({ email, password }));
+        try {
+            const result = await dispatch(login({ email, password })).unwrap();
+            if (result) {
+                const user = JSON.parse(localStorage.getItem("user"));
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng nhập thành công!',
+                });
+    
+                if (user?.role === "admin") {
+                    navigate('/dashboard'); 
+                } else {
+                    navigate('/'); 
+                }
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error || 'Đăng nhập thất bại',
+                confirmButtonText: 'Thử lại'
+            });
+        }
     };
+    
 
     useEffect(() => {
         if (token) {

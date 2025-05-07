@@ -19,7 +19,16 @@ exports.login = async function (req, res) {
         }
 
         const token = generateToken(user._id, user.role);
-        res.json({ token });
+        res.status(201).json({
+            message: 'Đăng nhập thành công',
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role:user.role
+            },
+            token,
+        });
     } catch (error) {
         console.error('Register error:', error);
         res.status(500).json({ message: 'Lỗi server', error: error.message });
@@ -40,7 +49,7 @@ exports.register = async function (req, res) {
             email,
             password
         })
-        const token = generateToken(user._id);
+        const token = generateToken(user._id,user.role);
 
         res.status(201).json({
             message: 'Đăng ký thành công',
@@ -48,6 +57,7 @@ exports.register = async function (req, res) {
                 id: user._id,
                 username: user.username,
                 email: user.email,
+                role:user.role
             },
             token,
         });

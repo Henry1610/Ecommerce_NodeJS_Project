@@ -5,6 +5,7 @@ import userRoutes from './routes/UserRoutes';
 import adminRoutes from './routes/AdminRoutes';
 import UserLayout from './Layout/UserLayout';
 import AdminLayout from './Layout/AdminLayout';
+import ProtectedRoute from './routes/components/ProtectedRoute';
 
 function App() {
   return (
@@ -41,7 +42,7 @@ function App() {
             <Route
               key={index}
               path={route.path}
-              element={<AdminLayout><Page /></AdminLayout>}
+              element={<ProtectedRoute role="admin"><AdminLayout ><Page /></AdminLayout></ProtectedRoute>}
             />
           );
         })}
