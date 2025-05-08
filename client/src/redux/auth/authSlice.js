@@ -22,7 +22,7 @@ export const register = createAsyncThunk(
             return {token:data.token,user:data.user};
         }
         catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối server');  // Nếu có lỗi kết nối, trả về thông báo lỗi
+            return thunkAPI.rejectWithValue('Lỗi kết nối server'); 
 
         }
     }

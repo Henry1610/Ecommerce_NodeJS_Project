@@ -25,16 +25,11 @@ const oderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    isPaid: {
-        type: Boolean,
-        default: false
-    },
-    paidAt: Date,
-    isDelivered: {
-        type: Boolean,
-        default: false
-    },
-    deliveredAt: Date
+    status: {
+      type: String,
+      enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'], // Các trạng thái của đơn hàng
+      default: 'pending', 
+    }
 
 })
 

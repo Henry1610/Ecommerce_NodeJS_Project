@@ -36,16 +36,32 @@ function App() {
         })}
 
         {/* Admin Routes */}
-        {adminRoutes.map((route, index) => {
-          const Page = route.component;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={<ProtectedRoute role="admin"><AdminLayout ><Page /></AdminLayout></ProtectedRoute>}
-            />
-          );
-        })}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          {adminRoutes.map((route, index) => {
+            const Page = route.component;
+            return (
+              <Route
+                key={index}
+                path={route.path}  
+                element={
+                  <ProtectedRoute role="admin">
+                    <AdminLayout>
+                      <Page />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+            );
+          })}
+        </Route>
+
       </Routes>
     </Router>
   );

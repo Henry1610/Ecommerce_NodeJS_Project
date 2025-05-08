@@ -6,9 +6,7 @@ exports.login = async function (req, res) {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        // if (!user || !(await bcrypt.compare(password, user.password))) {
-        //     return res.status(401).json({ message: 'Invalid credentials' });
-        // }
+        
         if (!user) {
             return res.status(401).json({ message: 'User not found' });
         }
@@ -66,5 +64,9 @@ exports.register = async function (req, res) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
 
     }
+
+}
+exports.getProfile =(req,res)=>{
+    res.status(200).json(req.user);
 
 }
