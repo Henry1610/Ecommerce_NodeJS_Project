@@ -1,4 +1,4 @@
-const User = require('../models/user')
+const User = require('../models/User')
 const bcrypt = require('bcryptjs');
 const generateToken = require('../utils/generateToken');
 
@@ -64,9 +64,5 @@ exports.register = async function (req, res) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
 
     }
-
-}
-exports.getProfile =(req,res)=>{
-    res.status(200).json(req.user);
 
 }
