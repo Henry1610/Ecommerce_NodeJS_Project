@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const shippingSchema = new mongoose.Schema({
   user: { 
@@ -32,4 +32,4 @@ const shippingSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Shipping', shippingSchema);
+export default mongoose.model('Shipping', shippingSchema);

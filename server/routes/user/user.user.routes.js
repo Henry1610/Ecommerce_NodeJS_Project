@@ -1,10 +1,9 @@
-const express = require('express');
-const { getMe,
-    updateMe} = require('../../controllers/user/userController');
+import express from 'express';
+import { getMe, updateMe } from '../../controllers/user/userController.js';
+
 const router = express.Router();
 
-router.get('/me', getMe);                     
-router.put('/:id', updateMe);           
-  
+router.get('/me', getMe);
+router.put('/:id', updateMe);
 
-module.exports = router
+export default router;

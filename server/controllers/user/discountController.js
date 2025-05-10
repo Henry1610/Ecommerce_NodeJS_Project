@@ -1,5 +1,7 @@
 // [GET] /api/users/discounts/check?code=SUMMER2025
-exports.checkDiscountCode = async (req, res) => {
+import Discount from '../../models/Discount.js'
+
+export const checkDiscountCode = async (req, res) => {
     try {
       const { code } = req.query;
   

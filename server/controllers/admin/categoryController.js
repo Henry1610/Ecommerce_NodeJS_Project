@@ -1,5 +1,5 @@
-import Category from '../models/Category'
-exports.getCategories = async (req, res) => {
+import Category from '../../models/Category.js'
+export const getCategories = async (req, res) => {
     try {
         const categories = Category.find();
         res.status(200).json(categories)
@@ -7,7 +7,7 @@ exports.getCategories = async (req, res) => {
         res.status(500).json({ message: 'Không tìm thấy danh sách sản phẩm', error: err.message })
     }
 }
-exports.addCategory = async (req, res) => {
+export const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
         const newCategory = new Category(
@@ -23,12 +23,12 @@ exports.addCategory = async (req, res) => {
 
     }
 }
-exports.getCategoryById = async (req, res) => {
+export const getCategoryById = async (req, res) => {
     const category = await Category.findById(req.params.id).populate('category brand');
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json(category);
 };
-exports.updateCategory = async (req, res) => {
+export const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description } = req.body;
@@ -47,7 +47,7 @@ exports.updateCategory = async (req, res) => {
         res.status(500).json({ message: 'Lỗi khi cập nhật sản phẩm', error: error.message });
     }
 };
-exports.deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
 

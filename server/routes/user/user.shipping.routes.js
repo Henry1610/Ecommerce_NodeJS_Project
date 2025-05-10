@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import { getSavedShippingAddresses } from '../../controllers/user/shippingController.js';
+
 const router = express.Router();
-const { getSavedShippingAddresses } = require('../../controllers/user/shippingController');
 
 router.get('/shipping-addresses', getSavedShippingAddresses);
 
-module.exports = router;
+export default router;

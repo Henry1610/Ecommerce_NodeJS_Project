@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import { checkDiscountCode } from '../../controllers/user/discountController.js';
+
 const router = express.Router();
-const discountController=require('../../controllers/user/discountController') 
 
-router.get('/check', discountController.checkDiscountCode);
+router.get('/check', checkDiscountCode);
 
-module.exports = router;
+export default router;

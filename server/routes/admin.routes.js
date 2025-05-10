@@ -1,27 +1,27 @@
-const express = require('express');
-const router = express.Router();
-const authenticate = require('../middleware/authenticate');
-const authorize = require('../middleware/authorize');
+import express from 'express';
+import { authenticate } from '../middleware/authenticate.js';
+import { authorize } from '../middleware/authorize.js';
 
-const paymentRoutes=require('./admin/admin.payment.routes')
-const categoryRoutes=require('./admin/admin.category.routes')
-const brandRoutes=require('./admin/admin.brand.routes')
-const productRoutes=require('./admin/admin.product.routes')
-const orderRoutes=require('./admin/admin.order.routes')
-const userRoutes=require('./admin/admin.user.routes')
-const discountRoutes=require('./admin/admin.discount.routes')
+// import paymentRoutes from './admin/admin.payment.routes.js';
+import categoryRoutes from './admin/admin.category.routes.js';
+import brandRoutes from './admin/admin.brand.routes.js';
+import productRoutes from './admin/admin.product.routes.js';
+import orderRoutes from './admin/admin.order.routes.js';
+import userRoutes from './admin/admin.user.routes.js';
+import discountRoutes from './admin/admin.discount.routes.js';
+
+const router = express.Router();
 
 // Các route cho admin
 router.get('/dashboard', authenticate, authorize(['admin']), (req, res) => {
     res.json({ message: 'Welcome to admin dashboard' });
 });
-app.use('/brands', authenticate, authorize(['admin']), brandRoutes);
-app.use('/categories', authenticate, authorize(['admin']), categoryRoutes);
-app.use('/discounts', authenticate, authorize(['admin']), discountRoutes);
-app.use('/orders', authenticate, authorize(['admin']), orderRoutes);
-app.use('/payments', authenticate, authorize(['admin']), paymentRoutes);
-app.use('/products',authenticate, authorize(['admin']),productRoutes)
-app.use('/users', authenticate, authorize(['admin']), userRoutes);
+router.use('/brands', authenticate, authorize(['admin']), brandRoutes);
+router.use('/categories', authenticate, authorize(['admin']), categoryRoutes);
+router.use('/discounts', authenticate, authorize(['admin']), discountRoutes);
+router.use('/orders', authenticate, authorize(['admin']), orderRoutes);
+// router.use('/payments', authenticate, authorize(['admin']), paymentRoutes);
+router.use('/products', authenticate, authorize(['admin']), productRoutes);
+router.use('/users', authenticate, authorize(['admin']), userRoutes);
 
-
-module.exports = router;
+export default router;

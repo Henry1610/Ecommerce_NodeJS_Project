@@ -1,5 +1,9 @@
+import User from "../../models/User.js";
+
 // [GET] /api/users/me 
-exports.getMe = async (req, res) => {
+
+
+export const getMe = async (req, res) => {
     try {
       const user = await User.findById(req.user.id).select('-password');
       res.json(user);
@@ -9,7 +13,7 @@ exports.getMe = async (req, res) => {
   };
   
   // [PUT] /api/users/me
-  exports.updateMe = async (req, res) => {
+  export const updateMe = async (req, res) => {
     try {
       const { username, email, password } = req.body;
   

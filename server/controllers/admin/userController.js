@@ -1,16 +1,16 @@
-const User = require('../../models/user.model');
+import User from '../../models/User.js';
 // [GET] Lấy tất cả người dùng
 
-exports.getAllUsers=async (req,res)=>{
+export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find().sort({ createdAt: -1 }).select('-password');
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi lấy danh sách người dùng', error });
     }
-}
+};
 // [DELETE] Xóa người dùng theo ID
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) {
@@ -21,7 +21,7 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: 'Lỗi khi xóa người dùng', error });
     }
 };
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password');
         if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
@@ -31,7 +31,7 @@ exports.getUserById = async (req, res) => {
     }
 };
 // [PUT] Cập nhật role của user
-exports.updateUserRole = async (req, res) => {
+export const updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
         if (!['user', 'admin'].includes(role)) {

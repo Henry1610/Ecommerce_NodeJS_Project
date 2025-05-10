@@ -1,6 +1,6 @@
-import Product from '../models/Product'
-import Review from '../models/Review'
-exports.getProducts = async (req, res) => {
+import Product from '../../models/Product.js'
+import Review from '../../models/Review.js'
+export const getProducts = async (req, res) => {
     try {
         const products = Product.find().populate('category brand');
         res.status(200).json(products)
@@ -8,7 +8,7 @@ exports.getProducts = async (req, res) => {
         res.status(500).json({ message: 'Không tìm thấy danh sách sản phẩm', error: err.message })
     }
 }
-exports.getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id)
@@ -30,7 +30,7 @@ exports.getProductById = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-exports.addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
     try {
         const { name, description, price, stock, category, brand, images } = req.body;
         const newProduct = new Product(
@@ -51,7 +51,7 @@ exports.addProduct = async (req, res) => {
 
     }
 }
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description, price, stock, category, brand, images } = req.body;
@@ -79,7 +79,7 @@ exports.updateProduct = async (req, res) => {
         res.status(500).json({ message: 'Lỗi khi cập nhật sản phẩm', error: error.message });
     }
 };
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
 

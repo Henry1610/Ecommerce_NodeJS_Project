@@ -1,4 +1,5 @@
-exports.getSavedShippingAddresses = async (req, res) => {
+import Shipping from "../../models/Shipping.js";
+export const getSavedShippingAddresses = async (req, res) => {
     try {
       const shippingAddresses = await Shipping.find({ user: req.user._id });
       res.json(shippingAddresses);

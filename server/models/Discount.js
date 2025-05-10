@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 const discountSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true },
@@ -7,9 +7,7 @@ const discountSchema = new mongoose.Schema({
     validFrom: { type: Date, required: true },
     validTo: { type: Date, required: true },
     isActive: { type: Boolean, default: false },
+});
 
-
-
-})
-module.exports = mongoose.model('Discount', discountSchema)
+export default mongoose.model('Discount', discountSchema);
 

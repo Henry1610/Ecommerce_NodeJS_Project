@@ -1,11 +1,9 @@
-const Discount = require('../model/Discount');  // Import Discount model
+import Discount from '../../models/Discount.js';  // Import Discount model
 
-// 1. Tạo mới mã giảm giá (Create)
-exports.createDiscount = async (req, res) => {
+export const createDiscount = async (req, res) => {
     try {
         const { code, description, discountPercent, validFrom, validTo, isActive } = req.body;
 
-        // Kiểm tra xem mã giảm giá đã tồn tại chưa
         const existingDiscount = await Discount.findOne({ code });
         if (existingDiscount) {
             return res.status(400).json({ message: 'Discount code already exists' });
@@ -31,7 +29,7 @@ exports.createDiscount = async (req, res) => {
 };
 
 // 2. Lấy tất cả mã giảm giá (Read All)
-exports.getAllDiscounts = async (req, res) => {
+export const getAllDiscounts = async (req, res) => {
     try {
         const discounts = await Discount.find();
         res.status(200).json(discounts);
@@ -41,7 +39,7 @@ exports.getAllDiscounts = async (req, res) => {
 };
 
 // 3. Lấy mã giảm giá theo ID (Read One)
-exports.getDiscountById = async (req, res) => {
+export const getDiscountById = async (req, res) => {
     try {
         const { id } = req.params;
         const discount = await Discount.findById(id);
@@ -54,8 +52,7 @@ exports.getDiscountById = async (req, res) => {
     }
 };
 
-// 4. Cập nhật mã giảm giá (Update)
-exports.updateDiscount = async (req, res) => {
+export const updateDiscount = async (req, res) => {
     try {
         const { id } = req.params;
         const { code, description, discountPercent, validFrom, validTo, isActive } = req.body;
@@ -63,7 +60,7 @@ exports.updateDiscount = async (req, res) => {
         const updatedDiscount = await Discount.findByIdAndUpdate(
             id,
             { code, description, discountPercent, validFrom, validTo, isActive },
-            { new: true }  // Trả về discount đã được cập nhật
+            { new: true }  
         );
 
         if (!updatedDiscount) {
@@ -79,8 +76,7 @@ exports.updateDiscount = async (req, res) => {
     }
 };
 
-// 5. Xóa mã giảm giá (Delete)
-exports.deleteDiscount = async (req, res) => {
+export const deleteDiscount = async (req, res) => {
     try {
         const { id } = req.params;
         const deletedDiscount = await Discount.findByIdAndDelete(id);

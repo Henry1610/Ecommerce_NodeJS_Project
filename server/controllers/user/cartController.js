@@ -1,8 +1,7 @@
-const Cart = require('../../models/Cart');
-const Product = require('../../models/Product');
+import Cart from '../../models/Cart.js';
 
 // [PUT] /api/users/cart/add
-exports.addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.user._id;
 
@@ -28,7 +27,7 @@ exports.addToCart = async (req, res) => {
 };
 
 // [PUT] /api/users/cart/update
-exports.updateQuantity = async (req, res) => {
+export const updateQuantity = async (req, res) => {
   const userId = req.user._id;
   const { productId, quantity } = req.body;
 
@@ -49,7 +48,7 @@ exports.updateQuantity = async (req, res) => {
 };
 
 // [DELETE] /api/users/cart/remove/:productId
-exports.removeFromCart = async (req, res) => {
+export const removeFromCart = async (req, res) => {
   const { productId } = req.params;
   const userId = req.user._id;
 
@@ -67,7 +66,7 @@ exports.removeFromCart = async (req, res) => {
 };
 
 // [GET] /api/users/cart
-exports.getCart = async (req, res) => {
+export const getCart = async (req, res) => {
   const userId = req.user._id;
 
   try {

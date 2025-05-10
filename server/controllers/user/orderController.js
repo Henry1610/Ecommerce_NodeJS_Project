@@ -1,7 +1,7 @@
-const Order = require('../models/Order');
+import Order from '../../models/Oder.js';
 
-exports.getOrders = async (req, res) => { /* ... */ };
-exports.createOrder = async (req, res) => { /* ... */ };
-exports.getOrderById = async (req, res) => { /* ... */ };
-exports.updateOrder = async (req, res) => { /* ... */ };
-exports.deleteOrder = async (req, res) => { /* ... */ };
+export const getOrders = async (req, res) => { /* ... */ };
+export const createOrder = async (req, res) => { /* ... */ };
+export const getOrderById = async (req, res) => { /* ... */ };
+export const updateOrder = async (req, res) => { /* ... */ };
+export const deleteOrder = async (req, res) => { /* ... */ };

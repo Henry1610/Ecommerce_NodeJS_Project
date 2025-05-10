@@ -1,6 +1,6 @@
-const Brand = require('../models/Brand');  
+import  Brand from '../../models/Brand.js';  
 
-exports.createBrand = async (req, res) => {
+export const createBrand = async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -20,7 +20,7 @@ exports.createBrand = async (req, res) => {
     }
 };
 
-exports.getAllBrands = async (req, res) => {
+export const getAllBrands = async (req, res) => {
     try {
         const brands = await Brand.find();
         res.status(200).json(brands);
@@ -29,7 +29,7 @@ exports.getAllBrands = async (req, res) => {
     }
 };
 
-exports.getBrandById = async (req, res) => {
+export const getBrandById = async (req, res) => {
     try {
         const { id } = req.params;
         const brand = await Brand.findById(id);
@@ -42,7 +42,7 @@ exports.getBrandById = async (req, res) => {
     }
 };
 
-exports.updateBrand = async (req, res) => {
+export const updateBrand = async (req, res) => {
     try {
         const { id } = req.params;
         const { name } = req.body;
@@ -66,7 +66,7 @@ exports.updateBrand = async (req, res) => {
     }
 };
 
-exports.deleteBrand = async (req, res) => {
+export const deleteBrand = async (req, res) => {
     try {
         const { id } = req.params;
         const deletedBrand = await Brand.findByIdAndDelete(id);

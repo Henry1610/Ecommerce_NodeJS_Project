@@ -1,8 +1,8 @@
-const User = require('../models/User')
-const bcrypt = require('bcryptjs');
-const generateToken = require('../utils/generateToken');
+import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import generateToken from '../utils/generateToken.js';
 
-exports.login = async function (req, res) {
+export const login = async function (req, res) {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -23,7 +23,7 @@ exports.login = async function (req, res) {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role:user.role
+                role: user.role
             },
             token,
         });
@@ -31,23 +31,23 @@ exports.login = async function (req, res) {
         console.error('Register error:', error);
         res.status(500).json({ message: 'Lỗi server', error: error.message });
     }
-}
-exports.register = async function (req, res) {
+};
+
+export const register = async function (req, res) {
     try {
-        const { username, email, password } = req.body
+        const { username, email, password } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Username hoặc email đã tồn tại' });
-
         }
 
         const user = await User.create({
-
             username,
             email,
             password
-        })
-        const token = generateToken(user._id,user.role);
+        });
+        
+        const token = generateToken(user._id, user.role);
 
         res.status(201).json({
             message: 'Đăng ký thành công',
@@ -55,14 +55,11 @@ exports.register = async function (req, res) {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role:user.role
+                role: user.role
             },
             token,
         });
-
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
-
     }
-
-}
+};

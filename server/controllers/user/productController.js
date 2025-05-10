@@ -1,7 +1,7 @@
-const Product = require('../../models/Product');
+import Product from '../../models/Product.js';
 // [GET] /api/user/products
 
-exports.getAllProducts=async(req,res)=>{
+export const getAllProducts=async(req,res)=>{
     try{
         const products=Product.find()
         .populate('category')
@@ -15,7 +15,7 @@ exports.getAllProducts=async(req,res)=>{
     }
 }
 // [GET] /api/user/products/:id
-exports.getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
     try {
       const product = await Product.findById(req.params.id)
         .populate('category')

@@ -1,9 +1,14 @@
-const express = require('express');
+import express from 'express';
+import {
+  getOrders,
+  getOrderById,
+  updateOrderStatus
+} from '../../controllers/admin/orderController.js';
+
 const router = express.Router();
-const orderController = require('../../controllers/admin/orderController');
 
-router.get('/', orderController.getOrders);           
-router.get('/:id', orderController.getOrderById);      
-router.put('/:id', orderController.updateOrderStatus); 
+router.get('/', getOrders);
+router.get('/:id', getOrderById);
+router.put('/:id', updateOrderStatus);
 
-module.exports = router;
+export default router;

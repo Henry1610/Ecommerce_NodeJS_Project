@@ -1,7 +1,7 @@
-import Review from '../../models/Review';
-import Product from '../../models/Product';
+import Review from '../../models/Review.js';
+import Product from '../../models/Product.js';
 
-exports.createReview = async (req, res) => {
+export const createReview = async (req, res) => {
     try {
         const { product, rating, comment } = req.body;
         const alreadyReview = await Review.findOne({
@@ -36,7 +36,7 @@ exports.createReview = async (req, res) => {
     }
 };
 
-exports.getReviewsByProduct = async (req, res) => {
+export const getReviewsByProduct = async (req, res) => {
     try {
         const reviews = await Review.find({ product: req.params.productId })
             .populate('user', 'username')
@@ -49,7 +49,7 @@ exports.getReviewsByProduct = async (req, res) => {
 };
 
 // [DELETE] Người dùng xóa review của họ
-exports.deleteReview = async (req, res) => {
+export const deleteReview = async (req, res) => {
     try {
         const review = await Review.findOne({
             _id: req.params.id,
@@ -79,7 +79,7 @@ exports.deleteReview = async (req, res) => {
     }
 };
 // [PUT] Người dùng sửa đánh giá của họ
-exports.updateReview = async (req, res) => {
+export const updateReview = async (req, res) => {
     try {
         const { rating, comment } = req.body;
         const review = await Review.findOne({
