@@ -1,8 +1,11 @@
-.single-product-wrap:hover .add-actions {
-    opacity: 1 !important;
-    transition: opacity 0.3s ease-in-out;
+
+  a {
+    color: gray!important;
+    text-decoration: none!important;
   }
-  .add-actions {
-    transition: opacity 0.3s ease-in-out;
+  
+  a:hover {
+    color: #555!important;
+    text-decoration: underline!important;
   }
   

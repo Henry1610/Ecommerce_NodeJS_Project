@@ -5,11 +5,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 function Login() {
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { token, loading, error } = useSelector((state) => state.auth);
+    const { token } = useSelector((state) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -24,11 +23,11 @@ function Login() {
                     icon: 'success',
                     title: 'Đăng nhập thành công!',
                 });
-    
+
                 if (user?.role === "admin") {
-                    navigate('/admin/dashboard'); 
+                    navigate('/admin/dashboard');
                 } else {
-                    navigate('/'); 
+                    navigate('/');
                 }
             }
         } catch (error) {
@@ -40,7 +39,6 @@ function Login() {
             });
         }
     };
-    
 
     useEffect(() => {
         if (token) {
@@ -49,62 +47,64 @@ function Login() {
     }, [token, navigate]);
 
     return (
+        <div className="container mt-2">
+            <nav aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                    <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+                    <li className="breadcrumb-item active" aria-current="page">Login</li>
+                </ol>
+            </nav>
 
-        <div>
-            <div class="breadcrumb-area">
-                <div className="container ">
-                    <div class="breadcrumb-content">
-                        <ul>
-                            <li><a href="index.html">Home</a></li>
-                            <li class="active">Login </li>
-                        </ul>
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="page-section mb-60">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12 col-md-12 col-xs-12 col-lg-6 mb-30">
-                            <form onSubmit={handleLogin} >
-                                <div class="login-form">
-                                    <h4 class="login-title">Login</h4>
-                                    <div class="row">
-                                        <div class="col-md-12 col-12 mb-20">
-                                            <label>Email Address*</label>
-                                            <input class="mb-0" type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} />
-                                        </div>
-                                        <div class="col-12 mb-20">
-                                            <label>Password</label>
-                                            <input class="mb-0" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="check-box d-inline-block ml-0 ml-md-2 mt-10">
-                                                <input type="checkbox" id="remember_me" />
-                                                <label for="remember_me">Remember me</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mt-10 mb-20 text-left text-md-right">
-                                            <a href="#"> Forgotten pasward?</a>
-                                        </div>
-                                        <div className="d-flex justify-content-between w-100">
-                                            <div class="col-md-6">
-                                                <button class="register-button mt-0">Login</button>
-                                            </div>
-                                            <div className="d-flex justify-content-end">
-                                                <p>Don't have an account? <Link to="/register" className="register-link">Register here</Link></p>
-                                            </div>
-                                        </div>
-
-                                    </div>
+            <div className="row justify-content-center mb-4">
+                <div className="col-md-6">
+                    <div className="card ">
+                        <div className="card-body">
+                            <h4 className="card-title mb-4 text-center">Login</h4>
+                            <form onSubmit={handleLogin}>
+                                <div className="mb-3">
+                                    <label htmlFor="email" className="form-label">Email Address</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        id="email"
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="password" className="form-label">Password</label>
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id="password"
+                                        placeholder="Enter your password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3 form-check">
+                                    <input type="checkbox" className="form-check-input" id="remember_me" />
+                                    <label className="form-check-label" htmlFor="remember_me">Remember me</label>
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="#">Forgot password?</a>
+                                </div>
+                                <div className="d-grid gap-2">
+                                    <button type="submit" className="btn btn-warning fw-bold ">Login</button>
                                 </div>
                             </form>
+                            <div className="mt-3 text-center">
+                                <p>Don't have an account? <Link to="/register" >Register here</Link></p>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
-        </div>)
+        </div>
+    );
 }
-export default Login
+
+export default Login;

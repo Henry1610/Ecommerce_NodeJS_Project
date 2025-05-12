@@ -1,21 +1,19 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../../../redux/auth/authSlice';
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Link, useLocation } from 'react-router-dom';
+    
 
 function Header() {
     const token = useSelector((state) => state.auth.token);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const isAuthenticated = !!token;
 
     const handleLogout = () => {
-        dispatch(logout()); 
+        dispatch(logout());
         navigate('/login');
     };
 
@@ -34,8 +32,8 @@ function Header() {
                         <div className="col-lg-9 col-md-8">
                             <div className="d-flex justify-content-end">
                                 {isAuthenticated && (
-                                    <button 
-                                        className="btn btn-warning text-dark border fw-bold" 
+                                    <button
+                                        className="btn btn-warning text-dark border fw-bold"
                                         onClick={handleLogout}
                                     >
                                         Log out
@@ -88,7 +86,7 @@ function Header() {
                                         {/* Wishlist */}
                                         <li className="me-4">
                                             <Link to="/wishlist" className="position-relative d-inline-block">
-                                            <i className="far fa-heart fs-4 text-warning"></i>
+                                                <i className="far fa-heart fs-4 text-warning"></i>
                                                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
                                                     2
                                                 </span>
@@ -104,10 +102,10 @@ function Header() {
                                                     2
                                                 </span>
                                             </button>
-                                            <div className="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style={{minWidth: "300px"}}>
+                                            <div className="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style={{ minWidth: "300px" }}>
                                                 <ul className="list-unstyled mb-3">
                                                     <li className="d-flex align-items-center mb-3">
-                                                        <img src="/images/product/small-size/5.jpg" alt="cart product" className="img-fluid me-3" style={{width: "60px"}} />
+                                                        <img src="/images/product/small-size/5.jpg" alt="cart product" className="img-fluid me-3" style={{ width: "60px" }} />
                                                         <div className="flex-grow-1">
                                                             <h6 className="mb-0"><a href="#" className="text-decoration-none">Aenean eu tristique</a></h6>
                                                             <span className="text-warning">£40 x 1</span>
@@ -117,7 +115,7 @@ function Header() {
                                                         </button>
                                                     </li>
                                                     <li className="d-flex align-items-center">
-                                                        <img src="/images/product/small-size/6.jpg" alt="cart product" className="img-fluid me-3" style={{width: "60px"}} />
+                                                        <img src="/images/product/small-size/6.jpg" alt="cart product" className="img-fluid me-3" style={{ width: "60px" }} />
                                                         <div className="flex-grow-1">
                                                             <h6 className="mb-0"><a href="#" className="text-decoration-none">Aenean eu tristique</a></h6>
                                                             <span className="text-warning">£40 x 1</span>
@@ -142,12 +140,18 @@ function Header() {
                                 <div className="d-flex justify-content-end">
                                     <div className="row g-2 w-50">
                                         <div className="col-6">
-                                            <Link to="/login" className="btn btn-warning w-100 fw-bold text-dark opacity-75">
+                                            <Link
+                                                to="/login"
+                                                className={`btn ${location.pathname === '/login' ? 'btn-warning' : 'btn-outline-warning'} w-100 fw-bold text-dark opacity-75`}
+                                            >
                                                 Login
                                             </Link>
                                         </div>
                                         <div className="col-6">
-                                            <Link to="/register" className="btn btn-outline-warning w-100 fw-bold text-dark opacity-75">
+                                            <Link
+                                                to="/register"
+                                                className={`btn ${location.pathname === '/register' ? 'btn-warning' : 'btn-outline-warning'} w-100 fw-bold text-dark opacity-75`}
+                                            >
                                                 Register
                                             </Link>
                                         </div>
