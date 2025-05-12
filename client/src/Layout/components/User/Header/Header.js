@@ -3,305 +3,270 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from '../../../../redux/auth/authSlice';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 function Header() {
     const token = useSelector((state) => state.auth.token);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-  const isAuthenticated = !!token;
+    const isAuthenticated = !!token;
 
-  const handleLogout = () => {
-    dispatch(logout()); 
-    navigate('/login');
-  };
+    const handleLogout = () => {
+        dispatch(logout()); 
+        navigate('/login');
+    };
+
     return (
         <header>
-
-            <div class="header-top">
-                <div class="container">
-                    <div class="row">
-
-                        <div class="col-lg-3 col-md-4">
-                            <div class="header-top-left">
-                                <ul class="phone-wrap">
-                                    <li><span>Telephone Enquiry:</span><a href="#">(+123) 123 321 345</a></li>
-                                </ul>
+            {/* Header Top */}
+            <div className="bg-light py-2">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-3 col-md-4">
+                            <div className="d-flex align-items-center">
+                                <span className="me-2">Telephone Enquiry:</span>
+                                <a href="#" className="text-decoration-none text-warning">(+123) 123 321 345</a>
                             </div>
                         </div>
-
-                        <div class="col-lg-9 col-md-8">
-                            <div class="header-top-right">
-                                <ul class="ht-menu">
-                                    
-
-                                    
-
-                                    {isAuthenticated ? (<button className="d-block text-center border   text-decoration-none fw-bold  bg-light" onClick={handleLogout}>Log out</button>
-                                    ) : (<></>)}
-
-                                </ul>
+                        <div className="col-lg-9 col-md-8">
+                            <div className="d-flex justify-content-end">
+                                {isAuthenticated && (
+                                    <button 
+                                        className="btn btn-warning text-dark border fw-bold" 
+                                        onClick={handleLogout}
+                                    >
+                                        Log out
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="header-middle pl-sm-0 pr-sm-0 pl-xs-0 pr-xs-0">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="logo pb-sm-30 pb-xs-30">
-                                <a href="/">
-                                    <img src="images/menu/logo/1.jpg" alt="" />
-                                </a>
+            {/* Header Middle */}
+            <div className="py-3">
+                <div className="container">
+                    <div className="row align-items-center">
+                        {/* Logo */}
+                        <div className="col-lg-3">
+                            <div className="logo">
+                                <Link to="/">
+                                    <img src="/images/menu/logo/1.jpg" alt="Logo" />
+                                </Link>
                             </div>
                         </div>
 
-                        <div class="col-lg-9 pl-0 ml-sm-15 ml-xs-15">
-                            <form action="#" class="hm-searchbox">
-                                <select class="nice-select select-search-category">
-                                    <option value="0">All</option>
-                                    <option value="10">Laptops</option>
-                                    <option value="17">- -  Prime Video</option>
-                                    <option value="20">- - - -  All Videos</option>
-                                    <option value="21">- - - -  Blouses</option>
-                                    <option value="22">- - - -  Evening Dresses</option>
-                                    <option value="23">- - - -  Summer Dresses</option>
-                                    <option value="24">- - - -  T-shirts</option>
-                                    <option value="25">- - - -  Rent or Buy</option>
-                                    <option value="26">- - - -  Your Watchlist</option>
-                                    <option value="27">- - - -  Watch Anywhere</option>
-                                    <option value="28">- - - -  Getting Started</option>
-                                    <option value="18">- - - -  Computers</option>
-                                    <option value="29">- - - -  More to Explore</option>
-                                    <option value="30">- - - -  TV &amp; Video</option>
-                                    <option value="31">- - - -  Audio &amp; Theater</option>
-                                    <option value="32">- - - -  Camera, Photo </option>
-                                    <option value="33">- - - -  Cell Phones</option>
-                                    <option value="34">- - - -  Headphones</option>
-                                    <option value="35">- - - -  Video Games</option>
-                                    <option value="36">- - - -  Wireless Speakers</option>
-                                    <option value="19">- - - -  Electronics</option>
-                                    <option value="37">- - - -  Amazon Home</option>
-                                    <option value="38">- - - -  Kitchen &amp; Dining</option>
-                                    <option value="39">- - - -  Furniture</option>
-                                    <option value="40">- - - -  Bed &amp; Bath</option>
-                                    <option value="41">- - - -  Appliances</option>
-                                    <option value="11">TV &amp; Audio</option>
-                                    <option value="42">- -  Chamcham</option>
-                                    <option value="45">- - - -  Office</option>
-                                    <option value="47">- - - -  Gaming</option>
-                                    <option value="48">- - - -  Chromebook</option>
-                                    <option value="49">- - - -  Refurbished</option>
-                                    <option value="50">- - - -  Touchscreen</option>
-                                    <option value="51">- - - -  Ultrabooks</option>
-                                    <option value="52">- - - -  Blouses</option>
-                                    <option value="43">- -  Sanai</option>
-                                    <option value="53">- - - -  Hard Drives</option>
-                                    <option value="54">- - - -  Graphic Cards</option>
-                                    <option value="55">- - - -  Processors (CPU)</option>
-                                    <option value="56">- - - -  Memory</option>
-                                    <option value="57">- - - -  Motherboards</option>
-                                    <option value="58">- - - -  Fans &amp; Cooling</option>
-                                    <option value="59">- - - -  CD/DVD Drives</option>
-                                    <option value="44">- -  Meito</option>
-                                    <option value="60">- - - -  Sound Cards</option>
-                                    <option value="61">- - - -  Cases &amp; Towers</option>
-                                    <option value="62">- - - -  Casual Dresses</option>
-                                    <option value="63">- - - -  Evening Dresses</option>
-                                    <option value="64">- - - -  T-shirts</option>
-                                    <option value="65">- - - -  Tops</option>
-                                    <option value="12">Smartphone</option>
-                                    <option value="66">- -  Camera Accessories</option>
-                                    <option value="68">- - - -  Octa Core</option>
-                                    <option value="69">- - - -  Quad Core</option>
-                                    <option value="70">- - - -  Dual Core</option>
-                                    <option value="71">- - - -  7.0 Screen</option>
-                                    <option value="72">- - - -  9.0 Screen</option>
-                                    <option value="73">- - - -  Bags &amp; Cases</option>
-                                    <option value="67">- -  XailStation</option>
-                                    <option value="74">- - - -  Batteries</option>
-                                    <option value="75">- - - -  Microphones</option>
-                                    <option value="76">- - - -  Stabilizers</option>
-                                    <option value="77">- - - -  Video Tapes</option>
-                                    <option value="78">- - - -  Memory Card Readers</option>
-                                    <option value="79">- - - -  Tripods</option>
-                                    <option value="13">Cameras</option>
-                                    <option value="14">headphone</option>
-                                    <option value="15">Smartwatch</option>
-                                    <option value="16">Accessories</option>
-                                </select>
-                                <input type="text" placeholder="Enter your search key ..." />
+                        {/* Search and Account */}
+                        <div className="col-lg-9">
+                            {/* Search Box */}
+                            <div className="mb-3">
+                                <div className="input-group">
+                                    <select className="form-select w-25 border-warning">
+                                        <option value="0">All</option>
+                                        <option value="10">Laptops</option>
+                                        <option value="12">Smartphone</option>
+                                        <option value="13">Cameras</option>
+                                        <option value="14">Headphone</option>
+                                        <option value="15">Smartwatch</option>
+                                        <option value="16">Accessories</option>
+                                    </select>
+                                    <input type="text" className="form-control border-warning" placeholder="Enter your search key..." />
+                                    <button className="btn btn-warning text-dark" type="submit">
+                                        <i className="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
 
-                                <button class="li-btn" type="submit"><i class="fa fa-search"></i></button>
+                            {/* Account Area */}
+                            {isAuthenticated ? (
+                                <div className="d-flex justify-content-end">
+                                    <ul className="list-unstyled d-flex mb-0">
+                                        {/* Wishlist */}
+                                        <li className="me-4">
+                                            <Link to="/wishlist" className="position-relative d-inline-block">
+                                            <i className="far fa-heart fs-4 text-warning"></i>
+                                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                                                    2
+                                                </span>
+                                            </Link>
+                                        </li>
 
-                            </form>
-
-                            {
-                                isAuthenticated ? (
-
-                                    <div class="header-middle-right">
-                                        <ul class="hm-menu">
-                                            <li class="hm-wishlist">
-                                                <Link  to="/wishlist">
-                                                    <span class="cart-item-count wishlist-item-count">0</span>
-                                                    <i class="fa fa-heart-o"></i>
-                                                </Link>
-                                            </li>
-
-                                            <li class="hm-minicart">
-                                                <div class="hm-minicart-trigger">
-                                                    <span class="item-icon"></span>
-                                                    <span class="item-text">£80.00
-                                                        <span class="cart-item-count">2</span>
-                                                    </span>
+                                        {/* Mini Cart */}
+                                        <li className="dropdown">
+                                            <button className="btn btn-light dropdown-toggle position-relative" type="button" id="cartDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i className="fas fa-shopping-cart me-2 text-warning"></i>
+                                                <span className="text-warning">£80.00</span>
+                                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                                                    2
+                                                </span>
+                                            </button>
+                                            <div className="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style={{minWidth: "300px"}}>
+                                                <ul className="list-unstyled mb-3">
+                                                    <li className="d-flex align-items-center mb-3">
+                                                        <img src="/images/product/small-size/5.jpg" alt="cart product" className="img-fluid me-3" style={{width: "60px"}} />
+                                                        <div className="flex-grow-1">
+                                                            <h6 className="mb-0"><a href="#" className="text-decoration-none">Aenean eu tristique</a></h6>
+                                                            <span className="text-warning">£40 x 1</span>
+                                                        </div>
+                                                        <button className="btn btn-sm text-danger">
+                                                            <i className="fas fa-times"></i>
+                                                        </button>
+                                                    </li>
+                                                    <li className="d-flex align-items-center">
+                                                        <img src="/images/product/small-size/6.jpg" alt="cart product" className="img-fluid me-3" style={{width: "60px"}} />
+                                                        <div className="flex-grow-1">
+                                                            <h6 className="mb-0"><a href="#" className="text-decoration-none">Aenean eu tristique</a></h6>
+                                                            <span className="text-warning">£40 x 1</span>
+                                                        </div>
+                                                        <button className="btn btn-sm text-danger">
+                                                            <i className="fas fa-times"></i>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                                <p className="d-flex justify-content-between fw-bold mb-3">
+                                                    SUBTOTAL: <span className="text-warning">£80.00</span>
+                                                </p>
+                                                <div className="d-grid gap-2">
+                                                    <Link to="/cart" className="btn btn-outline-warning">View Full Cart</Link>
+                                                    <a href="checkout.html" className="btn btn-warning text-dark">Checkout</a>
                                                 </div>
-
-                                                <span></span>
-                                                <div class="minicart">
-                                                    <ul class="minicart-product-list">
-                                                        <li>
-                                                            <a href="single-product.html" class="minicart-product-image">
-                                                                <img src="images/product/small-size/5.jpg" alt="cart products" />
-                                                            </a>
-                                                            <div class="minicart-product-details">
-                                                                <h6><a href="single-product.html">Aenean eu tristique</a></h6>
-                                                                <span>£40 x 1</span>
-                                                            </div>
-                                                            <button class="close" title="Remove">
-                                                                <i class="fa fa-close"></i>
-                                                            </button>
-                                                        </li>
-                                                        <li>
-                                                            <a href="single-product.html" class="minicart-product-image">
-                                                                <img src="images/product/small-size/6.jpg" alt="cart products" />
-                                                            </a>
-                                                            <div class="minicart-product-details">
-                                                                <h6><a href="single-product.html">Aenean eu tristique</a></h6>
-                                                                <span>£40 x 1</span>
-                                                            </div>
-                                                            <button class="close" title="Remove">
-                                                                <i class="fa fa-close"></i>
-                                                            </button>
-                                                        </li>
-                                                    </ul>
-                                                    <p class="minicart-total">SUBTOTAL: <span>£80.00</span></p>
-                                                    <div class="minicart-button">
-                                                        <Link href="/cart" class="li-button li-button-fullwidth li-button-dark">
-                                                            <span>View Full Cart</span>
-                                                        </Link>
-                                                        <a href="checkout.html" class="li-button li-button-fullwidth">
-                                                            <span>Checkout</span>
-                                                        </a>
-                                                    </div>
-
-
-                                                </div>
-                                            </li>
-
-                                        </ul>
-
-                                    </div>
-
-                                ) : (
-                                    <div className=" justify-content-center justify-content-center align-items-center gap-2 row">
-                                       
-                                            <Link
-                                                to="/login"
-                                                className="text-center   text-dark  fw-bold opacity-50 text-decoration-none  col-md-6 bg-light"
-                                            >
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            ) : (
+                                <div className="d-flex justify-content-end">
+                                    <div className="row g-2 w-50">
+                                        <div className="col-6">
+                                            <Link to="/login" className="btn btn-warning w-100 fw-bold text-dark opacity-75">
                                                 Login
                                             </Link>
-                                        
-
-                                      
-                                            <Link
-                                                to="/register"
-                                                className="text-center    text-dark  fw-bold opacity-50 text-decoration-none   col-md-6  bg-light"
-                                            >
+                                        </div>
+                                        <div className="col-6">
+                                            <Link to="/register" className="btn btn-outline-warning w-100 fw-bold text-dark opacity-75">
                                                 Register
                                             </Link>
-                                        
+                                        </div>
                                     </div>
-                                )
-                            }
-
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="header-bottom header-sticky d-none d-lg-block d-xl-block">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="hb-menu">
-                                <nav>
-                                    <ul>
-                                        <li class="dropdown-holder"><a href="/">Home</a>
-                                            <ul class="hb-dropdown">
-                                                <li class="active"><a href="index.html">Home One</a></li>
-                                                <li><a href="index-2.html">Home Two</a></li>
-                                                <li><a href="index-3.html">Home Three</a></li>
-                                                <li><a href="index-4.html">Home Four</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="megamenu-holder"><a href="/product">Shop</a>
-                                            <ul class="megamenu hb-megamenu">
-                                                <li><a href="shop-left-sidebar.html">Shop Page Layout</a>
-                                                    <ul>
-                                                        <li><a href="shop-3-column.html">Shop 3 Column</a></li>
-                                                        <li><a href="shop-4-column.html">Shop 4 Column</a></li>
-                                                        <li><a href="shop-left-sidebar.html">Shop Left Sidebar</a></li>
-                                                        <li><a href="shop-right-sidebar.html">Shop Right Sidebar</a></li>
-                                                        <li><a href="shop-list.html">Shop List</a></li>
-                                                        <li><a href="shop-list-left-sidebar.html">Shop List Left Sidebar</a></li>
-                                                        <li><a href="shop-list-right-sidebar.html">Shop List Right Sidebar</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="single-product-gallery-left.html">Single Product Style</a>
-                                                    <ul>
-                                                        <li><a href="single-product-carousel.html">Single Product Carousel</a></li>
-                                                        <li><a href="single-product-gallery-left.html">Single Product Gallery Left</a></li>
-                                                        <li><a href="single-product-gallery-right.html">Single Product Gallery Right</a></li>
-                                                        <li><a href="single-product-tab-style-top.html">Single Product Tab Style Top</a></li>
-                                                        <li><a href="single-product-tab-style-left.html">Single Product Tab Style Left</a></li>
-                                                        <li><a href="single-product-tab-style-right.html">Single Product Tab Style Right</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="single-product.html">Single Products</a>
-                                                    <ul>
-                                                        <li><a href="single-product.html">Single Product</a></li>
-                                                        <li><a href="single-product-sale.html">Single Product Sale</a></li>
-                                                        <li><a href="single-product-group.html">Single Product Group</a></li>
-                                                        <li><a href="single-product-normal.html">Single Product Normal</a></li>
-                                                        <li><a href="single-product-affiliate.html">Single Product Affiliate</a></li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        
-                                        
-                                        <li><a href="/about-us">About Us</a></li>
-                                        <li><a href="/contact">Contact</a></li>
-                                        
+            {/* Header Bottom / Main Menu - Desktop */}
+            <nav className="navbar navbar-expand-lg navbar-light bg-light d-none d-lg-block border-top border-bottom">
+                <div className="container">
+                    <div className="collapse navbar-collapse">
+                        <ul className="navbar-nav">
+                            {/* Home */}
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle text-warning" href="/" id="homeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Home
+                                </a>
+                                <ul className="dropdown-menu" aria-labelledby="homeDropdown">
+                                    <li><a className="dropdown-item active bg-warning text-dark" href="index.html">Home One</a></li>
+                                    <li><a className="dropdown-item" href="index-2.html">Home Two</a></li>
+                                    <li><a className="dropdown-item" href="index-3.html">Home Three</a></li>
+                                    <li><a className="dropdown-item" href="index-4.html">Home Four</a></li>
+                                </ul>
+                            </li>
+
+                            {/* Shop */}
+                            <li className="nav-item dropdown position-static">
+                                <a className="nav-link dropdown-toggle text-warning" href="/product" id="shopDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Shop
+                                </a>
+                                <div className="dropdown-menu w-100" aria-labelledby="shopDropdown">
+                                    <div className="container">
+                                        <div className="row">
+                                            <div className="col-md-4">
+                                                <h6 className="dropdown-header text-warning">Shop Page Layout</h6>
+                                                <a className="dropdown-item" href="shop-3-column.html">Shop 3 Column</a>
+                                                <a className="dropdown-item" href="shop-4-column.html">Shop 4 Column</a>
+                                                <a className="dropdown-item" href="shop-left-sidebar.html">Shop Left Sidebar</a>
+                                                <a className="dropdown-item" href="shop-right-sidebar.html">Shop Right Sidebar</a>
+                                                <a className="dropdown-item" href="shop-list.html">Shop List</a>
+                                                <a className="dropdown-item" href="shop-list-left-sidebar.html">Shop List Left Sidebar</a>
+                                                <a className="dropdown-item" href="shop-list-right-sidebar.html">Shop List Right Sidebar</a>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <h6 className="dropdown-header text-warning">Single Product Style</h6>
+                                                <a className="dropdown-item" href="single-product-carousel.html">Single Product Carousel</a>
+                                                <a className="dropdown-item" href="single-product-gallery-left.html">Single Product Gallery Left</a>
+                                                <a className="dropdown-item" href="single-product-gallery-right.html">Single Product Gallery Right</a>
+                                                <a className="dropdown-item" href="single-product-tab-style-top.html">Single Product Tab Style Top</a>
+                                                <a className="dropdown-item" href="single-product-tab-style-left.html">Single Product Tab Style Left</a>
+                                                <a className="dropdown-item" href="single-product-tab-style-right.html">Single Product Tab Style Right</a>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <h6 className="dropdown-header text-warning">Single Products</h6>
+                                                <a className="dropdown-item" href="single-product.html">Single Product</a>
+                                                <a className="dropdown-item" href="single-product-sale.html">Single Product Sale</a>
+                                                <a className="dropdown-item" href="single-product-group.html">Single Product Group</a>
+                                                <a className="dropdown-item" href="single-product-normal.html">Single Product Normal</a>
+                                                <a className="dropdown-item" href="single-product-affiliate.html">Single Product Affiliate</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            {/* About Us */}
+                            <li className="nav-item">
+                                <a className="nav-link text-warning" href="/about-us">About Us</a>
+                            </li>
+
+                            {/* Contact */}
+                            <li className="nav-item">
+                                <a className="nav-link text-warning" href="/contact">Contact</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Mobile Menu */}
+            <div className="d-lg-none">
+                <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                    <div className="container">
+                        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+                            <span className="navbar-toggler-icon"></span>
+                        </button>
+                        <div className="collapse navbar-collapse" id="mobileMenu">
+                            <ul className="navbar-nav">
+                                <li className="nav-item dropdown">
+                                    <a className="nav-link dropdown-toggle text-warning" href="/" id="mobileHomeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Home
+                                    </a>
+                                    <ul className="dropdown-menu" aria-labelledby="mobileHomeDropdown">
+                                        <li><a className="dropdown-item" href="index.html">Home One</a></li>
+                                        <li><a className="dropdown-item" href="index-2.html">Home Two</a></li>
+                                        <li><a className="dropdown-item" href="index-3.html">Home Three</a></li>
+                                        <li><a className="dropdown-item" href="index-4.html">Home Four</a></li>
                                     </ul>
-                                </nav>
-                            </div>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link text-warning" href="/product">Shop</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link text-warning" href="/about-us">About Us</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link text-warning" href="/contact">Contact</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="mobile-menu-area d-lg-none d-xl-none col-12">
-                <div class="container">
-                    <div class="row">
-                        <div class="mobile-menu">
-                        </div>
-                    </div>
-                </div>
+                </nav>
             </div>
         </header>
-    )
+    );
 }
+
 export default Header;

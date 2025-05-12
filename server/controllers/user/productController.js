@@ -2,8 +2,9 @@ import Product from '../../models/Product.js';
 // [GET] /api/user/products
 
 export const getAllProducts=async(req,res)=>{
+  
     try{
-        const products=Product.find()
+        const products=await Product.find()
         .populate('category')
         .populate('brand')
         .sort({ createdAt: -1 }); 
