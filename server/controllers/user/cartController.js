@@ -1,10 +1,23 @@
 import Cart from '../../models/Cart.js';
 
-// [PUT] /api/users/cart/add
+export const getCart = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+    if (!cart) return res.json({ items: [] });
+
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Không thể lấy giỏ hàng', error });
+  }
+};
+
 export const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
-  const userId = req.user._id;
 
+  const userId = req.user.id;
   try {
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
@@ -22,13 +35,14 @@ export const addToCart = async (req, res) => {
     await cart.save();
     res.json(cart);
   } catch (error) {
+    console.error("Error adding to cart:", error); // Log thêm lỗi để debug
+
     res.status(500).json({ message: 'Không thể thêm vào giỏ hàng', error });
   }
 };
 
-// [PUT] /api/users/cart/update
 export const updateQuantity = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const { productId, quantity } = req.body;
 
   try {
@@ -47,10 +61,9 @@ export const updateQuantity = async (req, res) => {
   }
 };
 
-// [DELETE] /api/users/cart/remove/:productId
 export const removeFromCart = async (req, res) => {
   const { productId } = req.params;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   try {
     const cart = await Cart.findOneAndUpdate(
@@ -65,16 +78,19 @@ export const removeFromCart = async (req, res) => {
   }
 };
 
-// [GET] /api/users/cart
-export const getCart = async (req, res) => {
-  const userId = req.user._id;
+// export const initCart = async (req, res) => {
+//   const userId = req.user._id;
 
-  try {
-    const cart = await Cart.findOne({ user: userId }).populate('items.product');
-    if (!cart) return res.json({ items: [] });
+//   try {
+//     const existingCart = await Cart.findOne({ user: userId });
+//     if (existingCart) return res.status(400).json({ message: 'Giỏ hàng đã tồn tại' });
 
-    res.json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Không thể lấy giỏ hàng', error });
-  }
-};
+//     const newCart = new Cart({ user: userId, items: [] });
+//     await newCart.save();
+
+//     res.status(201).json({ message: 'Đã tạo giỏ hàng rỗng', cart: newCart });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Không thể tạo giỏ hàng', error });
+//   }
+// };
+

@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts', async (_, thunkAPI) => {
         try {
-            console.log('Fetching products list...');
             const res = await fetch('http://localhost:5000/api/users/products'
                 , {
                     method: 'GET',
@@ -31,7 +30,6 @@ export const fetchProducts = createAsyncThunk(
 export const fetchProductById = createAsyncThunk(
     'products/fetchProductById', async (productId, thunkAPI) => {
         try {
-            console.log('Fetching product by ID:', productId);
             const res = await fetch(`http://localhost:5000/api/users/products/${productId}`
                 , {
                     method: 'GET',
@@ -41,7 +39,6 @@ export const fetchProductById = createAsyncThunk(
                 }
             )
             const data = await res.json();
-            console.log('Product data received:', data);
 
             if (!res.ok) {
                 console.error('Error fetching product:', data);

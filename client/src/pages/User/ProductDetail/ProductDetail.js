@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs } from 'swiper/modules';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from "react-redux"
 import { useParams } from 'react-router-dom';
@@ -11,23 +11,31 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/thumbs';
 
+
 function ProductDetail() {
     const dispatch = useDispatch();
     const { productId } = useParams();
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const [activeTab, setActiveTab] = useState('description');
     const { product, loading, error } = useSelector((state) => state.products);
+    
+    // Tham chiếu đến các tab
+    const tabsRef = useRef(null);
 
     useEffect(() => {
         if (productId) {
-            console.log('Fetching product with ID:', productId);
             dispatch(fetchProductById(productId));
         }
         
         return () => {
-            console.log('Component unmounting, resetting product state');
             dispatch(resetProductDetail());
         };
     }, [dispatch, productId]);
+
+    // Xử lý khi tab được chọn
+    const handleTabClick = (tabId) => {
+        setActiveTab(tabId);
+    };
 
     if (loading) return <div className="container py-5 text-center"><div className="spinner-border text-warning" role="status"></div></div>;
     if (error) return <div className="container py-5 text-center text-danger">Lỗi: {error}</div>;
@@ -178,9 +186,9 @@ function ProductDetail() {
                                 ))}
                             </ul>
                         </div>
-                                <a onClick={(e) => e.preventDefault()} className="text-decoration-none small">Đọc đánh giá ({product?.numReviews || 0})</a>
+                                <Link onClick={(e) => e.preventDefault()} className="text-decoration-none small">Đọc đánh giá ({product?.numReviews || 0})</Link>
                                 <span className="mx-2">|</span>
-                                <a onClick={(e) => e.preventDefault()} className="text-decoration-none small">Viết đánh giá</a>
+                                <Link onClick={(e) => e.preventDefault()} className="text-decoration-none small">Viết đánh giá</Link>
                             </div>
                             
                             <div className="mb-3">
@@ -278,29 +286,59 @@ function ProductDetail() {
                 {/* Product Tabs */}
                 <div className="row mb-5">
                     <div className="col-12">
-                        <ul className="nav nav-tabs border-0 mb-3" id="productTab" role="tablist">
+                        <ul className="nav nav-tabs border-0 mb-3" id="productTab" role="tablist" ref={tabsRef}>
                             <li className="nav-item" role="presentation">
-                                <button className="nav-link active fw-bold text-dark" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Mô tả</button>
+                                <button 
+                                    className={`nav-link fw-bold text-dark ${activeTab === 'description' ? 'active' : ''}`} 
+                                    id="description-tab" 
+                                    onClick={() => handleTabClick('description')}
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="description" 
+                                    aria-selected={activeTab === 'description'}
+                                >
+                                    Mô tả
+                                </button>
                             </li>
                             <li className="nav-item" role="presentation">
-                                <button className="nav-link fw-bold text-dark" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">Chi tiết sản phẩm</button>
+                                <button 
+                                    className={`nav-link fw-bold text-dark ${activeTab === 'details' ? 'active' : ''}`} 
+                                    id="details-tab" 
+                                    onClick={() => handleTabClick('details')}
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="details" 
+                                    aria-selected={activeTab === 'details'}
+                                >
+                                    Chi tiết sản phẩm
+                                </button>
                             </li>
                             <li className="nav-item" role="presentation">
-                                <button className="nav-link fw-bold text-dark" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Đánh giá</button>
+                                <button 
+                                    className={`nav-link fw-bold text-dark ${activeTab === 'reviews' ? 'active' : ''}`} 
+                                    id="reviews-tab" 
+                                    onClick={() => handleTabClick('reviews')}
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="reviews" 
+                                    aria-selected={activeTab === 'reviews'}
+                                >
+                                    Đánh giá
+                                </button>
                             </li>
                         </ul>
                         <div className="tab-content border p-4 rounded shadow-sm" id="productTabContent">
-                            <div className="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <div className={`tab-pane fade ${activeTab === 'description' ? 'show active' : ''}`} id="description" role="tabpanel" aria-labelledby="description-tab">
                                 <p>The best is yet to come! Give your walls a voice with a framed poster. This aesthethic, optimistic poster will look great in your desk or in an open-space office. Painted wooden frame with passe-partout for more depth.</p>
                             </div>
-                            <div className="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                            <div className={`tab-pane fade ${activeTab === 'details' ? 'show active' : ''}`} id="details" role="tabpanel" aria-labelledby="details-tab">
                                 <div className="d-flex flex-column">
                                     <img src="/images/product-details/1.jpg" alt="Manufacturer Image" className="img-fluid mb-3" style={{maxWidth: "200px"}} />
                                     <p><strong>Mã sản phẩm:</strong> demo_7</p>
                                     <p><strong>Thương hiệu:</strong> Studio Design</p>
                                 </div>
                             </div>
-                            <div className="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                            <div className={`tab-pane fade ${activeTab === 'reviews' ? 'show active' : ''}`} id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                                 <div id="review-section">
                                     <div className="border-bottom mb-4 pb-4">
                                         <div className="d-flex align-items-center mb-3">
@@ -332,16 +370,16 @@ function ProductDetail() {
                                             </div>
                                         </div>
                                         <div className="mb-3">
-                                            <label for="review-text" className="form-label">Nội dung đánh giá *</label>
+                                            <label htmlFor="review-text" className="form-label">Nội dung đánh giá *</label>
                                             <textarea className="form-control border-warning" id="review-text" rows="4" required></textarea>
                                         </div>
                                         <div className="row">
                                             <div className="col-md-6 mb-3">
-                                                <label for="review-name" className="form-label">Tên của bạn *</label>
+                                                <label htmlFor="review-name" className="form-label">Tên của bạn *</label>
                                                 <input type="text" className="form-control border-warning" id="review-name" required />
                                             </div>
                                             <div className="col-md-6 mb-3">
-                                                <label for="review-email" className="form-label">Email *</label>
+                                                <label htmlFor="review-email" className="form-label">Email *</label>
                                                 <input type="email" className="form-control border-warning" id="review-email" required />
                                             </div>
                                         </div>

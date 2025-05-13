@@ -1,0 +1,25 @@
+/* Cart.css */
+.custom-yellow {
+    color: #ffc017 !important;
+  }
+  
+  .custom-btn-yellow {
+    background-color: #ffc017 !important;
+    border: none;
+  }
+  
+  .custom-btn-yellow:hover {
+    background-color: #e0aa14 !important;
+  }
+  
+  .custom-btn-outline-yellow {
+    border: 1px solid #ffc017 !important;
+    color: #ffc017 !important;
+    background-color: transparent;
+  }
+  
+  .custom-btn-outline-yellow:hover {
+    background-color: #ffc017 !important;
+    color: white !important;
+  }
+  

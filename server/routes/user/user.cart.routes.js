@@ -3,14 +3,16 @@ import {
   getCart,
   addToCart,
   updateQuantity,
-  removeFromCart
+  removeFromCart,
+  // initCart
 } from '../../controllers/user/cartController.js';
 
 const router = express.Router();
 
 router.get('/', getCart);
-router.put('/add', addToCart);
+router.post('/add', addToCart);
 router.put('/update', updateQuantity);
 router.delete('/remove/:productId', removeFromCart);
+// router.post('/init', initCart);
 
 export default router;

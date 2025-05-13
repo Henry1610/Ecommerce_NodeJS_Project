@@ -5,12 +5,18 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS của Toastify
+import { ToastContainer } from 'react-toastify';  // Import ToastContainer
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
+
     <React.StrictMode>
       <App />
     </React.StrictMode>
+    <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+
   </Provider>
 
 );

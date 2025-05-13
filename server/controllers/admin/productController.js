@@ -1,6 +1,7 @@
 import Product from '../../models/Product.js'
 import Review from '../../models/Review.js'
 export const getProducts = async (req, res) => {
+    
     try {
         const products = Product.find().populate('category brand');
         res.status(200).json(products)
@@ -10,6 +11,7 @@ export const getProducts = async (req, res) => {
 }
 export const getProductById = async (req, res) => {
     try {
+        
         const { id } = req.params;
         const product = await Product.findById(id)
             .populate('category') 
