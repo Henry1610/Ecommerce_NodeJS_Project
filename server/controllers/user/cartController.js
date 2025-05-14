@@ -40,45 +40,45 @@ export const addToCart = async (req, res) => {
     res.status(500).json({ message: 'Không thể thêm vào giỏ hàng', error });
   }
 };
-
-export const updateQuantity = async (req, res) => {
-  const userId = req.user.id;
-  const { productId, quantity } = req.body;
-
+export const setCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
+    const userId = req.user.id;
+    const items = req.body || [];
 
-    const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-    if (itemIndex === -1) return res.status(404).json({ message: 'Sản phẩm không có trong giỏ' });
+    // Lọc ra các item có quantity > 0
+    const validItems = items.filter(item => item.quantity > 0);
 
-    cart.items[itemIndex].quantity = quantity;
+    // Format lại giỏ hàng
+    const formattedItems = validItems.map(item => ({
+      product: item.productId,
+      quantity: item.quantity
+    }));
+
+    // Tìm giỏ hàng của user
+    let cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      cart = new Cart({ user: userId, items: formattedItems });
+    } else {
+      cart.items = formattedItems; // Ghi đè toàn bộ giỏ
+    }
 
     await cart.save();
-    res.json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Không thể cập nhật số lượng', error });
-  }
-};
 
-export const removeFromCart = async (req, res) => {
-  const { productId } = req.params;
-  const userId = req.user.id;
-
-  try {
-    const cart = await Cart.findOneAndUpdate(
-      { user: userId },
-      { $pull: { items: { product: productId } } },
-      { new: true }
-    );
 
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ message: 'Không thể xóa sản phẩm khỏi giỏ', error });
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi cập nhật giỏ hàng' });
   }
 };
 
-// export const initCart = async (req, res) => {
+
+
+
+
+
+
 //   const userId = req.user._id;
 
 //   try {

@@ -10,22 +10,33 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/thumbs';
-
+import { addToCart } from '../../../redux/cart/cartSlice';
+import { toast } from 'react-toastify';
 
 function ProductDetail() {
     const dispatch = useDispatch();
     const { productId } = useParams();
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
     const [activeTab, setActiveTab] = useState('description');
+    const [quantity, setQuantity] = useState(1);
     const { product, loading, error } = useSelector((state) => state.products);
     
     // Tham chiếu đến các tab
     const tabsRef = useRef(null);
 
     useEffect(() => {
-        if (productId) {
-            dispatch(fetchProductById(productId));
-        }
+        // Sửa lỗi useEffect async
+        const fetchProduct = () => {
+            if (productId) {
+                dispatch(fetchProductById(productId))
+                    .unwrap()
+                    .catch(error => {
+                        toast.error(`Lỗi khi tải sản phẩm: ${error}`);
+                    });
+            }
+        };
+        
+        fetchProduct();
         
         return () => {
             dispatch(resetProductDetail());
@@ -35,6 +46,33 @@ function ProductDetail() {
     // Xử lý khi tab được chọn
     const handleTabClick = (tabId) => {
         setActiveTab(tabId);
+    };
+
+    // Hàm tăng số lượng
+    const increaseQuantity = () => {
+        setQuantity(prev => prev + 1);
+    };
+
+    // Hàm giảm số lượng
+    const decreaseQuantity = () => {
+        if (quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };
+
+    // Hàm thêm vào giỏ hàng
+    const handleAddToCart = (e) => {
+        e.preventDefault();
+        if (product && quantity > 0) {
+            dispatch(addToCart({ productId: product._id, quantity }))
+                .unwrap()
+                .then(() => {
+                    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+                })
+                .catch(error => {
+                    toast.error(`Lỗi khi thêm vào giỏ hàng: ${error}`);
+                });
+        }
     };
 
     if (loading) return <div className="container py-5 text-center"><div className="spinner-border text-warning" role="status"></div></div>;
@@ -218,14 +256,20 @@ function ProductDetail() {
                                 </select>
                             </div>
                             
-                            <form className="mb-4">
+                            <form className="mb-4" onSubmit={handleAddToCart}>
                                 <div className="row align-items-center g-3">
                                     <div className="col-md-4 col-6">
                                         <label className="fw-bold mb-2">Số lượng:</label>
                                         <div className="input-group">
-                                            <button className="btn btn-outline-warning" type="button">-</button>
-                                            <input type="number" className="form-control text-center border-warning" value="1" min="1" />
-                                            <button className="btn btn-outline-warning" type="button">+</button>
+                                            <button className="btn btn-outline-warning" type="button" onClick={decreaseQuantity}>-</button>
+                                            <input 
+                                                type="number" 
+                                                className="form-control text-center border-warning" 
+                                                value={quantity} 
+                                                min="1" 
+                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                            />
+                                            <button className="btn btn-outline-warning" type="button" onClick={increaseQuantity}>+</button>
                                         </div>
                                     </div>
                                     <div className="col-md-8 col-12">

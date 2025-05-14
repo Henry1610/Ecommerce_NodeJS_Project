@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
     res.json({ user: req.user });
 });
 
-router.use('/carts', authenticate, cartRoutes);
+router.use('/cart', authenticate, cartRoutes);
 router.use('/users', authenticate, userRoutes);
 router.use('/discounts', authenticate, discountRoutes);
 // router.use('/orders', authenticate, orderRoutes);

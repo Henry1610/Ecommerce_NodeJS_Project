@@ -7,6 +7,9 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS của Toastify
 import { ToastContainer } from 'react-toastify';  // Import ToastContainer
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

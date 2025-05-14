@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
 
   try {
-    const res = await fetch('http://localhost:5000/api/users/carts', {
+    const res = await fetch('http://localhost:5000/api/users/cart', {
       method: 'GET',
 
       headers: {
@@ -20,53 +20,32 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) 
   }
 })
 
-export const updateCartItemQuantity = createAsyncThunk('cart/updateQuantity', async ({ productId, quantity }, thunkAPI) => {
-
+export const setCart = createAsyncThunk('cart/setCart', async ({ items }, thunkAPI) => {
   try {
-    const res = await fetch('http://localhost:5000/api/users/carts/update', {
-      method: 'PUT',
-
+    const res = await fetch('http://localhost:5000/api/users/cart/set', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ productId, quantity })
+      body: JSON.stringify({ items })
 
 
-    })
+    });
+
     const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message);
+    if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật giỏ hàng');
     return data;
   } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || 'Cập nhật thất bại');
+    return thunkAPI.rejectWithValue('Lỗi kết nối server');
 
   }
 })
-export const removeFromCart = createAsyncThunk(
-  'cart/removeFromCart',
-  async (productId, thunkAPI) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/users/carts/remove/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-      });
-      const data = await res.json();
-      if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi xóa sản phẩm');
-      return data;
-    } catch (err) {
-      return thunkAPI.rejectWithValue('Lỗi kết nối server');
-    }
-  }
-);
 export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, quantity }, thunkAPI) => {
   try {
     const token = localStorage.getItem('token')
 
-    const res = await fetch('http://localhost:5000/api/users/carts/add', {
+    const res = await fetch('http://localhost:5000/api/users/cart/add', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -88,7 +67,6 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, 
 
 })
 
-// export const initializeCart = createAsyncThunk('cart/initializeCart', async (_, thunkAPI) => {
 //     try {
 //         const res = await fetch('http://localhost:5000/api/users/cart/init', {
 //             method: 'POST',
@@ -114,65 +92,48 @@ const cartSlice = createSlice({
     error: null
   },
   reducers: {
-    resetCart: (state) => {
-      state.cart = null;
-      state.error = null;
+    setCartManual: (state, action) => {
+      state.cart = action.payload;
     }
   },
   extraReducers: builder => {
     builder
+      // FETCH CART
       .addCase(fetchCart.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.cart = action.payload; // Cập nhật giỏ hàng đầy đủ từ payload
+        state.cart = action.payload;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Lỗi nếu có
+        state.error = action.payload;
       })
-
+  
+      // ADD TO CART
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.cart = action.payload; // Cập nhật giỏ hàng sau khi thêm sản phẩm
+        state.cart = action.payload;
       })
       .addCase(addToCart.rejected, (state, action) => {
-        state.error = action.payload; // Lỗi nếu có
+        state.error = action.payload;
       })
-
-      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
-        // Cập nhật chỉ các item trong cart
-        const updatedItem = action.payload;
-        const itemIndex = state.cart.items.findIndex(item => item.product._id === updatedItem.product._id);
-        if (itemIndex !== -1) {
-          state.cart.items[itemIndex] = updatedItem; // Cập nhật lại item cụ thể
-        }
+  
+      // SET CART
+      .addCase(setCart.pending, (state) => {
+        state.loading = true;
       })
-      .addCase(updateCartItemQuantity.rejected, (state, action) => {
-        state.error = action.payload; // Lỗi nếu có
+      .addCase(setCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cart = action.payload;
       })
-
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.cart = action.payload; // Cập nhật giỏ hàng sau khi xóa sản phẩm
-      })
-      .addCase(removeFromCart.rejected, (state, action) => {
-        state.error = action.payload; // Lỗi nếu có
-      })
-
-
-    //   .addCase(initializeCart.pending, (state) => {
-    //     state.loading = true;
-    // })
-    // .addCase(initializeCart.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.items = [];
-    // })
-    // .addCase(initializeCart.rejected, (state, action) => {
-    //     state.loading = false;
-    //     state.error = action.payload;
-    // });
+      .addCase(setCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   }
+  
+  
 })
-
-export const { resetCart } = cartSlice.actions;
+export const { setCartManual } = cartSlice.actions;
 export default cartSlice.reducer
