@@ -7,12 +7,15 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) 
       method: 'GET',
 
       headers: {
+        'Content-Type': 'application/json', 
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
 
     })
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi lấy giỏ hàng');
+    // console.log('data:',data);
+    
     return data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.message || 'Không lấy được giỏ hàng');
@@ -20,20 +23,23 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) 
   }
 })
 
-export const setCart = createAsyncThunk('cart/setCart', async ({ items }, thunkAPI) => {
+export const setCart = createAsyncThunk('cart/setCart', async ( {items} , thunkAPI) => {
   try {
+    console.log('items setcart_redux:',items);
+    
     const res = await fetch('http://localhost:5000/api/users/cart/set', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ items })
+      body: JSON.stringify( {items} )
 
 
     });
 
     const data = await res.json();
+    
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật giỏ hàng');
     return data;
   } catch (error) {
@@ -55,7 +61,8 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, 
 
     })
     const data = await res.json();
-
+    console.log('data:',data);
+    
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật số lượng');
     return data;
   } catch (error) {

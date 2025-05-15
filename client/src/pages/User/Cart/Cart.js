@@ -2,112 +2,65 @@ import { Link } from 'react-router-dom';
 import './Cart.css';
 import { useEffect, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCart, setCart, setCartManual } from '../../../redux/cart/cartSlice';
+import { fetchCart, setCart } from '../../../redux/cart/cartSlice';
 import { toast } from 'react-toastify';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 
 function Cart() {
     const dispatch = useDispatch();
     const { cart, error, loading } = useSelector(state => state.cart);
-    const [isRemoving, setIsRemoving] = useState(false);
+
     const [localCart, setLocalCart] = useState(null);
 
     useEffect(() => {
-        const fetchCartData = () => {
-            dispatch(fetchCart())
-                .unwrap()
-                .then(data => {
-                    setLocalCart(data); // Cập nhật local cart state
-                })
-                .catch(error => {
-                    toast.error(`Lỗi khi tải giỏ hàng: ${error}`);
-                });
-        };
-
-        fetchCartData();
+        dispatch(fetchCart())
+            .unwrap()
+            .then(data => setLocalCart(data))
+            .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
     }, [dispatch]);
 
-    // Đồng bộ localCart với cart từ redux khi cart thay đổi
-    useEffect(() => {
-        if (cart) {
-            setLocalCart(cart);
-        }
-    }, [cart]);
+    const debounceSetCart = useCallback(
+        debounce(items => {
+            dispatch(setCart({ items }))
+        }, 500), [dispatch]
+    )
 
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return;
 
-        // Cập nhật local cart trước
-        const newLocalCart = {...localCart};
-        newLocalCart.items = newLocalCart.items.map((item) => {
+        const newItems = cart.items.map((item) => {
             if (item.product._id === productId) {
                 return { ...item, quantity: newQuantity };
             }
             return item;
         });
-        setLocalCart(newLocalCart);
+        setLocalCart({ ...localCart, items: newItems });
 
         // Chuẩn bị dữ liệu để gửi lên server
-        const itemsForBackend = newLocalCart.items.map(item => ({
-            productId: item.product._id,
+        const itemsForBackend = newItems.map(item => ({
+            product: item.product._id,
             quantity: item.quantity,
         }));
-
-        debouncedSetCart({ items: itemsForBackend });
+        debounceSetCart(itemsForBackend);
     };
 
     const handleRemoveItemFromCart = (productId) => {
-        setIsRemoving(true);
+        const updatedItems = cart.items.filter(item => item.product._id !== productId);
+        console.log('updatedItems:', updatedItems);
+        setLocalCart({ ...localCart, items: updatedItems });
 
-        // Lưu trữ giỏ hàng hiện tại để khôi phục nếu cần
-        const currentCart = {...localCart};
-        
-        // Cập nhật local cart ngay lập tức để UI phản hồi nhanh
-        const updatedItems = currentCart.items.filter(item => item.product._id !== productId);
-        const newLocalCart = {...currentCart, items: updatedItems};
-        
-        // Cập nhật hiển thị UI ngay lập tức
-        setLocalCart(newLocalCart);
-        
-        // Cập nhật cả Redux state tạm thời
-        dispatch(setCartManual(newLocalCart));
-
-        // Tạo mảng dữ liệu để gửi lên server
-        const itemsForBackend = updatedItems.map(item => ({
-            productId: item.product._id,
+        //console.log('productId:',productId);
+        const validateCart = updatedItems.map(item => ({
+            product: item.product._id,
             quantity: item.quantity
-        }));
+        }))
+        console.log('validateCart_Fe:', validateCart);
 
-        // Gửi request đến server
-        dispatch(setCart({ items: itemsForBackend }))
-            .unwrap()
-            .then((response) => {
-                // Cập nhật thành công
-                toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
-                setIsRemoving(false);
-            })
-            .catch(error => {
-                // Xử lý lỗi - khôi phục giỏ hàng cũ
-                toast.error(`Lỗi khi xóa sản phẩm: ${error}`);
-                setLocalCart(currentCart);
-                dispatch(setCartManual(currentCart));
-                setIsRemoving(false);
-                
-                // Tải lại giỏ hàng từ server để đảm bảo dữ liệu đồng bộ
-                dispatch(fetchCart());
-            });
+        dispatch(setCart({ items: validateCart }))
     };
 
-    const debouncedSetCart = useCallback(
-        debounce((items) => dispatch(setCart(items)), 500),
-        [dispatch]
-    );
-
-    // Tính tổng giá trị giỏ hàng
     const calculateTotal = () => {
-        if (!localCart || !localCart.items || localCart.items.length === 0) {
-            return 0;
-        }
+        if (!localCart?.items?.length) return 0;
 
         return localCart.items.reduce((total, item) => {
             const price = item.product.price || 0;
@@ -116,7 +69,7 @@ function Cart() {
         }, 0);
     };
 
-    if (loading && !localCart) {
+    if (loading) {
         return <div className="container py-5 text-center">Đang tải giỏ hàng...</div>;
     }
 
@@ -142,12 +95,6 @@ function Cart() {
                     <li className="breadcrumb-item active text-dark" aria-current="page">Shopping Cart</li>
                 </ol>
             </nav>
-
-            {isRemoving && (
-                <div className="alert alert-info">
-                    Đang xóa sản phẩm...
-                </div>
-            )}
 
             {/* Cart Table */}
             <div className="table-responsive">
@@ -175,7 +122,6 @@ function Cart() {
                                             <button
                                                 className="btn btn-sm btn-danger"
                                                 onClick={() => handleRemoveItemFromCart(item.product._id)}
-                                                disabled={isRemoving}
                                             >
                                                 ×
                                             </button>
@@ -192,7 +138,6 @@ function Cart() {
                                                 className="form-control w-50 mx-auto"
                                                 value={quantity}
                                                 onChange={(e) => handleQuantityChange(item.product._id, Number(e.target.value))}
-                                                disabled={isRemoving}
                                             />
                                         </td>
                                         <td>${subtotal.toFixed(2)}</td>
