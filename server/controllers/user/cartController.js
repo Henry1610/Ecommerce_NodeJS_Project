@@ -7,8 +7,11 @@ export const getCart = async (req, res) => {
     
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart) return res.json({ items: [] });
-
-    res.json(cart);
+    
+    res.json({
+      user: cart.user,
+      items: cart.items
+    });
   } catch (error) {
     res.status(500).json({ message: 'Không thể lấy giỏ hàng', error });
   }
@@ -33,7 +36,9 @@ export const addToCart = async (req, res) => {
     }
 
     await cart.save();
-    res.json(cart);
+    const populatedCart = await cart.populate('items.product');
+
+    res.json(populatedCart);
   } catch (error) {
     console.error("Error adding to cart:", error); // Log thêm lỗi để debug
 
@@ -43,6 +48,7 @@ export const addToCart = async (req, res) => {
 export const setCart = async (req, res) => {
   try {
     const userId = req.user.id;
+<<<<<<< HEAD
     const items = req.body || [];
 
     // Lọc ra các item có quantity > 0
@@ -65,8 +71,32 @@ export const setCart = async (req, res) => {
 
     await cart.save();
 
+=======
+    const {items} =  req.body || [];
+    // console.log('🧺 Items:', req.body);
 
-    res.json(cart);
+    // const validItems = items
+    //   .filter(item => item && item.productId && item.quantity > 0)
+    //   .map(item => ({
+    //     productId: item.productId,
+    //     quantity: item.quantity
+    //   }));
+    // if (!Array.isArray(items)) {
+    //   return res.status(400).json({ message: 'Items phải là một mảng' });
+    // }
+    
+
+    const updatedCart = await Cart.findOneAndUpdate(
+      { user: userId },
+       {items} ,           
+      { new: true, upsert: true }
+    ).populate('items.product');
+>>>>>>> 3fc3399 (fix(cart):done cart logic-2)
+
+    // await cart.save();
+
+    
+    res.status(200).json(updatedCart);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Lỗi cập nhật giỏ hàng' });
