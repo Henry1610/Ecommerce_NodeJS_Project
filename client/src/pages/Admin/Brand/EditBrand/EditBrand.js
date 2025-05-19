@@ -37,6 +37,7 @@ const EditBrand = () => {
         if (brand) {
             setName(brand.name || '');
             setPreview(`http://localhost:5000/uploads/brands/${brand.logo}`);
+            
         }
     }, [brand]);
 

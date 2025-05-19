@@ -53,10 +53,10 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, 
 
     const res = await fetch('http://localhost:5000/api/users/cart/add', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       body: JSON.stringify({ productId, quantity })
 
     })

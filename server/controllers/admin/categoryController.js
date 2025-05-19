@@ -1,12 +1,17 @@
 import Category from '../../models/Category.js'
 export const getCategories = async (req, res) => {
     try {
-        const categories = Category.find();
-        res.status(200).json(categories)
+        const categories = await Category.find().lean(); // <- cần có await và lean()
+
+        res.status(200).json(categories);
     } catch (err) {
-        res.status(500).json({ message: 'Không tìm thấy danh sách sản phẩm', error: err.message })
+        res.status(500).json({
+            message: 'Không tìm thấy danh sách sản phẩm',
+            error: err.message,
+        });
     }
-}
+};
+
 export const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;

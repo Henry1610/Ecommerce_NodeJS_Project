@@ -64,18 +64,7 @@ const EditCategory = () => {
                                         />
                                     </div>
                                 </div>
-                                <div className="col-lg-6 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Category Code</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="categoryCode"
-                                            value={formData.categoryCode}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
+                                
                                 <div className="col-lg-12">
                                     <div className="form-group">
                                         <label className="form-label">Description</label>
@@ -87,50 +76,7 @@ const EditCategory = () => {
                                         ></textarea>
                                     </div>
                                 </div>
-                                <div className="col-lg-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Product Image</label>
-                                        <div className="image-upload">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
-                                            <div className="image-uploads">
-                                                <img src="assets/img/icons/upload.svg" alt="upload" />
-                                                <h4>Drag and drop a file to upload</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <div className="product-list">
-                                        <ul className="row g-3">
-                                            {images.map(image => (
-                                                <li key={image.id} className="col-auto ps-0">
-                                                    <div className="productviews d-flex align-items-center">
-                                                        <div className="productviewsimg">
-                                                            <img src={image.src} alt="category" />
-                                                        </div>
-                                                        <div className="productviewscontent">
-                                                            <div className="productviewsname">
-                                                                <h2>{image.name}</h2>
-                                                                <h3>{image.size}</h3>
-                                                            </div>
-                                                            <a
-                                                                href="#"
-                                                                className="hideset"
-                                                                onClick={() => handleRemoveImage(image.id)}
-                                                            >
-                                                                <i className="fas fa-times"></i>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
+                                
                                 <div className="col-lg-12 d-flex gap-2">
                                     <button
                                         className="btn btn-submit"
