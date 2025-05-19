@@ -1,0 +1,70 @@
+.profile-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profileupload {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #0d6efd;
+    border-radius: 50 ;
+    padding: 5px;
+}
+
+.profileupload a {
+    color: white;
+}
+
+.profileupload input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.profile-contentname h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.profile-contentname h4 {
+    margin: 5px 0 0;
+    color: #6c757d;
+}
+
+.pass-group {
+    position: relative;
+}
+
+.pass-input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.btn-submit {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}

@@ -1,0 +1,71 @@
+/* ProductList.css */
+
+.product-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.checkboxs {
+    display: inline-block;
+    position: relative;
+    padding-left: 25px;
+    cursor: pointer;
+}
+
+.checkboxs input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmarks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+
+.checkboxs input:checked ~ .checkmarks {
+    background-color: #0d6efd;
+}
+
+.checkmarks:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkboxs input:checked ~ .checkmarks:after {
+    display: block;
+}
+
+.checkmarks:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.btn-filter,
+.btn-searchset,
+.btn-filters {
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.action-icons a {
+    margin-right: 10px;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}

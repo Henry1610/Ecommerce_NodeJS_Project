@@ -99,9 +99,7 @@ const cartSlice = createSlice({
     error: null
   },
   reducers: {
-    setCartManual: (state, action) => {
-      state.cart = action.payload;
-    }
+    
   },
   extraReducers: builder => {
     builder
@@ -142,5 +140,4 @@ const cartSlice = createSlice({
   
   
 })
-export const { setCartManual } = cartSlice.actions;
 export default cartSlice.reducer

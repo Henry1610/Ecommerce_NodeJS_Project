@@ -48,30 +48,7 @@ export const addToCart = async (req, res) => {
 export const setCart = async (req, res) => {
   try {
     const userId = req.user.id;
-<<<<<<< HEAD
-    const items = req.body || [];
-
-    // Lọc ra các item có quantity > 0
-    const validItems = items.filter(item => item.quantity > 0);
-
-    // Format lại giỏ hàng
-    const formattedItems = validItems.map(item => ({
-      product: item.productId,
-      quantity: item.quantity
-    }));
-
-    // Tìm giỏ hàng của user
-    let cart = await Cart.findOne({ user: userId });
-
-    if (!cart) {
-      cart = new Cart({ user: userId, items: formattedItems });
-    } else {
-      cart.items = formattedItems; // Ghi đè toàn bộ giỏ
-    }
-
-    await cart.save();
-
-=======
+    
     const {items} =  req.body || [];
     // console.log('🧺 Items:', req.body);
 
@@ -91,7 +68,6 @@ export const setCart = async (req, res) => {
        {items} ,           
       { new: true, upsert: true }
     ).populate('items.product');
->>>>>>> 3fc3399 (fix(cart):done cart logic-2)
 
     // await cart.save();
 

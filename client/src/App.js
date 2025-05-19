@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import publicRoutes from './routes/PublicRoutes';
 import userRoutes from './routes/UserRoutes';
 import adminRoutes from './routes/AdminRoutes';
@@ -30,38 +30,44 @@ function App() {
             <Route
               key={index}
               path={route.path}
-              element={<UserLayout><Page /></UserLayout>}
+              element={
+                <ProtectedRoute>
+                  <UserLayout><Page /></UserLayout>
+                </ProtectedRoute>
+              }
             />
           );
         })}
 
-        {/* Admin Routes */}
+        {/* Admin Routes - Sử dụng cấu trúc nested routes */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute role="admin">
-              <AdminLayout />
+              <AdminLayout>
+                <Outlet />
+              </AdminLayout>
             </ProtectedRoute>
           }
         >
+          {/* Route mặc định cho /admin */}
+          <Route index element={<div>Chào mừng đến với trang quản trị</div>} />
+
+          {/* Các route con của admin */}
           {adminRoutes.map((route, index) => {
             const Page = route.component;
             return (
               <Route
                 key={index}
-                path={route.path}  
-                element={
-                  <ProtectedRoute role="admin">
-                    <AdminLayout>
-                      <Page />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
+                path={route.path}
+                element={<Page />}
               />
             );
           })}
         </Route>
 
+        {/* Route bắt lỗi 404 */}
+        <Route path="*" element={<UserLayout><div>Không tìm thấy trang</div></UserLayout>} />
       </Routes>
     </Router>
   );

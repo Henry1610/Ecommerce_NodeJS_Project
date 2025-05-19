@@ -46,7 +46,6 @@ function Cart() {
 
     const handleRemoveItemFromCart = (productId) => {
         const updatedItems = cart.items.filter(item => item.product._id !== productId);
-        console.log('updatedItems:', updatedItems);
         setLocalCart({ ...localCart, items: updatedItems });
 
         //console.log('productId:',productId);
@@ -54,7 +53,6 @@ function Cart() {
             product: item.product._id,
             quantity: item.quantity
         }))
-        console.log('validateCart_Fe:', validateCart);
 
         dispatch(setCart({ items: validateCart }))
     };

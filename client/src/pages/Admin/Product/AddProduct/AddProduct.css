@@ -1,0 +1,34 @@
+.image-upload {
+    position: relative;
+    text-align: center;
+    border: 2px dashed #ccc;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.image-uploads img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.image-uploads h4 {
+    margin: 0;
+    color: #6c757d;
+}
+
+.image-upload input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
