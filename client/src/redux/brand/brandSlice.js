@@ -41,7 +41,6 @@ export const fetchBrandById = createAsyncThunk('brands/fetchBrandById', async (b
 })
 export const updateBrand = createAsyncThunk('brands/updateBrand', async ({brandData,brandId}, thunkAPI) => {
 
-  console.log('formDatasl:',brandData);
 
   try {
     const res = await fetch(`http://localhost:5000/api/admin/brands/${brandId}`, {

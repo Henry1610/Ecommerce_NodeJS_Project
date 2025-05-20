@@ -1,34 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './ProductDetail.css';
-
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductById,resetProductDetail } from '../../../../redux/product/productsSlice';
+import { toast } from 'react-toastify';
 const ProductDetail = () => {
-    const product = {
-        productName: 'Macbook pro',
-        category: 'Computers',
-        subCategory: 'None',
-        brand: 'None',
-        unit: 'Piece',
-        sku: 'PT0001',
-        minimumQty: '5',
-        quantity: '50',
-        tax: '0.00 %',
-        discountType: 'Percentage',
-        price: '1500.00',
-        status: 'Active',
-        description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s,',
-    };
+    const dispatch = useDispatch();
+    const {product,error,loading}=useSelector(state=>state.products)
 
-    const images = [
-        { id: 'img1', src: 'assets/img/product/product69.jpg', name: 'macbookpro.jpg', size: '581kb' },
-        { id: 'img2', src: 'assets/img/product/product69.jpg', name: 'macbookpro.jpg', size: '581kb' },
-    ];
-
+    const { id: productId } = useParams();
+    
+    useEffect(() => {
+        if (!productId) {
+            return
+        }
+        dispatch(fetchProductById(productId))
+            .unwrap()
+            .catch((error) => {
+                toast.error(`Lỗi khi tải thương hiệu: ${error}`);
+            });
+        return () => {
+            dispatch(resetProductDetail());
+        };
+    }, [dispatch, productId])
+   
+    if (loading) {
+        return <div className="text-center py-5">Đang tải sản phẩm...</div>;
+    }
+if (!product || !product.name) {
+        return <div className="text-center py-5 text-warning">Không tìm thấy sản phẩm</div>;
+    }
     return (
+        
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
@@ -51,35 +59,20 @@ const ProductDetail = () => {
                                 <ul className="product-bar">
                                     <li>
                                         <h4>Product</h4>
-                                        <h6>{product.productName}</h6>
+                                        <h6>{product.name}</h6>
                                     </li>
                                     <li>
                                         <h4>Category</h4>
-                                        <h6>{product.category}</h6>
+                                        <h6>{product.category.name}</h6>
                                     </li>
-                                    <li>
-                                        <h4>Sub Category</h4>
-                                        <h6>{product.subCategory}</h6>
-                                    </li>
+                                    
                                     <li>
                                         <h4>Brand</h4>
-                                        <h6>{product.brand}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Unit</h4>
-                                        <h6>{product.unit}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>SKU</h4>
-                                        <h6>{product.sku}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Minimum Qty</h4>
-                                        <h6>{product.minimumQty}</h6>
+                                        <h6>{product.brand.name}</h6>
                                     </li>
                                     <li>
                                         <h4>Quantity</h4>
-                                        <h6>{product.quantity}</h6>
+                                        <h6>{product.stock}</h6>
                                     </li>
                                     <li>
                                         <h4>Tax</h4>
@@ -93,14 +86,8 @@ const ProductDetail = () => {
                                         <h4>Price</h4>
                                         <h6>{product.price}</h6>
                                     </li>
-                                    <li>
-                                        <h4>Status</h4>
-                                        <h6>{product.status}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Description</h4>
-                                        <h6>{product.description}</h6>
-                                    </li>
+                                    
+                                   
                                 </ul>
                             </div>
                         </div>
@@ -111,7 +98,7 @@ const ProductDetail = () => {
                     <div className="card shadow-sm">
                         <div className="card-body">
                             <div className="slider-product-details">
-                                <Swiper
+                                {/* <Swiper
                                     modules={[Navigation, Pagination]}
                                     navigation
                                     pagination={{ clickable: true }}
@@ -126,7 +113,7 @@ const ProductDetail = () => {
                                             <h6>{image.size}</h6>
                                         </SwiperSlide>
                                     ))}
-                                </Swiper>
+                                </Swiper> */}
                             </div>
                         </div>
                     </div>

@@ -3,7 +3,7 @@ import Review from '../../models/Review.js'
 export const getProducts = async (req, res) => {
     
     try {
-        const products = Product.find().populate('category brand');
+        const products = await Product.find().populate('category brand');
         res.status(200).json(products)
     } catch (err) {
         res.status(500).json({ message: 'Không tìm thấy danh sách sản phẩm', error: err.message })
@@ -21,7 +21,7 @@ export const getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'product not found' });
         }
-        const reviews = await Review.find({ product: productId })
+        const reviews = await Review.find({ product: product._id })
             .populate('user')
             .exec();
         res.status(200).json({

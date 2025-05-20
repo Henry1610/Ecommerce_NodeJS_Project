@@ -29,7 +29,7 @@ export const addCategory = async (req, res) => {
     }
 }
 export const getCategoryById = async (req, res) => {
-    const category = await Category.findById(req.params.id).populate('category brand');
+    const category = await Category.findById(req.params.id);
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json(category);
 };
@@ -61,7 +61,7 @@ export const deleteCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category không tồn tại' });
         }
 
-        res.status(200).json({ message: 'Category đã bị xóa thành công' });
+        res.status(200).json({ message: 'Category đã bị xóa thành công',id });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi xóa Category', error: error.message });
     }

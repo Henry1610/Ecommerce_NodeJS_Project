@@ -17,27 +17,25 @@ const EditBrand = () => {
 
 
     useEffect(() => {
-        const fetchBrand = () => {
-            if (brandId) {
-                dispatch(fetchBrandById(brandId))
-                    .unwrap()
-                    .catch(error => {
-                        toast.error(`Lỗi khi tải sản phẩm: ${error}`);
-                    });
-            }
+        if (!brandId) return;
 
-        }
-        fetchBrand();
+        dispatch(fetchBrandById(brandId))
+            .unwrap()
+            .catch((error) => {
+                toast.error(`Lỗi khi tải thương hiệu: ${error}`);
+            });
 
         return () => {
             dispatch(resetBrandDetail());
         };
     }, [dispatch, brandId])
+
+    
     useEffect(() => {
         if (brand) {
             setName(brand.name || '');
             setPreview(`http://localhost:5000/uploads/brands/${brand.logo}`);
-            
+
         }
     }, [brand]);
 

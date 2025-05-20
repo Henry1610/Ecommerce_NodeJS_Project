@@ -4,9 +4,11 @@ import { fetchCategories } from '../../../../redux/category/categoriesSlice';
 import { Link } from 'react-router-dom';
 import './CategoryList.css';
 
+import { deleteCategory } from '../../../../redux/category/categoriesSlice';
+import Swal from 'sweetalert2';
+
 const CategoryList = () => {
     const dispatch = useDispatch();
-
     // Lấy categories, loading, error từ redux state
     const { categories, loading, error } = useSelector(state => state.categories);
 
@@ -27,7 +29,31 @@ const CategoryList = () => {
             prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
         );
     };
-
+    const handleDelete = (e, categoryId) => {
+            e.preventDefault();
+          
+            Swal.fire({
+              title: 'Bạn có chắc chắn muốn xóa?',
+              text: "Hành động này không thể hoàn tác!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Xóa',
+              cancelButtonText: 'Hủy',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                dispatch(deleteCategory(categoryId))
+                  .unwrap()
+                  .then(() => {
+                    Swal.fire('Đã xóa!', 'Category đã được xóa thành công.', 'success');
+                  })
+                  .catch((err) => {
+                    Swal.fire('Lỗi!', `Không thể xóa: ${err}`, 'error');
+                  });
+              }
+            });
+          };
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -86,9 +112,9 @@ const CategoryList = () => {
                                                     <td>{category.description}</td>
                                                     <td className="action-icons">
                                                         <Link to={`edit/${category._id}`} className="me-2" title="Edit">
-                                                            <i className="fas fa-edit"></i> 
+                                                            <i className="fas fa-edit"></i>
                                                         </Link>
-                                                        <button href="#" className="confirm-text" title="Delete" >
+                                                        <button href="#" className="confirm-text" title="Delete" onClick={(e) => handleDelete(e, category._id)}>
                                                             <i className="fas fa-trash"></i>
                                                         </button>
                                                     </td>

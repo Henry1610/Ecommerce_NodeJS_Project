@@ -32,7 +32,7 @@ export const fetchCategoryById = createAsyncThunk(
     'categories/fetchCategoryById',
     async (id, thunkAPI) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, {
+            const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const addCategory = createAsyncThunk(
     'categories/addCategory',
     async ({ name, description }, thunkAPI) => {
         try {
-            const res = await fetch(API_URL, {
+            const res = await fetch('http://localhost:5000/api/admin/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,41 +81,43 @@ export const addCategory = createAsyncThunk(
 );
 
 // Update category
-export const updateCategory = createAsyncThunk(
-    'categories/updateCategory',
-    async ({ id, name, description }, thunkAPI) => {
-        try {
-            const res = await fetch(`${API_URL}/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+    export const updateCategory = createAsyncThunk(
+        'categories/updateCategory',
+        async ({ categoryId, formData }, thunkAPI) => {
+            
+            try {
+                const res = await fetch(`http://localhost:5000/api/admin/categories/${categoryId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
 
-                },
-                body: JSON.stringify({ name, description })
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                console.error('Error updating category:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể cập nhật danh mục');
+                    },
+                    body: JSON.stringify(formData )
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    console.error('Error updating category:', data);
+                    return thunkAPI.rejectWithValue(data.message || 'Không thể cập nhật danh mục');
+                }
+                return data;
+            } catch (error) {
+                console.error('Network error updating category:', error);
+                return thunkAPI.rejectWithValue('Lỗi kết nối server');
             }
-            return data;
-        } catch (error) {
-            console.error('Network error updating category:', error);
-            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
-    }
-);
+    );
 
 // Delete category
 export const deleteCategory = createAsyncThunk(
     'categories/deleteCategory',
     async (id, thunkAPI) => {
+        
         try {
-            const res = await fetch(`${API_URL}/${id}`, {
+            const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
                 }
             });
@@ -124,7 +126,7 @@ export const deleteCategory = createAsyncThunk(
                 console.error('Error deleting category:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể xóa danh mục');
             }
-            return { id, message: data.message };
+            return {  message: data.message,id };
         } catch (error) {
             console.error('Network error deleting category:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
@@ -144,6 +146,8 @@ const categorySlice = createSlice({
         resetCategoryDetail: (state) => {
             state.category = null;
             state.error = null;
+            state.loading = false;
+
         }
     },
     extraReducers: (builder) => {
