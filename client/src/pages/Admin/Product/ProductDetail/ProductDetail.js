@@ -7,36 +7,37 @@ import 'swiper/css/pagination';
 import './ProductDetail.css';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductById,resetProductDetail } from '../../../../redux/product/productsSlice';
+import { fetchProductById, resetProductDetail } from '../../../../redux/product/productsSlice';
 import { toast } from 'react-toastify';
 const ProductDetail = () => {
     const dispatch = useDispatch();
-    const {product,error,loading}=useSelector(state=>state.products)
+    const { product, error, loading, reviews } = useSelector(state => state.products)
 
     const { id: productId } = useParams();
-    
+
     useEffect(() => {
         if (!productId) {
             return
         }
+
         dispatch(fetchProductById(productId))
             .unwrap()
             .catch((error) => {
-                toast.error(`Lỗi khi tải thương hiệu: ${error}`);
+                toast.error(`Lỗi khi tải sản phẩm: ${error}`);
             });
         return () => {
             dispatch(resetProductDetail());
         };
     }, [dispatch, productId])
-   
+
     if (loading) {
         return <div className="text-center py-5">Đang tải sản phẩm...</div>;
     }
-if (!product || !product.name) {
+    if (!product) {
         return <div className="text-center py-5 text-warning">Không tìm thấy sản phẩm</div>;
     }
     return (
-        
+
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
@@ -65,7 +66,7 @@ if (!product || !product.name) {
                                         <h4>Category</h4>
                                         <h6>{product.category.name}</h6>
                                     </li>
-                                    
+
                                     <li>
                                         <h4>Brand</h4>
                                         <h6>{product.brand.name}</h6>
@@ -86,8 +87,8 @@ if (!product || !product.name) {
                                         <h4>Price</h4>
                                         <h6>{product.price}</h6>
                                     </li>
-                                    
-                                   
+
+
                                 </ul>
                             </div>
                         </div>

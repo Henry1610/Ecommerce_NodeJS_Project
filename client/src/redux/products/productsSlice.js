@@ -3,21 +3,22 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts', async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/users/products'
+            const res = await fetch('http://localhost:5000/api/admin/products'
                 , {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 }
             )
             const data = await res.json();
-            
+
             if (!res.ok) {
                 console.error('Error fetching products:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách sản phẩm')
             }
-            
+
             console.log('Products fetched successfully:', data);
             return data;
         } catch (error) {
@@ -26,16 +27,19 @@ export const fetchProducts = createAsyncThunk(
         }
     }
 )
-
 export const fetchProductById = createAsyncThunk(
     'products/fetchProductById', async (productId, thunkAPI) => {
+
         try {
-            const res = await fetch(`http://localhost:5000/api/users/products/${productId}`
+            const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`
                 , {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                        , Authorization: `Bearer ${localStorage.getItem('token')}`
+
+                    },
+
                 }
             )
             const data = await res.json();
@@ -57,6 +61,7 @@ const productsSlice = createSlice({
     name: 'products',
     initialState: {
         products: [],
+        reviews: [],
         product: null,
         loading: false,
         error: null,
@@ -91,21 +96,23 @@ const productsSlice = createSlice({
             })
             .addCase(fetchProductById.fulfilled, (state, action) => {
                 state.loading = false;
-                
-                // Nếu có dữ liệu sản phẩm, tính toán thêm các thông tin cần thiết
-                if (action.payload) {
-                    const product = action.payload;
-                    
-                    // Nếu sản phẩm có trường discount nhưng không có trường discountedPrice
-                    if (product.discount && product.discount > 0 && !product.discountedPrice) {
-                        product.discountedPrice = +(product.price * (1 - product.discount / 100)).toFixed(2);
-                    }
-                    
-                    state.product = product;
+              
+                if (action.payload && action.payload.product) {
+                  const product = action.payload.product;
+              
+                  // Nếu sản phẩm có discount và chưa có discountedPrice thì tính luôn
+                  if (product.discountPercent && product.discountPercent > 0 && !product.discountedPrice) {
+                    product.discountedPrice = +(product.price * (1 - product.discountPercent / 100)).toFixed(2);
+                  }
+              
+                  state.product = product;
+                  state.reviews = action.payload.reviews || [];
                 } else {
-                    state.product = action.payload;
+                  state.product = null;
+                  state.reviews = [];
                 }
-            })
+              })
+              
             .addCase(fetchProductById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;

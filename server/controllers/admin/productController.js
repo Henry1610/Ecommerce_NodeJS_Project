@@ -13,6 +13,8 @@ export const getProductById = async (req, res) => {
     try {
         
         const { id } = req.params;
+        console.log("productId:", id);
+
         const product = await Product.findById(id)
             .populate('category') 
             .populate('brand')     

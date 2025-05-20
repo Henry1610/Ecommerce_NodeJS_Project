@@ -98,9 +98,9 @@ const ProductList = () => {
                           <Link to={`${product._id}`} className="me-2" title="Xem chi tiết">
                             <i className="fas fa-eye"></i>
                           </Link>
-                          <a href="editproduct.html" className="me-2" title="Chỉnh sửa">
+                          <Link to={`edit/${product._id}`} className="me-2" title="Chỉnh sửa">
                             <i className="fas fa-edit"></i>
-                          </a>
+                          </Link>
                           <a href="#" className="confirm-text" title="Xóa">
                             <i className="fas fa-trash"></i>
                           </a>
