@@ -89,7 +89,7 @@ const EditProduct = () => {
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Sub Category</label>
+                                        <label className="form-label">Brand</label>
                                         <select
                                             className="form-select"
                                             name="subCategory"
@@ -103,7 +103,7 @@ const EditProduct = () => {
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Brand</label>
+                                        <label className="form-label">stock</label>
                                         <select
                                             className="form-select"
                                             name="brand"
@@ -117,7 +117,7 @@ const EditProduct = () => {
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Unit</label>
+                                        <label className="form-label">color</label>
                                         <select
                                             className="form-select"
                                             name="unit"
@@ -129,42 +129,8 @@ const EditProduct = () => {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">SKU</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="sku"
-                                            value={formData.sku}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Minimum Qty</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="minimumQty"
-                                            value={formData.minimumQty}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Quantity</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="quantity"
-                                            value={formData.quantity}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
+                                
+                                
                                 <div className="col-lg-12">
                                     <div className="form-group">
                                         <label className="form-label">Description</label>
@@ -176,20 +142,7 @@ const EditProduct = () => {
                                         ></textarea>
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Tax</label>
-                                        <select
-                                            className="form-select"
-                                            name="tax"
-                                            value={formData.tax}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>Choose Tax</option>
-                                            <option>2%</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label className="form-label">Discount Type</label>

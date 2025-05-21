@@ -1,7 +1,7 @@
 import Product from '../../models/Product.js'
 import Review from '../../models/Review.js'
 export const getProducts = async (req, res) => {
-    
+
     try {
         const products = await Product.find().populate('category brand');
         res.status(200).json(products)
@@ -11,13 +11,13 @@ export const getProducts = async (req, res) => {
 }
 export const getProductById = async (req, res) => {
     try {
-        
+
         const { id } = req.params;
         console.log("productId:", id);
 
         const product = await Product.findById(id)
-            .populate('category') 
-            .populate('brand')     
+            .populate('category')
+            .populate('brand')
             .exec();
 
         if (!product) {
@@ -36,7 +36,7 @@ export const getProductById = async (req, res) => {
 };
 export const addProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, brand, images } = req.body;
+        const { name, description, price, stock, category, brand, images, discountPercent, statusCurrent, color } = req.body;
         const newProduct = new Product(
             {
                 name,
@@ -46,6 +46,9 @@ export const addProduct = async (req, res) => {
                 category,
                 brand,
                 images,
+                color,
+                discountPercent,
+                statusCurrent
             }
         )
         const product = await newProduct.save();
@@ -62,12 +65,15 @@ export const updateProduct = async (req, res) => {
 
         const updatedProduct = await Product.findByIdAndUpdate(id, {
             name,
+            stock,
+            discountPercent,
+            statusCurrent,
             description,
             price,
             stock,
             category,
             brand,
-            images,
+            color,
         }, { new: true });
 
         if (!updatedProduct) {

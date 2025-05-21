@@ -25,7 +25,6 @@ const AddBrand = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
         if (!formData.name) {
             toast.error('Tên brand không được để trống!');
             return;

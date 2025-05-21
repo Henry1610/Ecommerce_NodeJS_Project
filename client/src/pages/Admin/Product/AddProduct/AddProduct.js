@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBrands } from '../../../../redux/brand/brandSlice';
+import {fetchCategories} from '../../../../redux/category/categoriesSlice'
 import './AddProduct.css';
 
 const AddProduct = () => {
+    const dispatch = useDispatch();
+    const { brands } = useSelector(state => state.brands);
+    const { categories } = useSelector(state => state.categories);
+
+    useEffect(() => {
+        dispatch(fetchBrands());
+        dispatch(fetchCategories());
+    }, [dispatch]);
     const [formData, setFormData] = useState({
-        productName: '',
+        name: '',
         category: '',
-        subCategory: '',
         brand: '',
-        unit: '',
-        sku: '',
-        minQty: '',
-        quantity: '',
+        stock: '',
         description: '',
-        tax: '',
-        discountType: 'Percentage',
+        statusCurrent: '',
+        discountPercent: 'Percentage',
         price: '',
-        status: 'Closed',
-        productImage: null,
+        statusCurrent: 'Active',
+        images: null,
     });
 
     const handleInputChange = (e) => {
@@ -26,7 +32,7 @@ const AddProduct = () => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, productImage: e.target.files[0] });
+        setFormData({ ...formData, images: e.target.files[0] });
     };
 
     const handleSubmit = (e) => {
@@ -53,7 +59,7 @@ const AddProduct = () => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            name="productName"
+                                            name="name"
                                             value={formData.productName}
                                             onChange={handleInputChange}
                                         />
@@ -68,25 +74,15 @@ const AddProduct = () => {
                                             value={formData.category}
                                             onChange={handleInputChange}
                                         >
-                                            <option>Choose Category</option>
-                                            <option>Computers</option>
+                                            {
+                                                categories.map(category=>{
+                                                    return(<option>{category.name}</option>)
+                                                })
+                                            }
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Sub Category</label>
-                                        <select
-                                            className="form-select"
-                                            name="subCategory"
-                                            value={formData.subCategory}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>Choose Sub Category</option>
-                                            <option>Fruits</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label className="form-label">Brand</label>
@@ -96,61 +92,40 @@ const AddProduct = () => {
                                             value={formData.brand}
                                             onChange={handleInputChange}
                                         >
-                                            <option>Choose Brand</option>
-                                            <option>Brand</option>
+                                            {
+                                                brands.map(brand=>{
+                                                    return(<option>{brand.name}</option>)
+                                                })
+                                            }
+                                          
                                         </select>
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Unit</label>
-                                        <select
-                                            className="form-select"
-                                            name="unit"
-                                            value={formData.unit}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>Choose Unit</option>
-                                            <option>Unit</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">SKU</label>
+                                        <label className="form-label">Color</label>
                                         <input
                                             type="text"
                                             className="form-control"
-                                            name="sku"
-                                            value={formData.sku}
+                                            name="color"
+                                            value={formData.color}
                                             onChange={handleInputChange}
                                         />
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Minimum Qty</label>
+                                        <label className="form-label">Stock</label>
                                         <input
                                             type="text"
                                             className="form-control"
-                                            name="minQty"
-                                            value={formData.minQty}
+                                            name="stock"
+                                            value={formData.productName}
                                             onChange={handleInputChange}
                                         />
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Quantity</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="quantity"
-                                            value={formData.quantity}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
+                               
                                 <div className="col-lg-12">
                                     <div className="form-group">
                                         <label className="form-label">Description</label>
@@ -164,33 +139,17 @@ const AddProduct = () => {
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label className="form-label">Tax</label>
-                                        <select
-                                            className="form-select"
-                                            name="tax"
-                                            value={formData.tax}
+                                        <label className="form-label">discountPercent</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="discountPercent"
+                                            value={formData.discountPercent}
                                             onChange={handleInputChange}
-                                        >
-                                            <option>Choose Tax</option>
-                                            <option>2%</option>
-                                        </select>
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Discount Type</label>
-                                        <select
-                                            className="form-select"
-                                            name="discountType"
-                                            value={formData.discountType}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>Percentage</option>
-                                            <option>10%</option>
-                                            <option>20%</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label className="form-label">Price</label>
@@ -209,11 +168,11 @@ const AddProduct = () => {
                                         <select
                                             className="form-select"
                                             name="status"
-                                            value={formData.status}
+                                            value={formData.statusCurrent}
                                             onChange={handleInputChange}
                                         >
-                                            <option>Closed</option>
-                                            <option>Open</option>
+                                            <option>Active</option>
+                                            <option>Unactive</option>
                                         </select>
                                     </div>
                                 </div>

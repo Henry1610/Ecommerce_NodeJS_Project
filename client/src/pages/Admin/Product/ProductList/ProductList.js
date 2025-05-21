@@ -39,9 +39,9 @@ const ProductList = () => {
               <h4 className="fw-bold">Danh sách sản phẩm</h4>
               <h6 className="text-muted">Quản lý sản phẩm của bạn</h6>
             </div>
-            <a href="addproduct.html" className="btn btn-primary d-flex align-items-center">
+            <Link to='add' className="btn btn-primary d-flex align-items-center">
               <i className="fas fa-plus me-2"></i>Thêm sản phẩm mới
-            </a>
+            </Link>
           </div>
 
           <div className="card shadow-sm">
