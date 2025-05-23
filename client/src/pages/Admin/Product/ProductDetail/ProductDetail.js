@@ -40,87 +40,75 @@ const ProductDetail = () => {
 
         <div className="container-fluid py-4">
             <div className="row">
-                <div className="col-12">
-                    <div className="mb-4">
-                        <h4 className="fw-bold">Product Details</h4>
-                        <h6 className="text-muted">Full details of a product</h6>
-                    </div>
+                <div className="col-12 mb-4">
+                    <h4 className="fw-bold">Product Details</h4>
+                    <h6 className="text-muted">Full details of a product</h6>
                 </div>
 
+                {/* LEFT COLUMN */}
                 <div className="col-lg-8 col-sm-12">
                     <div className="card shadow-sm">
                         <div className="card-body">
-                            <div className="bar-code-view position-relative">
-                                <img src="assets/img/barcode1.png" alt="barcode" className="barcode-img" />
-                                <a href="#" className="printimg">
-                                    <i className="fas fa-print"></i>
-                                </a>
-                            </div>
-                            <div className="productdetails">
-                                <ul className="product-bar">
-                                    <li>
-                                        <h4>Product</h4>
-                                        <h6>{product.name}</h6>
+                            <ul className="product-bar">
+                                <li><h4>Product</h4><h6>{product.name}</h6></li>
+                                <li><h4>Description</h4><h6>{product.description}</h6></li>
+                                <li><h4>Category</h4><h6>{product.category?.name}</h6></li>
+                                <li><h4>Brand</h4><h6>{product.brand?.name}</h6></li>
+                                <li><h4>Color</h4><h6>{product.color}</h6></li>
+                                <li><h4>Quantity</h4><h6>{product.stock}</h6></li>
+                                <li><h4>Status</h4><h6>{product.statusCurrent}</h6></li>
+                                <li><h4>Price</h4><h6>${product.price}</h6></li>
+                                <li><h4>Discount (%)</h4><h6>{product.discountPercent}%</h6></li>
+                                <li><h4>Ratings</h4><h6>{product.ratings} ⭐</h6></li>
+                                <li><h4>Reviews</h4><h6>{product.numReviews}</h6></li>
+                                {product.attributes && Object.entries(product.attributes).map(([key, value]) => (
+                                    <li key={key}>
+                                        <h4>{key}</h4>
+                                        <h6>{String(value)}</h6>
                                     </li>
-                                    <li>
-                                        <h4>Category</h4>
-                                        <h6>{product.category.name}</h6>
-                                    </li>
-
-                                    <li>
-                                        <h4>Brand</h4>
-                                        <h6>{product.brand.name}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Quantity</h4>
-                                        <h6>{product.stock}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Tax</h4>
-                                        <h6>{product.tax}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Discount Type</h4>
-                                        <h6>{product.discountType}</h6>
-                                    </li>
-                                    <li>
-                                        <h4>Price</h4>
-                                        <h6>{product.price}</h6>
-                                    </li>
-
-
-                                </ul>
-                            </div>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 </div>
 
+                {/* RIGHT COLUMN: Images */}
                 <div className="col-lg-4 col-sm-12">
                     <div className="card shadow-sm">
                         <div className="card-body">
-                            <div className="slider-product-details">
-                                {/* <Swiper
+                            <div className="slider-product-details d-flex justify-content-center align-items-center">
+                                <Swiper
                                     modules={[Navigation, Pagination]}
                                     navigation
                                     pagination={{ clickable: true }}
                                     loop={true}
                                     slidesPerView={1}
                                     className="product-slide"
+                                    style={{ width: '100%', maxWidth: '320px' }}
                                 >
-                                    {images.map(image => (
-                                        <SwiperSlide key={image.id} className="slider-product">
-                                            <img src={image.src} alt="product" className="product-img" />
-                                            <h4>{image.name}</h4>
-                                            <h6>{image.size}</h6>
+                                    {product.images?.map((imgFileName, index) => (
+                                        <SwiperSlide key={index} className="d-flex justify-content-center">
+                                            <img
+                                                src={`http://localhost:5000/uploads/products/${product.slug}/${imgFileName}`}
+                                                alt={`product-${index}`}
+                                                className="img-fluid rounded shadow-sm"
+                                                style={{
+                                                    width: '100%',
+                                                    maxHeight: '300px',
+                                                    objectFit: 'contain',
+                                                }}
+                                            />
                                         </SwiperSlide>
                                     ))}
-                                </Swiper> */}
+                                </Swiper>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
+
     );
 };
 

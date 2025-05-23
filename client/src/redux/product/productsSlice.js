@@ -50,10 +50,9 @@ export const addProduct = createAsyncThunk(
         const res = await fetch('http://localhost:5000/api/admin/products', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-            body: JSON.stringify(productData),
+            body: productData,
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Không thể thêm sản phẩm');
@@ -63,14 +62,15 @@ export const addProduct = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
     'products/updateProduct',
-    async ({ id, productData }) => {
-        const res = await fetch(`http://localhost:5000/api/admin/products/${id}`, {
+    async ({ productId, productData }) => {
+        console.log('productIdSlice:',productId);
+        
+        const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-            body: JSON.stringify(productData),
+            body: productData,
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Không thể cập nhật sản phẩm');
