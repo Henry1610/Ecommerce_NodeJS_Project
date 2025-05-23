@@ -36,19 +36,26 @@ export const getProductById = async (req, res) => {
 };
 export const addProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, brand, images, discountPercent, statusCurrent, color } = req.body;
+        const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color } = req.body;
+        const files = req.files
+        if (!files || files.length === 0) {
+            return res.status(400).json({ message: 'Vui lòng upload ít nhất 1 ảnh.' });
+        }
+        const imagesPaths = files.map(file => file.filename)
         const newProduct = new Product(
             {
                 name,
                 description,
                 price,
-                stock,
+                stock: Number(stock),
                 category,
                 brand,
-                images,
                 color,
-                discountPercent,
-                statusCurrent
+                discountPercent: Number(discountPercent),
+                statusCurrent,
+                images: imagesPaths,
+                slug: req.slug,
+
             }
         )
         const product = await newProduct.save();
@@ -61,7 +68,15 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, stock, category, brand, images } = req.body;
+        const { name, description, price, stock, category, brand, statusCurrent, discountPercent, color } = req.body;
+
+        const newImagesFiles = req.files;
+        const oldImagesJson = req.body.oldImages;
+
+        const oldImages = oldImagesJson ? JSON.parse(oldImagesJson) : [];//nếu mà  có content ở  header thì nó tự chuyển thành object trường hợp này gửi file nên k dùng nên phải thêm bước này
+        const newImagesNames = newImagesFiles ? newImagesFiles.map(f => f.filename) : [];
+        
+        const newImg = [...oldImages, ...newImagesNames];
 
         const updatedProduct = await Product.findByIdAndUpdate(id, {
             name,
@@ -70,10 +85,11 @@ export const updateProduct = async (req, res) => {
             statusCurrent,
             description,
             price,
-            stock,
             category,
             brand,
             color,
+            images: newImg, 
+
         }, { new: true });
 
         if (!updatedProduct) {

@@ -7,8 +7,7 @@ export const createBrand = async (req, res) => {
     try {
         const { name } = req.body;
         const logo = req.file ? req.file.filename : null;
-        console.log('req.body:', req.body);
-        console.log('req.file:', req.file);
+        
         const existingBrand = await Brand.findOne({ name });
         if (existingBrand) {
             return res.status(400).json({ message: 'Brand already exists' });
