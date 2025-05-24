@@ -58,11 +58,11 @@ const productSchema = new mongoose.Schema(
 );
 
 
-// productSchema.pre('save', function (next) {
-//     if (!this.slug && this.name) {
-//         this.slug = slugify(this.name, { lower: true, strict: true })
-//         next();
+productSchema.pre('save', function (next) {
+    if (!this.slug && this.name) {
+        this.slug = slugify(this.name, { lower: true, strict: true })
+        next();
 
-//     }
-// })
+    }
+})
 export default mongoose.model('Product', productSchema);

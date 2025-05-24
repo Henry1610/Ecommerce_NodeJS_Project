@@ -67,15 +67,32 @@ export const addProduct = async (req, res) => {
 }
 export const updateProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { name, description, price, stock, category, brand, statusCurrent, discountPercent, color } = req.body;
 
+        const { id } = req.params;
+        let { attributes } = req.body
+        const { name, description, price, stock, category, brand, statusCurrent, discountPercent, color } = req.body;
+        let processedAttributes = {};
+        if (attributes) {
+            try {
+                if (typeof attributes === 'string') {
+                    processedAttributes = JSON.parse(attributes);
+                } else {
+                    processedAttributes = attributes;
+                }
+
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid attributes format'
+                });
+            }
+        }
         const newImagesFiles = req.files;
         const oldImagesJson = req.body.oldImages;
 
         const oldImages = oldImagesJson ? JSON.parse(oldImagesJson) : [];//nếu mà  có content ở  header thì nó tự chuyển thành object trường hợp này gửi file nên k dùng nên phải thêm bước này
         const newImagesNames = newImagesFiles ? newImagesFiles.map(f => f.filename) : [];
-        
+
         const newImg = [...oldImages, ...newImagesNames];
 
         const updatedProduct = await Product.findByIdAndUpdate(id, {
@@ -88,7 +105,8 @@ export const updateProduct = async (req, res) => {
             category,
             brand,
             color,
-            images: newImg, 
+            attributes:processedAttributes,
+            images: newImg,
 
         }, { new: true });
 

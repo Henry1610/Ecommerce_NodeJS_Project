@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate,Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -83,7 +83,13 @@ const AddProduct = () => {
             }
         }
         dispatch(addProduct(productData))
-        toast.success("Thêm sản phẩm thành công!");
+            .then(() => {
+                toast.success("Thêm sản phẩm thành công!");
+            })
+            .catch(() => {
+                toast.error("Thêm sản phẩm thất bại!");
+            });
+
 
         const data = Object.fromEntries(productData.entries());
 
@@ -312,7 +318,7 @@ const AddProduct = () => {
                                                     onClick={() => handleRemoveImage(index)}
                                                 >
                                                     <div className='fw-bold'>
-                                                    X
+                                                        X
                                                     </div>
                                                 </button>
                                             </div>
