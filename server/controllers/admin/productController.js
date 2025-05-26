@@ -36,35 +36,54 @@ export const getProductById = async (req, res) => {
 };
 export const addProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color } = req.body;
-        const files = req.files
+        const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color, attributes } = req.body;
+
+        let processedAttributes = {};
+        if (attributes) {
+            try {
+                if (typeof attributes === 'string') {
+                    processedAttributes = JSON.parse(attributes);
+                } else {
+                    processedAttributes = attributes;
+                }
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid attributes format'
+                });
+            }
+        }
+
+        const files = req.files;
         if (!files || files.length === 0) {
             return res.status(400).json({ message: 'Vui lòng upload ít nhất 1 ảnh.' });
         }
-        const imagesPaths = files.map(file => file.filename)
-        const newProduct = new Product(
-            {
-                name,
-                description,
-                price,
-                stock: Number(stock),
-                category,
-                brand,
-                color,
-                discountPercent: Number(discountPercent),
-                statusCurrent,
-                images: imagesPaths,
-                slug: req.slug,
 
-            }
-        )
+        const imagesPaths = files.map(file => file.filename);
+
+        const newProduct = new Product({
+            name,
+            description,
+            price,
+            stock: Number(stock),
+            category,
+            brand,
+            color,
+            discountPercent: Number(discountPercent),
+            statusCurrent,
+            images: imagesPaths,
+            attributes: processedAttributes
+        });
+
         const product = await newProduct.save();
-        res.status(200).json(product)
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi thêm sản phẩm', error: err.message });
+        res.status(200).json(product);
 
+    } catch (error) {
+        console.error('[ADD PRODUCT ERROR]', error); // Ghi log ra terminal
+        res.status(500).json({ message: 'Lỗi khi thêm sản phẩm', error: error.message });
     }
-}
+};
+
 export const updateProduct = async (req, res) => {
     try {
 

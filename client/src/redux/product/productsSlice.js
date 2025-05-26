@@ -47,6 +47,7 @@ export const fetchProductById = createAsyncThunk(
 export const addProduct = createAsyncThunk(
     'products/addProduct',
     async (productData) => {
+        
         const res = await fetch('http://localhost:5000/api/admin/products', {
             method: 'POST',
             headers: {
@@ -81,9 +82,12 @@ export const updateProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
     'products/deleteProduct',
     async (id) => {
+
         const res = await fetch(`http://localhost:5000/api/admin/products/${id}`, {
             method: 'DELETE',
             headers: {
+                'Content-Type': 'application/json',
+
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });

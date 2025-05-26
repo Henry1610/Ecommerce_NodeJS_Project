@@ -29,8 +29,11 @@ const AddProduct = () => {
         discountPercent: 'Percentage',
         price: '',
         images: null,
-        color: ''
+        color: '',
+        attributes: {}
     });
+    const [attributesList, setAttributesList] = useState([]);
+
     const status = ['active', 'unactive', 'draft'];
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -65,12 +68,41 @@ const AddProduct = () => {
         });
     };
 
+    const handleAttributeChange = (index, field, value) => {
+        const updatedAttributes = [...attributesList];
+        updatedAttributes[index] = [
+            field === "key" ? value : updatedAttributes[index][0],
+            field === "value" ? value : updatedAttributes[index][1]
+        ];
+        setAttributesList(updatedAttributes);
+
+        const attributesObject = Object.fromEntries(updatedAttributes);
+        setFormData(prev => ({
+            ...prev,
+            attributes: attributesObject
+        }));
+    };
+
+    const handleAddAttribute = () => {
+        const updated = [...attributesList, ['', '']];
+        setAttributesList(updated);
+    };
+
+    const handleRemoveAttribute = (index) => {
+        const updated = attributesList.filter((_, i) => i !== index);
+        setAttributesList(updated);
+
+        const attributesObject = Object.fromEntries(updated);
+        setFormData(prev => ({
+            ...prev,
+            attributes: attributesObject
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // console.log('Form submitted:', formData);
-        // Add logic to send form data (e.g., API call) here
         const productData = new FormData();
         for (const key in formData) {
             if (key === "images" && formData.images) {
@@ -78,24 +110,31 @@ const AddProduct = () => {
                     productData.append('images', formData.images[i])
                 }
             }
+            else if (key === "attributes") {
+                const validAttributes = attributesList
+                    .filter(([key, value]) => key && value)
+                    .reduce((acc, [key, value]) => {
+                        acc[key] = value;
+                        return acc;
+                    }, {});
+                productData.append(key, JSON.stringify(validAttributes));
+            }
             else {
                 productData.append(key, formData[key])
             }
         }
+        // for (let [key, value] of productData.entries()) {
+        //     console.log(`${key}:`, value);
+        //   }
+        console.log('FormData entries:', [...productData.entries()]);
         dispatch(addProduct(productData))
             .then(() => {
                 toast.success("Thêm sản phẩm thành công!");
+                navigate('/admin/product');
             })
-            .catch(() => {
-                toast.error("Thêm sản phẩm thất bại!");
+            .catch((error) => {
+                toast.error(`Thêm sản phẩm thất bại: ${error.message}`);
             });
-
-
-        const data = Object.fromEntries(productData.entries());
-
-        console.log('data:', data);
-        navigate('/admin/product');
-
     };
     const validateForm = () => {
         const { name, category, brand, stock, description, statusCurrent, discountPercent, price, color, images } = formData;
@@ -209,7 +248,7 @@ const AddProduct = () => {
                                             type="number"
                                             className="form-control"
                                             name="stock"
-                                            value={formData.productName}
+                                            value={formData.stock}
                                             onChange={handleInputChange}
                                         />
                                     </div>
@@ -326,6 +365,59 @@ const AddProduct = () => {
                                     </div>
 
                                 )}
+
+                                <div className="col-lg-12">
+                                    <div className="form-group">
+                                        <label className="form-label">Thông tin sản phẩm</label>
+                                        <div className="bg-light p-3 rounded">
+                                            <ul className="list-unstyled text-secondary mb-0 small">
+                                                {attributesList.map(([key, value], index) => (
+                                                    <li key={index} className="d-flex align-items-center gap-2 mb-2">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm w-25"
+                                                            value={key}
+                                                            onChange={(e) => handleAttributeChange(index, "key", e.target.value)}
+                                                            placeholder="Tên thuộc tính"
+                                                        />
+                                                        <span>:</span>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm w-50"
+                                                            value={value}
+                                                            onChange={(e) => handleAttributeChange(index, "value", e.target.value)}
+                                                            placeholder="Giá trị"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveAttribute(index)}
+                                                            className="btn p-0 border-0 bg-transparent text-dark"
+                                                            style={{
+                                                                fontSize: '1.2rem',
+                                                                lineHeight: 1,
+                                                                cursor: 'pointer',
+                                                                width: '24px',
+                                                                height: '24px',
+                                                            }}
+                                                            aria-label="Xoá thuộc tính"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm mt-2 border-0 border-top d-flex align-items-center gap-1 bg-transparent"
+                                                onClick={handleAddAttribute}
+                                            >
+                                                <span style={{ fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>+</span>
+                                                Thêm thuộc tính
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div className="col-lg-12 d-flex gap-2">
                                     <button

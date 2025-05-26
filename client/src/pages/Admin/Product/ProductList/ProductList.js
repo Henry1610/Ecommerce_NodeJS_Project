@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../../../redux/product/productsSlice';
-import './ProductList.css';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { deleteProduct, fetchProducts } from '../../../../redux/product/productsSlice';
+import Swal from 'sweetalert2';
+
+import './ProductList.css';
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const {products,loading,error} = useSelector(state => state.products); // tùy vào tên state trong slice của bạn
-  
+  const { products, loading, error } = useSelector(state => state.products); // tùy vào tên state trong slice của bạn
+
 
   const [selectAll, setSelectAll] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -26,7 +29,31 @@ const ProductList = () => {
       prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
     );
   };
-
+  const handleDelete = (id) => {
+    if (!id) return;
+  console.log('id:',id);
+  
+    Swal.fire({
+      title: 'Bạn có chắc muốn xoá?',
+      text: 'Hành động này không thể hoàn tác!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xoá',
+      cancelButtonText: 'Huỷ'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteProduct(id))
+          .then(() => {
+            toast.success('Xoá sản phẩm thành công!');
+          })
+          .catch(() => {
+            toast.error('Xoá sản phẩm thất bại!');
+          });
+      }
+    });
+  };
   if (loading) return <p>Đang tải dữ liệu sản phẩm...</p>;
   if (error) return <p>Lỗi: {error}</p>;
 
@@ -66,7 +93,7 @@ const ProductList = () => {
                       <th>Tên sản phẩm</th>
                       <th>Danh mục</th>
                       <th>Thương hiệu</th>
-                      <th>Giá</th>                     
+                      <th>Giá</th>
                       <th>Số lượng</th>
                       <th>Hành động</th>
                     </tr>
@@ -101,9 +128,9 @@ const ProductList = () => {
                           <Link to={`edit/${product._id}`} className="me-2" title="Chỉnh sửa">
                             <i className="fas fa-edit"></i>
                           </Link>
-                          <a href="#" className="confirm-text" title="Xóa">
+                          <buton onClick={()=>handleDelete(product._id)} className="confirm-text" title="Xóa">
                             <i className="fas fa-trash"></i>
-                          </a>
+                          </buton>
                         </td>
                       </tr>
                     ))}
