@@ -65,16 +65,11 @@ export const updateBrand = async (req, res) => {
         // Nếu có logo mới thì gán, không thì giữ logo cũ
         const logo = req.file ? req.file.filename : brand.logo;
 
-        // Nếu có file mới và đã có ảnh cũ thì xóa ảnh cũ
-        if (req.file && brand.logo) {
-            const oldLogoPath = path.join('public', 'uploads', 'brands', brand.logo);
-            fs.unlink(oldLogoPath, (err) => {
-                if (err) console.log('Không thể xoá ảnh cũ:', err.message);
-            });
-        }
-
+        
         brand.name = name;
         brand.logo = logo;
+
+        
         const updatedBrand = await brand.save();
 
         res.status(200).json({
@@ -95,7 +90,11 @@ export const deleteBrand = async (req, res) => {
         if (!deletedBrand) {
             return res.status(404).json({ message: 'Brand not found' });
         }
+        const productPathLogo=path.join('uploads','brands',deletedBrand.logo);
+        if(fs.existsSync(productPathLogo)){
+            fs.rmSync(productPathLogo);
 
+        }
         res.status(200).json({
             message: 'Brand deleted successfully',
             id: deletedBrand._id

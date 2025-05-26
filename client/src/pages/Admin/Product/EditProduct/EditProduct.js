@@ -149,46 +149,42 @@ const EditProduct = () => {
             attributes: attributesObject
         }));
     };
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Dữ liệu attributes gửi đi:', formData.attributes);
-
-        const productData = new FormData();
-        for (const key in formData) {
+      
+        try {
+          const productData = new FormData();
+      
+          for (const key in formData) {
             if (key === "images") {
-                // console.log('newFiles.length:',newFiles.length);
-                for (let i = 0; i < newFiles.length; i++) {
-
-                    productData.append('newImages', newFiles[i])
-                }
+              for (let i = 0; i < newFiles.length; i++) {
+                productData.append("newImages", newFiles[i]); // <-- Nếu backend expect "images[]", đổi tên này
+              }
+            } else if (key === "attributes") {
+              productData.append(key, JSON.stringify(formData[key]));
+            } else {
+              productData.append(key, formData[key]);
             }
-            else if(key==="attributes"){
-                productData.append(key, JSON.stringify(
-                    formData[key]
-                  ));
-            }
-            else {
-                productData.append(key, formData[key])
-            }
+          }
+      
+          productData.append("oldImages", JSON.stringify(imagesFromServer));
+      
+          await dispatch(updateProduct({ productId, productData })).unwrap();
+          toast.success("Cập nhật sản phẩm thành công!");
+        } catch (err) {
+          toast.error("Cập nhật sản phẩm thất bại!");
+          console.error("Update error:", err);
         }
-        productData.append('oldImages', JSON.stringify(imagesFromServer))
-        // console.log('oldImages:',imagesFromServer);
-
-        dispatch(updateProduct({ productId, productData }))
-            .then(() => {
-                toast.success("Cập nhật sản phẩm thành công!");
-            })
-            .catch(() => {
-                toast.error("Cập nhật sản phẩm thất bại!");
-            });
-        const data = Object.fromEntries(productData.entries());
-
-        console.log('data:', data);
-    };
+    //    const debugData = Object.fromEntries(productData.entries());
+    //     console.log("Dữ liệu gửi lên:", debugData);
+        // Debug log
+       
+      };
+      
 
     const renderedImages = [
         ...imagesFromServer.map(name => ({
-            src: `http://localhost:5000/uploads/products/${product.slug}/${name}`, // hoặc Cloudinary link
+            src: `http://localhost:5000/uploads/products/${product._id}/${name}`, // hoặc Cloudinary link
             name,
             isNew: false
         })),

@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-
+import { useDispatch } from 'react-redux';
 import './AddCategory.css';
+import { addCategory } from '../../../../redux/category/categoriesSlice';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AddCategory = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        categoryName: '',
-        categoryCode: '',
+        name: '',
         description: '',
-        categoryImage: null,
     });
 
     const handleInputChange = (e) => {
@@ -15,15 +18,20 @@ const AddCategory = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleFileChange = (e) => {
-        setFormData({ ...formData, categoryImage: e.target.files[0] });
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            await dispatch(addCategory(formData)).unwrap();
+            toast.success('Thêm category thành công!');
+            navigate('/admin/category');
+        } catch (error) {
+            toast.error(`Thêm category thất bại: ${error}`);
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-        // Add logic to send form data (e.g., API call) here
-    };
 
     return (
         <div className="container-fluid py-4">
@@ -43,24 +51,13 @@ const AddCategory = () => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            name="categoryName"
-                                            value={formData.categoryName}
+                                            name="name"
+                                            value={formData.name}
                                             onChange={handleInputChange}
                                         />
                                     </div>
                                 </div>
-                                <div className="col-lg-6 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Category Code</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="categoryCode"
-                                            value={formData.categoryCode}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
+
                                 <div className="col-lg-12">
                                     <div className="form-group">
                                         <label className="form-label">Description</label>
@@ -72,22 +69,7 @@ const AddCategory = () => {
                                         ></textarea>
                                     </div>
                                 </div>
-                                <div className="col-lg-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Category Image</label>
-                                        <div className="image-upload">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
-                                            <div className="image-uploads">
-                                                <img src="assets/img/icons/upload.svg" alt="upload" />
-                                                <h4>Drag and drop a file to upload</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <div className="col-lg-12 d-flex gap-2">
                                     <button
                                         className="btn btn-submit"

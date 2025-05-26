@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.get('/', getProducts);
 router.get('/:id', getProductById);
-router.post('/', upload.array('images', 10),generateSlugFromName,moveFilesToSlugFolderForCreate, addProduct);
-router.put('/:id', upload.array('newImages', 10),generateSlugFromName,moveFilesToSlugFolder, updateProduct);
+router.post('/', upload.array('images', 10), addProduct,moveFilesToSlugFolderForCreate);
+router.put('/:id', upload.array('newImages', 10), updateProduct,moveFilesToSlugFolder);
 router.delete('/:id', deleteProduct);
 
 export default router;

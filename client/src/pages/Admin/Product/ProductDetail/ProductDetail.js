@@ -173,7 +173,7 @@ const ProductDetail = () => {
                                 {product.images?.map((img, index) => (
                                     <SwiperSlide key={index}>
                                         <img
-                                            src={`http://localhost:5000/uploads/products/${product.slug}/${img}`}
+                                            src={`http://localhost:5000/uploads/products/${product._id}/${img}`}
                                             alt={`${product.name} - Ảnh ${index + 1}`}
                                             className="img-fluid rounded mb-2"
                                             loading="lazy"
@@ -195,7 +195,7 @@ const ProductDetail = () => {
                                 {product.images?.map((img, index) => (
                                     <SwiperSlide key={index} className="cursor-pointer">
                                         <img
-                                            src={`http://localhost:5000/uploads/products/${product.slug}/${img}`}
+                                            src={`http://localhost:5000/uploads/products/${product._id}/${img}`}
                                             alt={`${product.name} - Ảnh ${index + 1}`}
                                             className="img-fluid rounded"
                                             loading="lazy"

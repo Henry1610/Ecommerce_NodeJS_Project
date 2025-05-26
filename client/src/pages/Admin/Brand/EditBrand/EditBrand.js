@@ -30,7 +30,7 @@ const EditBrand = () => {
         };
     }, [dispatch, brandId])
 
-    
+
     useEffect(() => {
         if (brand) {
             setName(brand.name || '');
@@ -48,31 +48,24 @@ const EditBrand = () => {
             setPreview(URL.createObjectURL(file));
         }
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-
-        formData.append('name', name);
-        if (logoFile) {
-            formData.append('logo', logoFile);
-        }
 
         const brandData = new FormData();
         brandData.append('name', name);
-        brandData.append('logo', logoFile);
+        if (logoFile) {
+            brandData.append('logo', logoFile);
+        }
 
+        try {
+            await dispatch(updateBrand({ brandId, brandData })).unwrap();
+            toast.success('Cập nhật brand thành công!');
+            navigate('/admin/brand');
+        } catch (err) {
+            toast.error(`Lỗi: ${err}`);
+        }
+    };
 
-        dispatch(updateBrand({ brandId, brandData }))
-            .unwrap()
-            .then(() => {
-
-                toast.success('Cập nhật brand thành công!')
-                navigate('/admin/brand');
-            })
-            .catch((err) => {
-                toast.error(`Lỗi: ${err}`);
-            });
-    }
 
     return (
         <div className="container-fluid py-4">

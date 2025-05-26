@@ -34,7 +34,7 @@ export const getProductById = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-export const addProduct = async (req, res) => {
+export const addProduct = async (req, res,next) => {
     try {
         const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color, attributes } = req.body;
 
@@ -76,15 +76,16 @@ export const addProduct = async (req, res) => {
         });
 
         const product = await newProduct.save();
-        res.status(200).json(product);
-
+        req.product = product;
+        console.log('product:',product);
+        next();
     } catch (error) {
         console.error('[ADD PRODUCT ERROR]', error); // Ghi log ra terminal
         res.status(500).json({ message: 'Lỗi khi thêm sản phẩm', error: error.message });
     }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res,next) => {
     try {
 
         const { id } = req.params;
@@ -132,14 +133,15 @@ export const updateProduct = async (req, res) => {
         if (!updatedProduct) {
             return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
         }
-
-        res.status(200).json({
-            message: 'Brand updated successfully',
-            product: updatedProduct
-        }
-        );
+        req.product=updatedProduct;
+        next();
+        // res.status(200).json({
+        //     message: 'Brand updated successfully',
+        //     product: updatedProduct
+        // }
+        // );
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi cập nhật sản phẩm', error: error.message });
+        next(error);
     }
 };
 export const deleteProduct = async (req, res) => {

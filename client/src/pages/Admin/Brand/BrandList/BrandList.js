@@ -40,18 +40,17 @@ const BrandList = () => {
           cancelButtonColor: '#3085d6',
           confirmButtonText: 'Xóa',
           cancelButtonText: 'Hủy',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            dispatch(removeBrand(brandId))
-              .unwrap()
-              .then(() => {
-                Swal.fire('Đã xóa!', 'Brand đã được xóa thành công.', 'success');
-              })
-              .catch((err) => {
-                Swal.fire('Lỗi!', `Không thể xóa: ${err}`, 'error');
-              });
-          }
-        });
+        }).then(async(result) => {
+              if (result.isConfirmed) {
+                try {
+                  await dispatch(removeBrand(brandId)).unwrap(); 
+                  toast.success('Xoá brand thành công!');
+                  dispatch(fetchBrands()); 
+                } catch (error) {
+                  toast.error('Xoá brand thất bại!');
+                }
+              }
+            });
       };
     const handleSelectAll = () => {
         if (!brands || brands.length === 0) return;

@@ -11,8 +11,7 @@ const EditCategory = () => {
     const navigate = useNavigate();
     const { id: categoryId } = useParams();
     const { loading, error, category } = useSelector(state => state.categories)
-    console.log('categoryId:',categoryId);
-    
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -44,24 +43,19 @@ const EditCategory = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(updateCategory({ categoryId,formData }))
-            .unwrap()
-            .then(() => {
-                toast.success('Cập nhật category thành công!');
-                navigate('/admin/category');
-            })
-            .catch((err) => {
-                toast.error(`Lỗi: ${err}`);
-            });
+
+        try {
+            await dispatch(updateCategory({ categoryId, formData })).unwrap();
+            toast.success('Cập nhật category thành công!');
+            navigate('/admin/category');
+        } catch (err) {
+            toast.error(`Lỗi: ${err}`);
+        }
     };
-
-
     return (
-
-
-        <div className="container-fluid py-4">
+      <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
                     <div className="mb-4">

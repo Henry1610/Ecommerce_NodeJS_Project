@@ -99,43 +99,44 @@ const AddProduct = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+      
         if (!validateForm()) return;
-
+      
         const productData = new FormData();
+      
         for (const key in formData) {
-            if (key === "images" && formData.images) {
-                for (let i = 0; i < formData.images.length; i++) {
-                    productData.append('images', formData.images[i])
-                }
+          if (key === "images" && formData.images) {
+            for (let i = 0; i < formData.images.length; i++) {
+              productData.append('images', formData.images[i]);
             }
-            else if (key === "attributes") {
-                const validAttributes = attributesList
-                    .filter(([key, value]) => key && value)
-                    .reduce((acc, [key, value]) => {
-                        acc[key] = value;
-                        return acc;
-                    }, {});
-                productData.append(key, JSON.stringify(validAttributes));
-            }
-            else {
-                productData.append(key, formData[key])
-            }
+          } else if (key === "attributes") {
+            const validAttributes = attributesList
+              .filter(([key, value]) => key && value)
+              .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+              }, {});
+            productData.append(key, JSON.stringify(validAttributes));
+          } else {
+            productData.append(key, formData[key]);
+          }
         }
-        // for (let [key, value] of productData.entries()) {
-        //     console.log(`${key}:`, value);
-        //   }
-        console.log('FormData entries:', [...productData.entries()]);
-        dispatch(addProduct(productData))
-            .then(() => {
-                toast.success("Thêm sản phẩm thành công!");
-                navigate('/admin/product');
-            })
-            .catch((error) => {
-                toast.error(`Thêm sản phẩm thất bại: ${error.message}`);
-            });
-    };
+      
+        try {
+          // Debug formData nếu cần
+          console.log('FormData entries:', [...productData.entries()]);
+      
+          await dispatch(addProduct(productData)).unwrap(); // unwrap giúp bắt lỗi chính xác
+          toast.success("Thêm sản phẩm thành công!");
+          navigate('/admin/product');
+        } catch (error) {
+          toast.error(`Thêm sản phẩm thất bại: ${error.message}`);
+          console.error('Lỗi thêm sản phẩm:', error);
+        }
+      };
+      
     const validateForm = () => {
         const { name, category, brand, stock, description, statusCurrent, discountPercent, price, color, images } = formData;
 

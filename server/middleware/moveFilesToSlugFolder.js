@@ -10,50 +10,54 @@ import path from 'path';
  * - Trường hợp không có ảnh nào  được upload thì xóa các file trong folder product-slug đó
  */
 function moveFilesToSlugFolder(req, res, next) {
-  const slug = req.slug || 'default-slug';
-  const destFolder = path.join('uploads/products', slug);
-  
-  fs.mkdirSync(destFolder, { recursive: true });
-  const hasFiles = req.files && req.files.length > 0;
-
-  // Lấy danh sách ảnh cũ cần giữ lại từ req.body.oldImages
-  let imagesToKeep = [];
   try {
-    imagesToKeep = JSON.parse(req.body.oldImages || '[]');
-  } catch (e) {
-    console.error('Invalid oldImages JSON');
-  }
-  //lấy ra mảng file upload hiện tại
-  const existingFiles = fs.readdirSync(destFolder);
-  //xét trường hợp nếu mảng được truyền vào rỗng thì xóa hết file trong folder đó
-  if (!imagesToKeep && hasFiles) {
-    req.files.forEach(file => {
-      const tempPath = path.join('uploads/temp', file.filename);
-      fs.unlinkSync(tempPath);
-    });
-  }
+    const product = req.product || 'default-id';
+    const destFolder = path.join('uploads/products', product._id.toString());
 
-  //kiểm tra mảng trong folder đã có , có file nào không có trong mảng cũ vừa upload lên thì xóa đi(xóa các phần tử cũ mà req gửi lên sever không có)
-  existingFiles.forEach(file => {
-    if (!imagesToKeep.includes(file)) {
-      fs.unlinkSync(path.join(destFolder, file));
+    fs.mkdirSync(destFolder, { recursive: true });
+    const hasFiles = req.files && req.files.length > 0;
+
+    // Lấy danh sách ảnh cũ cần giữ lại từ req.body.oldImages
+    let imagesToKeep = [];
+    try {
+      imagesToKeep = JSON.parse(req.body.oldImages || '[]');
+    } catch (e) {
+      console.error('Invalid oldImages JSON');
     }
-  });
-  //Di chuyển file
+    //lấy ra mảng file upload hiện tại
+    const existingFiles = fs.readdirSync(destFolder);
+    //xét trường hợp nếu mảng được truyền vào rỗng thì xóa hết file trong folder đó
+    if (!imagesToKeep && hasFiles) {
+      req.files.forEach(file => {
+        const tempPath = path.join('uploads/temp', file.filename);
+        fs.unlinkSync(tempPath);
+      });
+    }
 
-  req.files.forEach(file => {
-    const oldPath = path.join('uploads/temp', file.filename);
-    const newPath = path.join(destFolder, file.filename);
+    //kiểm tra mảng trong folder đã có , có file nào không có trong mảng cũ vừa upload lên thì xóa đi(xóa các phần tử cũ mà req gửi lên sever không có)
+    existingFiles.forEach(file => {
+      if (!imagesToKeep.includes(file)) {
+        fs.unlinkSync(path.join(destFolder, file));
+      }
+    });
+    //Di chuyển file
 
-    fs.renameSync(oldPath, newPath);
+    req.files.forEach(file => {
+      const oldPath = path.join('uploads/temp', file.filename);
+      const newPath = path.join(destFolder, file.filename);
 
-    // Cập nhật lại file info nếu cần dùng trong controller
-    file.oldPath = oldPath;
-    file.path = newPath;
-    file.folder = slug;
-  });
+      fs.renameSync(oldPath, newPath);
 
-  next();
+      // Cập nhật lại file info nếu cần dùng trong controller
+      file.oldPath = oldPath;
+      file.path = newPath;
+      file.folder = product._id.toString();;
+    });
+    res.status(200).json({ message: 'Cập nhật thành công', product: req.product });
+  } catch (error) {
+    next(error);
+
+  }
 }
 export default moveFilesToSlugFolder
 

@@ -29,31 +29,30 @@ const CategoryList = () => {
             prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
         );
     };
-    const handleDelete = (e, categoryId) => {
-            e.preventDefault();
-          
-            Swal.fire({
-              title: 'Bạn có chắc chắn muốn xóa?',
-              text: "Hành động này không thể hoàn tác!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#3085d6',
-              confirmButtonText: 'Xóa',
-              cancelButtonText: 'Hủy',
-            }).then((result) => {
-              if (result.isConfirmed) {
-                dispatch(deleteCategory(categoryId))
-                  .unwrap()
-                  .then(() => {
-                    Swal.fire('Đã xóa!', 'Category đã được xóa thành công.', 'success');
-                  })
-                  .catch((err) => {
-                    Swal.fire('Lỗi!', `Không thể xóa: ${err}`, 'error');
-                  });
-              }
-            });
-          };
+    const handleDelete = async (e, categoryId) => {
+        e.preventDefault();
+      
+        const result = await Swal.fire({
+          title: 'Bạn có chắc chắn muốn xóa?',
+          text: 'Hành động này không thể hoàn tác!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Xóa',
+          cancelButtonText: 'Hủy',
+        });
+      
+        if (result.isConfirmed) {
+          try {
+            await dispatch(deleteCategory(categoryId)).unwrap();
+            await Swal.fire('Đã xóa!', 'Category đã được xóa thành công.', 'success');
+          } catch (err) {
+            await Swal.fire('Lỗi!', `Không thể xóa: ${err}`, 'error');
+          }
+        }
+      };
+      
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -63,9 +62,9 @@ const CategoryList = () => {
                             <h4 className="fw-bold">Product Category List</h4>
                             <h6 className="text-muted">View/Search product Category</h6>
                         </div>
-                        <a href="addcategory.html" className="btn btn-primary d-flex align-items-center">
+                        <Link  to="/admin/category/add" className="btn btn-primary d-flex align-items-center">
                             <i className="fas fa-plus me-2"></i>Add Category
-                        </a>
+                        </Link>
                     </div>
 
                     <div className="card shadow-sm">

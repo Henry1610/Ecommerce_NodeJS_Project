@@ -29,11 +29,10 @@ const ProductList = () => {
       prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
     );
   };
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!id) return;
-  console.log('id:',id);
-  
-    Swal.fire({
+
+    const result = await Swal.fire({
       title: 'Bạn có chắc muốn xoá?',
       text: 'Hành động này không thể hoàn tác!',
       icon: 'warning',
@@ -42,18 +41,20 @@ const ProductList = () => {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Xoá',
       cancelButtonText: 'Huỷ'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteProduct(id))
-          .then(() => {
-            toast.success('Xoá sản phẩm thành công!');
-          })
-          .catch(() => {
-            toast.error('Xoá sản phẩm thất bại!');
-          });
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        await dispatch(deleteProduct(id)).unwrap();
+        toast.success('Xoá sản phẩm thành công!');
+        await dispatch(fetchProducts());
+      } catch (error) {
+        toast.error('Xoá sản phẩm thất bại!');
+      }
+    }
   };
+
+
   if (loading) return <p>Đang tải dữ liệu sản phẩm...</p>;
   if (error) return <p>Lỗi: {error}</p>;
 
@@ -128,7 +129,7 @@ const ProductList = () => {
                           <Link to={`edit/${product._id}`} className="me-2" title="Chỉnh sửa">
                             <i className="fas fa-edit"></i>
                           </Link>
-                          <buton onClick={()=>handleDelete(product._id)} className="confirm-text" title="Xóa">
+                          <buton onClick={() => handleDelete(product._id)} className="confirm-text" title="Xóa">
                             <i className="fas fa-trash"></i>
                           </buton>
                         </td>
