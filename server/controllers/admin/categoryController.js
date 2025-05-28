@@ -1,4 +1,5 @@
 import Category from '../../models/Category.js'
+import Product  from '../../models/Product.js'
 export const getCategories = async (req, res) => {
     try {
         const categories = await Category.find().lean(); // <- cần có await và lean()
@@ -54,15 +55,33 @@ export const updateCategory = async (req, res) => {
 };
 export const deleteCategory = async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const deleteCategory = await Category.findByIdAndDelete(id);
-        if (!deleteCategory) {
-            return res.status(404).json({ message: 'Category không tồn tại' });
-        }
-
-        res.status(200).json({ message: 'Category đã bị xóa thành công',id });
+      const { id } = req.params;
+  
+      // Kiểm tra xem có sản phẩm nào đang dùng category này không
+      const isLinked = await Product.exists({ category: id });
+  
+      if (isLinked) {
+        return res.status(400).json({
+          message: 'Không thể xóa. Danh mục này đang được sử dụng bởi một hoặc nhiều sản phẩm.',
+        });
+      }
+  
+      // Tiến hành xóa
+      const deleted = await Category.findByIdAndDelete(id);
+  
+      if (!deleted) {
+        return res.status(404).json({ message: 'Category không tồn tại' });
+      }
+  
+      res.status(200).json({
+        message: 'Category đã bị xóa thành công',
+        id: deleted._id,
+      });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi xóa Category', error: error.message });
+      res.status(500).json({
+        message: 'Lỗi khi xóa Category',
+        error: error.message,
+      });
     }
-};             
+  };
+           

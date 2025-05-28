@@ -1,5 +1,6 @@
 
 import Brand from '../../models/Brand.js';
+import Product from '../../models/Product.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -85,11 +86,20 @@ export const updateBrand = async (req, res) => {
 export const deleteBrand = async (req, res) => {
     try {
         const { id } = req.params;
+        const isLinked = await Product.exists({ brand: id });
+
+        if (isLinked) {
+          return res.status(400).json({
+            message: 'Không thể xóa. Thương hiệu này đang được sử dụng bởi một hoặc nhiều sản phẩm.',
+          });
+        }
         const deletedBrand = await Brand.findByIdAndDelete(id);
 
         if (!deletedBrand) {
             return res.status(404).json({ message: 'Brand not found' });
         }
+
+            // Xóa file logo nếu tồn tại
         const productPathLogo=path.join('uploads','brands',deletedBrand.logo);
         if(fs.existsSync(productPathLogo)){
             fs.rmSync(productPathLogo);
