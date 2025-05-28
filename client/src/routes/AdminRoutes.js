@@ -10,6 +10,11 @@ import EditCategory from "../pages/Admin/Category/EditCategory";
 import Payment from "../pages/Admin/Payment";
 import ProductDetail from "../pages/Admin/Product/ProductDetail";
 import BrandList from "../pages/Admin/Brand/BrandList";
+import UserList from "../pages/Admin/UserList/UserList";
+import DiscountList from "../pages/Admin/Discount/DiscountList/Discount";
+import AddDiscount from "../pages/Admin/Discount/AddDiscount/AddDiscount";
+import EditDiscount from "../pages/Admin/Discount/EditDiscount/EditDiscount";
+import ShippingZoneList from "../pages/Admin/ShippingZone/ShippingZoneList";
 
 const adminRoutes = [
     { path: 'dashboard', component: Dashboard },
@@ -27,9 +32,9 @@ const adminRoutes = [
     { path: 'category', component: CategoryList },
     { path: 'category/add', component: AddCategory },
     
-    // { path: 'discount', component: Discount },
-    // { path: 'discount/add', component: AddDiscount },
-    // { path: 'discount/edit/:id', component: EditDiscount },
+    { path: 'discount', component: DiscountList },
+    { path: 'discount/add', component: AddDiscount },
+    { path: 'discount/edit/:id', component: EditDiscount },
 
     
     // { path: 'order', component: OrderList },
@@ -37,7 +42,9 @@ const adminRoutes = [
 
 
     { path: 'payment', component: Payment },
-    // { path: 'userlist', component: UserList },
+    { path: 'user', component: UserList },
+
+    { path: 'shipping-zones', component: ShippingZoneList },
     // { path: 'review', component: ReviewList },
 
 

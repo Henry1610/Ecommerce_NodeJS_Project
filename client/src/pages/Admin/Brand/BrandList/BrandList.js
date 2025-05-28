@@ -5,14 +5,13 @@ import { Link } from 'react-router-dom';
 import { fetchBrands, removeBrand } from '../../../../redux/brand/brandSlice'
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-
+import ErrorPage from '../../../../components/ErrorPage/ErrorPage'
 const BrandList = () => {
     const dispatch = useDispatch();
     const { brands, error, loading } = useSelector(state => state.brands);
 
 
     useEffect(() => {
-        console.log('Đang tải brands...');
         dispatch(fetchBrands())
             .unwrap()
             .then(data => {
@@ -84,29 +83,8 @@ const BrandList = () => {
     }
 
     if (error) {
-        return (
-            <div className="container-fluid py-4">
-                <div className="row">
-                    <div className="col-12">
-                        <div className="card shadow-sm">
-                            <div className="card-body text-center p-5">
-                                <div className="text-danger mb-3">
-                                    <i className="fas fa-exclamation-triangle fa-3x"></i>
-                                </div>
-                                <h5 className="text-danger">Đã xảy ra lỗi khi tải danh sách thương hiệu</h5>
-                                <p>{error}</p>
-                                <button
-                                    className="btn btn-primary mt-3"
-                                    onClick={() => dispatch(fetchBrands())}
-                                >
-                                    Thử lại
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        console.log('err:',error);
+        
     }
 
     if (!brands || brands.length === 0) {
