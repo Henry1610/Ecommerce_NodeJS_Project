@@ -9,535 +9,207 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { useState } from "react";
+import Banner from '../../../components/Banner/Banner';
+import './Home.css'
 function Home() {
     const dispatch = useDispatch();
     const { products, loading, error } = useSelector((state) => state.products);
-    
+
     useEffect(() => {
         dispatch(fetchProducts()); // Lấy danh sách sản phẩm khi component được render
     }, [dispatch]);
+    const [activeTabNews, setActiveTabNews] = useState("Mới nhất");
+    const [activeTabCategories, setActiveTabCategories] = useState("Laptop");
 
+    const news = ["Mới nhất", "Tin tức", "Đánh giá", "Tư vấn", "Thủ thuật"];
+    const categories = ["Laptop", "Bàn phím", "Tai nghe", "Chuột"];
+
+    const articles = [
+        {
+            img: "https://storage.googleapis.com/a1aa/image/281e9e10-13be-45c3-0300-6b3b765570d2.jpg",
+            title: "Lenovo trình làng loạt laptop Xiaoxin 2024 Ryzen Edition tại Trung Quốc, giá ...",
+            author: "Nguyễn Công Minh",
+        },
+        {
+            img: "https://storage.googleapis.com/a1aa/image/6ad92b02-1cd3-4e9d-0a4d-7b5b1768bac3.jpg",
+            title: "Laptop ThinkPad là gì? Tất tần tật về dòng Lenovo ThinkPad",
+            author: "Phạm Quốc Toàn",
+        },
+        {
+            img: "https://storage.googleapis.com/a1aa/image/2d178fd8-2731-4dd5-6d42-17e996639d7c.jpg",
+            title: "Đánh giá chi tiết Dell Precision 7550: Không dành cho số đông",
+            author: "Lương Mạnh Hà",
+        },
+        {
+            img: "https://storage.googleapis.com/a1aa/image/6fee00d4-32b9-4d6d-bb54-a784aaf2b765.jpg",
+            title: "Lenovo ThinkPad T14 – Lá cờ đầu của ThinkPad T-series chuẩn bị cập bến...",
+            author: "Thu Hồng",
+        },
+        {
+            img: "https://storage.googleapis.com/a1aa/image/47de56e7-1ee1-4f6c-9b20-8f6e045753ea.jpg",
+            title: "Review Lenovo Yoga: mỏng nhẹ linh động, cấu hình đáp ứng tốt mọi nhu cà...",
+            author: "Lương Mạnh Hà",
+        },
+    ];
+    const filteredProducts = activeTabCategories ? products.filter(p => p.category.name === activeTabCategories) : products;
     return (
-        <div>
-            <div className="slider-with-banner py-2">
-                <div className="container">
-                    <div className="row">
-                        {/* Categories Menu */}
-                        <div className="col-lg-3">
-                            <div className="card shadow-sm">
-                                <div className="card-header bg-warning text-dark py-2">
-                                    <h6 className="mb-0 text-uppercase fw-bold">Danh mục sản phẩm</h6>
-                                </div>
-                                <div className="card-body p-0">
-                                    <ul className="list-group list-group-flush small">
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Laptops</a>
-                                            <i className="fas fa-chevron-right small"></i>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">TV & Audio</a>
-                                            <i className="fas fa-chevron-right small"></i>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Smartphone</a>
-                                            <i className="fas fa-chevron-right small"></i>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Cameras</a>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Headphone</a>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Smartwatch</a>
-                                        </li>
-                                        <li className="list-group-item py-2 d-flex justify-content-between align-items-center">
-                                            <a href="#" className="text-decoration-none text-dark">Accessories</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+        <>
+            <Banner />
 
-                        {/* Main Slider */}
-                        <div className="col-lg-9">
-                            <div className="slider-area shadow-sm">
-                                <Swiper
-                                    modules={[Navigation, Pagination, Autoplay]}
-                                    spaceBetween={0}
-                                    slidesPerView={1}
-                                    
-                                    autoplay={{ delay: 5000 }}
-                                    loop={true}
+            {/* Hot News  */}
+            <div className="container py-5">
+                <h1 className="text-center fw-bold mb-4 d-flex align-items-center justify-content-center gap-2">
+
+                    Tin tức công nghệ
+                </h1>
+
+                <div className="tab-swiper-container text-center d-flex justify-content-center m-2">
+                    <Swiper
+                        spaceBetween={10}
+                        slidesPerView="auto"
+                        freeMode={true}
+                        className="tab-swiper bg-light rounded-pill  p-2  "
+                    >
+                        {news.map((cat) => (
+                            <SwiperSlide key={cat} className="w-auto ">
+                                <button
+                                    className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeTabNews === cat ? "active" : ""
+                                        }`}
+                                    onClick={() => setActiveTabNews(cat)}
                                 >
-                                    <SwiperSlide>
-                                        <div className="single-slide bg-4" style={{backgroundImage: "url('images/slider/1.jpg')", height: "450px", }}>
-                                            
-                                        </div>
-                                    </SwiperSlide>
-                                    <SwiperSlide>
-                                        <div className="single-slide bg-5" style={{backgroundImage: "url('images/slider/2.jpg')", height: "450px"}}>
-                                            
-                                        </div>
-                                    </SwiperSlide>
-                                    <SwiperSlide>
-                                        <div className="single-slide bg-6" style={{backgroundImage: "url('images/slider/3.jpg')", height: "450px"}}>
-                                            
-                                        </div>
-                                    </SwiperSlide>
-                                </Swiper>
-                            </div>
-                        </div>
-                    </div>
+                                    {cat}
+                                </button>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
                 </div>
-            </div>
 
-            {/* Banner Section */}
-            <div className="py-3">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-4 col-md-4 mb-3 mb-lg-0">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/1_3.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-lg-4 col-md-4 mb-3 mb-lg-0">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/1_4.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-lg-4 col-md-4">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/1_5.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Hot Deals Products Section */}
-            <section className="py-3 bg-light">
-                <div className="container">
-                    <div className="row mb-3">
-                        <div className="col-12">
-                            <h5 className="border-bottom pb-2 mb-0">
-                                <span className="border-bottom border-warning border-2 pb-2">Hot Deals Products</span>
-                            </h5>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-12">
-                            <Swiper
-                                modules={[Navigation, Autoplay]}
-                                spaceBetween={15}
-                                slidesPerView={4}
-                                navigation
-                                loop={true}
-                                autoplay={{ delay: 2500 }}
-                                breakpoints={{
-                                    0: {
-                                        slidesPerView: 1,
-                                    },
-                                    576: {
-                                        slidesPerView: 2,
-                                    },
-                                    768: {
-                                        slidesPerView: 3,
-                                    },
-                                    992: {
-                                        slidesPerView: 4,
-                                    },
-                                }}
-                            >
-                                {products && products.map((product) => (
-                                    <SwiperSlide key={product.id}>
-                                        <ProductCard product={product}/>
-                                    </SwiperSlide>
-                                ))}
-                                {(!products || products.length === 0) && loading && (
-                                    <SwiperSlide>
-                                        <div className="card shadow-sm">
-                                            <div className="card-body text-center p-4">
-                                                <div className="spinner-border text-primary" role="status">
-                                                    <span className="visually-hidden">Loading...</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </SwiperSlide>
-                                )}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Laptops Section */}
-            <section className="py-3">
-                <div className="container">
-                    <div className="row mb-3">
-                        <div className="col-12 d-flex justify-content-between align-items-center">
-                            <h5 className="mb-0">
-                                <span className="border-bottom border-warning border-2 pb-1">Laptops</span>
-                            </h5>
-                            <ul className="nav nav-pills nav-sm">
-                                <li className="nav-item">
-                                    <a className="nav-link active py-1 px-2 small bg-warning text-dark" href="#">Prime Video</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2 small" href="#">Computers</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2 small" href="#">Electronics</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-lg-6 mb-3 mb-lg-0">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_1.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-lg-6">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_2.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-12">
-                            <Swiper
-                                modules={[Navigation, Autoplay]}
-                                spaceBetween={15}
-                                slidesPerView={4}
-                                navigation
-                                loop={true}
-                                autoplay={{ delay: 3000 }}
-                                breakpoints={{
-                                    0: {
-                                        slidesPerView: 1,
-                                    },
-                                    576: {
-                                        slidesPerView: 2,
-                                    },
-                                    768: {
-                                        slidesPerView: 3,
-                                    },
-                                    992: {
-                                        slidesPerView: 4,
-                                    },
-                                }}
-                            >
-                                {products && products.map((product) => (
-                                    <SwiperSlide key={`laptop-${product.id}`}>
-                                        <ProductCard product={product} />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* TV & Audio Section */}
-            <section className="py-3 bg-light">
-                <div className="container">
-                    <div className="row mb-3">
-                        <div className="col-12 d-flex justify-content-between align-items-center">
-                            <h5 className="mb-0">
-                                <span className="border-bottom border-warning border-2 pb-1">TV & Audio</span>
-                            </h5>
-                            <ul className="nav nav-pills nav-sm">
-                                <li className="nav-item">
-                                    <a className="nav-link active py-1 px-2 small bg-warning text-dark" href="#">Chamcham</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2 small" href="#">Meito</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2 small" href="#">Sony Bravia</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-lg-6 mb-3 mb-lg-0">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_3.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-lg-6">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_4.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-12">
-                            <Swiper
-                                modules={[Navigation, Autoplay]}
-                                spaceBetween={15}
-                                slidesPerView={4}
-                                navigation
-                                loop={true}
-                                autoplay={{ delay: 3500 }}
-                                breakpoints={{
-                                    0: {
-                                        slidesPerView: 1,
-                                    },
-                                    576: {
-                                        slidesPerView: 2,
-                                    },
-                                    768: {
-                                        slidesPerView: 3,
-                                    },
-                                    992: {
-                                        slidesPerView: 4,
-                                    },
-                                }}
-                            >
-                                {products && products.map((product) => (
-                                    <SwiperSlide key={`tv-${product.id}`}>
-                                        <ProductCard product={product} />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Smartphone Section */}
-            <section className="py-3">
-                <div className="container">
-                    <div className="row mb-3">
-                        <div className="col-12 d-flex justify-content-between align-items-center">
-                            <h5 className="mb-0">
-                                <span className="border-bottom border-warning border-2 pb-1">Smartphone</span>
-                            </h5>
-                            <ul className="nav nav-pills nav-sm">
-                                <li className="nav-item">
-                                    <a className="nav-link active py-1 px-2 small bg-warning text-dark" href="#">Camera Accessories</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2 small" href="#">XailStation</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-lg-6 mb-3 mb-lg-0">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_5.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-lg-6">
-                            <div className="card border-0 shadow-sm h-100">
-                                <a href="#">
-                                    <img src="images/banner/2_6.jpg" alt="Banner" className="card-img-top img-fluid" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-12">
-                            <Swiper
-                                modules={[Navigation, Autoplay]}
-                                spaceBetween={15}
-                                slidesPerView={4}
-                                navigation
-                                loop={true}
-                                autoplay={{ delay: 4000 }}
-                                breakpoints={{
-                                    0: {
-                                        slidesPerView: 1,
-                                    },
-                                    576: {
-                                        slidesPerView: 2,
-                                    },
-                                    768: {
-                                        slidesPerView: 3,
-                                    },
-                                    992: {
-                                        slidesPerView: 4,
-                                    },
-                                }}
-                            >
-                                {products && products.map((product) => (
-                                    <SwiperSlide key={`smartphone-${product.id}`}>
-                                        <ProductCard product={product} />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Featured Product Banner */}
-            <div className="py-4 bg-dark text-white" style={{backgroundImage: "url('images/banner/full-width.jpg')", backgroundSize: "cover", backgroundPosition: "center", backgroundBlendMode: "overlay"}}>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-6 mx-auto text-center py-3">
-                            <p className="small mb-1">Sale Offer <span className="badge bg-warning text-dark">-20% Off</span> This Week</p>
-                            <h2 className="fs-3 fw-bold mb-1">Featured Product</h2>
-                            <h5 className="mb-2">Meito Accessories 2023</h5>
-                            <p className="small mb-2">
-                                Starting at
-                                <span className="text-warning fs-5 ms-1">$1209.00</span>
-                            </p>
-                            <a href="shop-left-sidebar.html" className="btn btn-sm btn-warning px-3">Shop Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Trending Products Section */}
-            <section className="py-3">
-                <div className="container">
-                    <div className="row mb-3">
-                        <div className="col-12">
-                            <h5 className="text-center mb-2">
-                                <span className="border-bottom border-warning border-2 pb-1">Trending Products</span>
-                            </h5>
-                            <ul className="nav nav-pills justify-content-center mb-3 small">
-                                <li className="nav-item">
-                                    <a className="nav-link active py-1 px-2 bg-warning text-dark" data-bs-toggle="pill" href="#meito">Meito</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2" data-bs-toggle="pill" href="#camera">Camera</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link py-1 px-2" data-bs-toggle="pill" href="#xail">XailStation</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="tab-content">
-                        <div id="meito" className="tab-pane fade show active">
-                            <div className="row">
-                                <div className="col-12">
-                                    <Swiper
-                                        modules={[Navigation, Autoplay]}
-                                        spaceBetween={15}
-                                        slidesPerView={4}
-                                        navigation
-                                        loop={true}
-                                        autoplay={{ delay: 4500 }}
-                                        breakpoints={{
-                                            0: {
-                                                slidesPerView: 1,
-                                            },
-                                            576: {
-                                                slidesPerView: 2,
-                                            },
-                                            768: {
-                                                slidesPerView: 3,
-                                            },
-                                            992: {
-                                                slidesPerView: 4,
-                                            },
-                                        }}
-                                    >
-                                        {products && products.map((product) => (
-                                            <SwiperSlide key={`trending-${product.id}`}>
-                                                <ProductCard product={product} />
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
+                <div className="row g-4">
+                    <div className="col-md-6">
+                        <div className="card border-0" style={{ backgroundColor: "#E5D7FF" }}>
+                            <div className="card-body position-relative">
+                                <p className="text-uppercase text-muted small fw-bold mb-2">Tin tức</p>
+                                <h2 className="card-title fw-bold fs-4">
+                                    Lenovo ra mắt Xiaoxin Pro AI 2024: Chạy chip Core Ultra siêu khỏe
+                                </h2>
+                                <div className="d-flex text-muted small mb-3">
+                                    <span>Nguyễn Công Minh</span>
+                                    <span className="mx-2">/</span>
+                                    <time dateTime="2025-05-26">26/05/2025</time>
                                 </div>
-                            </div>
-                        </div>
-                        <div id="camera" className="tab-pane fade">
-                            <div className="row">
-                                <div className="col-12">
-                                    <Swiper
-                                        modules={[Navigation, Autoplay]}
-                                        spaceBetween={15}
-                                        slidesPerView={4}
-                                        navigation
-                                        loop={true}
-                                        autoplay={{ delay: 4500 }}
-                                        breakpoints={{
-                                            0: {
-                                                slidesPerView: 1,
-                                            },
-                                            576: {
-                                                slidesPerView: 2,
-                                            },
-                                            768: {
-                                                slidesPerView: 3,
-                                            },
-                                            992: {
-                                                slidesPerView: 4,
-                                            },
-                                        }}
-                                    >
-                                        {products && products.map((product) => (
-                                            <SwiperSlide key={`camera-${product.id}`}>
-                                                <ProductCard product={product} />
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
+                                <div style={{ height: '379px', overflow: 'hidden' }}>
+                                    <img
+                                        src="https://storage.googleapis.com/a1aa/image/f2f0a71d-8fcb-4a0c-af13-672e49ce0cc9.jpg"
+                                        alt="Lenovo Xiaoxin Pro AI"
+                                        className="img-fluid rounded mb-3"
+                                        style={{ objectFit: 'cover', height: '100%', width: '100%' }}
+                                    />
                                 </div>
-                            </div>
-                        </div>
-                        <div id="xail" className="tab-pane fade">
-                            <div className="row">
-                                <div className="col-12">
-                                    <Swiper
-                                        modules={[Navigation, Autoplay]}
-                                        spaceBetween={15}
-                                        slidesPerView={4}
-                                        navigation
-                                        loop={true}
-                                        autoplay={{ delay: 4500 }}
-                                        breakpoints={{
-                                            0: {
-                                                slidesPerView: 1,
-                                            },
-                                            576: {
-                                                slidesPerView: 2,
-                                            },
-                                            768: {
-                                                slidesPerView: 3,
-                                            },
-                                            992: {
-                                                slidesPerView: 4,
-                                            },
-                                        }}
-                                    >
-                                        {products && products.map((product) => (
-                                            <SwiperSlide key={`xail-${product.id}`}>
-                                                <ProductCard product={product} />
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
+
+                                <p className="text-muted small">
+                                    Với sức mạnh mới cùng sự trợ giúp từ AI, con chip mới của đội Xanh hứa hẹn sẽ giúp
+                                    sản phẩm này có được hiệu năng ấn tượng và thời lượng pin dài.
+                                </p>
+                                <div
+                                    className="position-absolute top-0 end-0 bottom-0 text-nowrap overflow-hidden text-center fs-1 fw-bold text-light opacity-25"
+                                    style={{
+                                        writingMode: "vertical-rl",
+                                        textOrientation: "mixed",
+                                        color: "#C9B8F9",
+                                    }}
+                                >
+                                    HOT NEWS
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div className="col-md-6 d-flex flex-column gap-3">
+                        {articles.map((article, idx) => (
+                            <div key={idx} className="d-flex border-bottom pb-3 gap-3">
+                                <div style={{ width: '120px', height: '80px', overflow: 'hidden' }}>
+                                    <img
+                                        src={article.img}
+                                        alt={article.title}
+                                        className="img-fluid rounded"
+                                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                    />
+                                </div>
+
+                                <div className="flex-grow-1 small">
+                                    <div className="fw-semibold">{article.title}</div>
+                                    <div className="d-flex align-items-center mt-1 text-success fw-semibold small">
+                                        <span>{article.author}</span>
+                                        <span className="text-secondary mx-1">/</span>
+                                        <time className="text-muted" dateTime="2025-05-26">
+                                            26/05/2025
+                                        </time>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        <button className="btn btn-outline-secondary btn-sm align-self-start mt-2 fw-semibold ">
+                            Xem tất cả <i className="fas fa-sync-alt ms-1"></i>
+                        </button>
+                    </div>
                 </div>
-            </section>
-        </div>
+            </div>
+
+            {/* Option For You  */}
+            <div className="container py-5">
+                <h1 className="text-center fw-bold mb-4 d-flex align-items-center justify-content-center gap-2">
+
+                    Gợi ý cho bạn
+                </h1>
+
+                <div className="tab-swiper-container text-center d-flex justify-content-center m-3">
+                    <Swiper
+                        spaceBetween={10}
+                        slidesPerView="auto"
+                        freeMode={true}
+                        className="tab-swiper bg-light rounded-pill  p-2  "
+                    >
+                        {categories.map((cat) => (
+                            <SwiperSlide key={cat} className="w-auto ">
+                                <button
+                                    className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeTabCategories === cat ? "active" : ""
+                                        }`}
+                                    onClick={() => setActiveTabCategories(cat)}
+                                >
+                                    {cat}
+                                </button>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </div>
+
+                <div className="row g-3">
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map(pro => (
+                            <div className="col-6 col-md-4 col-lg-3 col-xxl-3" key={pro._id}>
+                                <ProductCard product={pro} />
+                            </div>
+                        ))
+                    ) : (
+                        <div>Không tìm thấy sản phẩm phù hợp</div>
+                    )}
+
+
+                   
+                </div>
+
+
+
+
+
+
+            </div>
+
+
+
+
+        </>
     )
 }
 

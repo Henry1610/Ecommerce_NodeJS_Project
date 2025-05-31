@@ -10,13 +10,21 @@ import { ToastContainer } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
 root.render(
   <Provider store={store}>
 
     <React.StrictMode>
+    <Elements stripe={stripePromise}>
+
       <App />
+      </Elements>
+
     </React.StrictMode>
     <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
 

@@ -7,6 +7,9 @@ import { toast } from 'react-toastify';
 function ProductCard({ product }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    if (!product) {
+        return <div>Sp khon ton tai</div>
+    }
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);
     const handleShowDetail = (productId) => {
@@ -26,62 +29,75 @@ function ProductCard({ product }) {
 
 
     return (
-        <div className="col">
-            <div className="card single-product-wrap position-relative overflow-hidden border-0 shadow-sm">
-                {/* Product Image */}
-                <div className="position-relative">
-                    <a href="single-product.html">
-                        <img src={product.images} alt="Product" className="card-img-top img-fluid" />
-                    </a>
-                    <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-2">New</span>
 
+        <div className="card shadow-sm rounded-4 overflow-hidden mx-auto " style={{ width: "100%" }} >
+            <img
+                src="https://storage.googleapis.com/a1aa/image/821514f3-0a04-418f-30e9-be563b4f05cb.jpg"
+                className="card-img-top px-3"
+                alt="Laptop mỏng"
+                style={{ height: "200px", objectFit: "cover" }}
+                onClick={() => handleShowDetail(product._id)}
+            />
+            <div className="card-body text-center p-2">
+                <h6 className="card-title fw-semibold text-truncate mb-2" style={{ fontSize: "0.9rem" }}  onClick={() => handleShowDetail(product._id)}>
+                    {product.name}
+                </h6>
 
+                <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <div className="text-warning star-shadow" style={{ fontSize: "0.75rem" }}>
+                        {[...Array(5)].map((_, index) => {
+                            const full = index + 1 <= product.ratings;
+                            const half = !full && index + 0.5 <= product.ratings;
+
+                            return full ? (
+                                <i key={index} className="fas fa-star text-warning" />
+                            ) : half ? (
+                                <i key={index} className="fas fa-star-half-alt text-warning" />
+                            ) : (
+                                <i key={index} className="far fa-star text-warning" />
+                            );
+                        })}
+                    </div>
+                    <span className="text-muted fw-medium" style={{ fontSize: "0.75rem" }}>
+                        {product.ratings}
+                    </span>
+                    <span className="text-muted small" style={{ fontSize: "0.7rem" }}>
+                        | Còn lại <strong className="text-dark">{product.numReviews}</strong>
+                    </span>
                 </div>
 
-                <div className="card-body product_desc ">
 
-
-                    {/* Product Name */}
-                    <h5 className="card-title mb-2">
-                        <a href="single-product.html" className="text-dark text-decoration-none">
-                            {product.name}
-                        </a>
-                    </h5>
-
-                    {/* Price */}
-                    {!product.discountPercent ? (
-                        <div className="price-box mt-2">
-                            <span className="fw-bold text-dark">${originalPrice}</span>
-                        </div>
-                    ) : (
-                        <div className="price-box mt-2 d-flex">
-                            <span className="text-warning fw-bold">${discountPrice.toFixed(2)}</span>
-                            <span className="text-muted text-decoration-line-through ms-2">${originalPrice}</span>
+                <div className="mb-2">
+                    <h6 className="text-danger fw-bold mb-1" style={{ fontSize: "1rem" }}>{discountPrice?.toLocaleString('vi-VN')}đ</h6>
+                    {product.discountPercent && (
+                        <div className="d-flex justify-content-center align-items-center gap-1">
+                            <span className="text-decoration-line-through text-secondary" style={{ fontSize: "0.75rem" }}>
+                                {originalPrice?.toLocaleString('vi-VN')}₫
+                            </span>
+                            <span className="badge bg-danger-subtle text-danger rounded-pill fw-semibold" style={{ fontSize: "0.65rem" }}>
+                                -{product.discountPercent}%
+                            </span>
                         </div>
                     )}
-                </div>
-                <div className="add-actions bottom-0 start-0 end-0 text-center bg-white py-2">
 
-                    <ul className="list-inline m-0">
-                        <li className="list-inline-item mx-1">
-                            <button className="btn btn-md btn-warning text-dark fw-bold px-4" onClick={() => handleAddToCart({ productId: product._id, quantity: 1 })}>Add to cart</button>
-                        </li>
-                        <li className="list-inline-item mx-1">
-                            <Link to="/wishlist" className="btn btn-sm btn-outline-warning">
-                                <i className="far fa-heart"></i>
-                            </Link>
-                        </li>
-                        <li className="list-inline-item mx-1">
-                            <div title="Quick view" onClick={() => handleShowDetail(product._id)} className="btn btn-sm btn-outline-warning" >
-                                <i className="fas fa-eye"></i>
-                            </div>
-                        </li>
-                    </ul>
+
+
+                </div>
+
+                <div className="text-success fw-semibold d-flex justify-content-center align-items-center gap-1 mb-3" style={{ fontSize: "0.75rem" }}>
+                    <i className="fas fa-credit-card fs-6"></i>
+                    <span>Trả góp 0%</span>
+                </div>
+
+                {/* Nút hành động với màu info */}
+                <div className="d-flex justify-content-center gap-2 ">
+                    <button className="btn btn-outline-info btn-sm px-3 fw-bold rounded-4" onClick={() => handleAddToCart({ productId: product._id, quantity: 1 })}>Thêm vào giỏ</button>
+                    <button className="btn btn-info btn-sm text-white px-3 fw-bold rounded-4">Mua ngay</button>
                 </div>
             </div>
-
-
         </div>
+
+
     );
 }
 

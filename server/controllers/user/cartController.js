@@ -5,7 +5,7 @@ export const getCart = async (req, res) => {
 
   try {
     
-    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+    const cart = await Cart.findOne({ user: userId }).populate('items.product').populate('items.product');
     if (!cart) return res.json({ items: [] });
     
     res.json({

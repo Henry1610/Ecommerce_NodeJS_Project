@@ -1,0 +1,37 @@
+.banner-swiper {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    height: 300px;
+  }
+  
+  .banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Tùy chỉnh nút điều hướng */
+  .swiper-button-next,
+  .swiper-button-prev {
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+  
+  .swiper-button-next:hover,
+  .swiper-button-prev:hover {
+    opacity: 1;
+  }
+  
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 16px;
+  }
+  

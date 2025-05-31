@@ -8,6 +8,7 @@ import categoryReducer from './category/categoriesSlice'
 import userSliceReducer from './user/userSlice'
 import discountSliceReducer from './discount/discountSlice'
 import shippingZoneReducer from './shippingZone/shippingZoneSlice';
+import paymentReducer from './payment/paymentSlice';
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
     users:userSliceReducer,
     discounts:discountSliceReducer,
     shippingZones: shippingZoneReducer,
+    payment:paymentReducer
 
   },
 });

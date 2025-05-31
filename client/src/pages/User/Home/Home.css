@@ -1,0 +1,22 @@
+.tab-btn {
+    background-color: transparent;
+    border: none;
+    color: #000;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    
+  }
+  
+  .tab-btn.active {
+    background-color: cyan;
+    color: black;
+  }
+  
+  .tab-swiper .swiper-slide {
+    width: auto !important;
+  }
+  
+  .tab-btn:focus {
+    outline: none;
+  }
+  

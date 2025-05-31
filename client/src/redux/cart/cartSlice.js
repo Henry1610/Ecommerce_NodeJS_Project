@@ -96,10 +96,18 @@ const cartSlice = createSlice({
   initialState: {
     cart: null,
     loading: false,
-    error: null
+    error: null,
+    selectedDiscountSlice: null,
+
   },
   reducers: {
     
+        setSelectedDiscountSlice: (state, action) => {
+            state.selectedDiscountSlice = action.payload;
+        },
+        clearSelectedDiscountSlice: (state) => {
+            state.selectedDiscountSlice = null;
+        }
   },
   extraReducers: builder => {
     builder
@@ -140,4 +148,5 @@ const cartSlice = createSlice({
   
   
 })
+export const {setSelectedDiscountSlice,clearSelectedDiscountSlice} =cartSlice.actions;
 export default cartSlice.reducer

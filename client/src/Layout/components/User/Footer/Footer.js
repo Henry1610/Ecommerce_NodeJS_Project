@@ -1,192 +1,126 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { memo } from "react";
 function Footer() {
-    return (
-        <footer className="bg-light pt-5">
-            {/* Footer Top - Shipping Benefits */}
-            <div className="container">
-                <div className="row mb-5">
-                    <div className="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                        <div className="d-flex">
-                            <div className="me-3">
-                                <img src="/images/shipping-icon/1.png" alt="Free Delivery" className="img-fluid" style={{maxWidth: "60px"}} />
-                            </div>
-                            <div>
-                                <h5 className="fw-bold">Free Delivery</h5>
-                                <p className="text-muted">And free returns. See checkout for delivery dates.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                        <div className="d-flex">
-                            <div className="me-3">
-                                <img src="/images/shipping-icon/2.png" alt="Safe Payment" className="img-fluid" style={{maxWidth: "60px"}} />
-                            </div>
-                            <div>
-                                <h5 className="fw-bold">Safe Payment</h5>
-                                <p className="text-muted">Pay with the world's most popular and secure payment methods.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-lg-3 col-md-6 mb-4 mb-md-0">
-                        <div className="d-flex">
-                            <div className="me-3">
-                                <img src="/images/shipping-icon/3.png" alt="Shop with Confidence" className="img-fluid" style={{maxWidth: "60px"}} />
-                            </div>
-                            <div>
-                                <h5 className="fw-bold">Shop with Confidence</h5>
-                                <p className="text-muted">Our Buyer Protection covers your purchase from click to delivery.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-lg-3 col-md-6">
-                        <div className="d-flex">
-                            <div className="me-3">
-                                <img src="/images/shipping-icon/4.png" alt="24/7 Help Center" className="img-fluid" style={{maxWidth: "60px"}} />
-                            </div>
-                            <div>
-                                <h5 className="fw-bold">24/7 Help Center</h5>
-                                <p className="text-muted">Have a question? Call a Specialist or chat online.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  const countries = [
+    "Quốc gia & Khu vực:", "Singapore", "Indonesia", "Thái Lan",
+    "Việt Nam", "Phillipines", "Brazil", "Mexico", "Colombia", "Chile"
+  ];
+  const policies = [
+    "CHÍNH SÁCH BẢO MẬT",
+    "QUY CHẾ HOẠT ĐỘNG",
+    "CHÍNH SÁCH VẬN CHUYỂN",
+    "CHÍNH SÁCH TRẢ HÀNG VÀ HOÀN TIỀN"
+  ];
+
+  return (
+    <div className=" text-center text-muted small container border-top">
+      <div className="row border-bottom py-4">
+        <div className="col-12 col-md-2 text-start mb-4">
+          <h6 className="fw-bold">DỊCH VỤ KHÁCH HÀNG</h6>
+          <ul className="list-unstyled">
+            {[
+              "Trung Tâm Trợ Giúp Shopee", "Shopee Blog", "Shopee Mall",
+              "Hướng Dẫn Mua Hàng/Đặt Hàng", "Hướng Dẫn Bán Hàng", "Ví ShopeePay",
+              "Shopee Xu", "Đơn Hàng", "Trả Hàng/Hoàn Tiền", "Liên Hệ Shopee", "Chính Sách Bảo Hành"
+            ].map((item, idx) => <li key={idx} className="mb-2">{item}</li>)}
+          </ul>
+        </div>
+
+        <div className="col-12 col-md-2 text-start mb-4">
+          <h6 className="fw-bold">SHOPEE VIỆT NAM</h6>
+          <ul className="list-unstyled">
+            {[
+              "Về Shopee", "Tuyển Dụng", "Điều Khoản Shopee", "Chính Sách Bảo Mật",
+              "Shopee Mall", "Kênh Người Bán", "Flash Sale", "Tiếp Thị Liên Kết", "Liên Hệ Truyền Thông"
+            ].map((item, idx) => <li key={idx} className="mb-2">{item}</li>)}
+          </ul>
+        </div>
+
+        <div className="col-12 col-md-4 text-start mb-4">
+          <div className="mb-3">
+            <h6 className="fw-bold">THANH TOÁN</h6>
+            <div className="d-flex flex-wrap gap-2 mt-2">
+              {[...Array(8).keys()].map(i => (
+                <img key={i} src={`https://down-vn.img.susercontent.com/file/${["d4bbea4570b93bfd5fc652ca82a262a8", "a0a9062ebe19b45c1ae0506f16af5c16", "38fd98e55806c3b2e4535c4e4a6c4c08", "bc2a874caeee705449c164be385b796c", "2c46b83d84111ddc32cfd3b5995d9281", "5e3f0bee86058637ff23cfdf2e14ca09", "9263fa8c83628f5deff55e2a90758b06", "0217f1d345587aa0a300e69e2195c492"][i]}`} className="bg-white p-1" alt="" height="30" />
+              ))}
             </div>
-
-            {/* Footer Middle - Company Info & Links */}
-            <div className="container py-5 border-top border-bottom">
-                <div className="row">
-                    {/* Company Info */}
-                    <div className="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                        <div className="mb-4">
-                            <img src="/images/menu/logo/1.jpg" alt="Footer Logo" className="img-fluid mb-3" style={{maxHeight: "50px"}} />
-                            <p className="text-muted">
-                                We are a team of designers and developers that create high quality HTML Template & Woocommerce, Shopify Theme.
-                            </p>
-                        </div>
-                        <ul className="list-unstyled">
-                            <li className="mb-2">
-                                <strong>Address: </strong>
-                                <span className="text-muted">6688 Princess Road, London, Greater London BAS 23JK, UK</span>
-                            </li>
-                            <li className="mb-2">
-                                <strong>Phone: </strong>
-                                <a href="tel:+1231233213345" className="text-decoration-none text-muted">(+123) 123 321 345</a>
-                            </li>
-                            <li className="mb-2">
-                                <strong>Email: </strong>
-                                <a href="mailto:info@yourdomain.com" className="text-decoration-none text-muted">info@yourdomain.com</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Product Links */}
-                    <div className="col-lg-2 col-md-3 col-sm-6 mb-4 mb-lg-0">
-                        <h5 className="fw-bold mb-4">Product</h5>
-                        <ul className="list-unstyled">
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Prices drop</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">New products</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Best sales</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Contact us</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Company Links */}
-                    <div className="col-lg-2 col-md-3 col-sm-6 mb-4 mb-lg-0">
-                        <h5 className="fw-bold mb-4">Our company</h5>
-                        <ul className="list-unstyled">
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Delivery</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Legal Notice</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">About us</a></li>
-                            <li className="mb-2"><a href="#" className="text-decoration-none text-muted">Contact us</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Social Media and Newsletter */}
-                    <div className="col-lg-4 col-md-6">
-                        <h5 className="fw-bold mb-4">Follow Us</h5>
-                        <ul className="list-unstyled d-flex mb-4">
-                            <li className="me-3">
-                                <a href="https://twitter.com/" className="btn btn-outline-secondary" target="_blank" title="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
-                            </li>
-                            <li className="me-3">
-                                <a href="https://rss.com/" className="btn btn-outline-secondary" target="_blank" title="RSS">
-                                    <i className="fas fa-rss"></i>
-                                </a>
-                            </li>
-                            <li className="me-3">
-                                <a href="https://www.plus.google.com/discover" className="btn btn-outline-secondary" target="_blank" title="Google Plus">
-                                    <i className="fab fa-google-plus-g"></i>
-                                </a>
-                            </li>
-                            <li className="me-3">
-                                <a href="https://www.facebook.com/" className="btn btn-outline-secondary" target="_blank" title="Facebook">
-                                    <i className="fab fa-facebook-f"></i>
-                                </a>
-                            </li>
-                            <li className="me-3">
-                                <a href="https://www.youtube.com/" className="btn btn-outline-secondary" target="_blank" title="Youtube">
-                                    <i className="fab fa-youtube"></i>
-                                </a>
-                            </li>
-                            <li className="me-3">
-                                <a href="https://www.instagram.com/" className="btn btn-outline-secondary" target="_blank" title="Instagram">
-                                    <i className="fab fa-instagram"></i>
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div className="mb-4">
-                            <h5 className="fw-bold mb-3">Sign up to newsletter</h5>
-                            <form action="#" method="post" className="needs-validation" noValidate>
-                                <div className="input-group">
-                                    <input type="email" className="form-control" placeholder="Enter your email" required />
-                                    <button className="btn btn-primary" type="submit">Subscribe</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div>
+            <h6 className="fw-bold">ĐƠN VỊ VẬN CHUYỂN</h6>
+            <div className="d-flex flex-wrap gap-2 mt-2">
+              {[...Array(9).keys()].map(i => (
+                <img key={i} src={`https://down-vn.img.susercontent.com/file/${["vn-11134258-7ras8-m20rc1wk8926cf", "vn-50009109-64f0b242486a67a3d29fd4bcf024a8c6", "59270fb2f3fbb7cbc92fca3877edde3f", "957f4eec32b963115f952835c779cd2c", "957f4eec32b963115f952835c779cd2c", "3900aefbf52b1c180ba66e5ec91190e5", "6e3be504f08f88a15a28a9a447d94d3d", "0b3014da32de48c03340a4e4154328f6", "vn-50009109-ec3ae587db6309b791b78eb8af6793fd"][i]}`} className="bg-white p-1" alt="" height="30" />
+              ))}
             </div>
+          </div>
+        </div>
 
-            {/* Footer Bottom - Links & Copyright */}
-            <div className="container py-4">
-                <div className="row">
-                    <div className="col-12">
-                        {/* Footer Links */}
-                        <div className="text-center mb-4">
-                            <ul className="list-inline">
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Online Shopping</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Promotions</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">My Orders</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Help</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Customer Service</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Support</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Most Populars</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">New Arrivals</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Special Products</a></li>
-                                <li className="list-inline-item"><a href="#" className="text-decoration-none text-muted small mx-2">Manufacturers</a></li>
-                            </ul>
-                        </div>
+        <div className="col-12 col-md-2 text-start mb-4">
+          <h6 className="fw-bold">THEO DÕI SHOPEE</h6>
+          <ul className="list-unstyled">
+            {[
+              { name: "Facebook", icon: "2277b37437aa470fd1c71127c6ff8eb5" },
+              { name: "Instagram", icon: "5973ebbc642ceee80a504a81203bfb91" },
+              { name: "LinkeIn", icon: "f4f86f1119712b553992a75493065d9a" }
+            ].map((social, idx) => (
+              <li key={idx} className="mb-2">
+                <a href="/" className="d-flex align-items-center text-decoration-none text-muted">
+                  <img src={`https://down-vn.img.susercontent.com/file/${social.icon}`} className="me-2" height="20" alt="" />
+                  <span>{social.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-                        {/* Payment Methods */}
-                        <div className="text-center mb-3">
-                            <img src="/images/payment/1.png" alt="Payment Methods" className="img-fluid" />
-                        </div>
-
-                        {/* Copyright */}
-                        <div className="text-center text-muted small">
-                            <p>&copy; 2023. All Rights Reserved. <a href="https://www.templateshub.net" className="text-decoration-none" target="_blank">Templates Hub</a></p>
-                        </div>
-                    </div>
-                </div>
+        <div className="col-12 col-md-2 text-start mb-4">
+          <h6 className="fw-bold">TẢI ỨNG DỤNG SHOPEE</h6>
+          <div className="d-flex">
+            <img src="https://down-vn.img.susercontent.com/file/a5e589e8e118e937dc660f224b9a1472" alt="" width="80" />
+            <div className="ms-2">
+              {["ad01628e90ddf248076685f73497c163", "ae7dced05f7243d0f3171f786e123def", "35352374f39bdd03b25e7b83542b2cb0"].map((img, idx) => (
+                <img key={idx} src={`https://down-vn.img.susercontent.com/file/${img}`} className="bg-white p-1 mb-1" width="90" alt="" />
+              ))}
             </div>
-        </footer>
-    )
+          </div>
+        </div>
+      </div>
+
+      <div className="d-flex flex-wrap justify-between py-4">
+        <div>© 2025 Shopee. Tất cả các quyền được bảo lưu.</div>
+        <div className="d-flex flex-wrap gap-2">
+          {countries.map((country, index) => (
+            <span key={index}>
+              {index !== 0 && <span className="mx-1">|</span>}
+              {country}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="text-muted small py-3">
+        <div className="d-flex justify-content-center flex-wrap">
+          {policies.map((policy, index) => (
+            <div key={index} className="px-2 position-relative">
+              {policy}
+              {index !== policies.length - 1 && <span className="position-absolute end-0 text-secondary">|</span>}
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center my-3">
+          <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/9765d68a8945750d.png" alt="" />
+        </div>
+
+        <div>Công ty TNHH Shopee</div>
+        <div className="mt-2">
+          Địa chỉ: Tầng 4-5-6, Tòa nhà Capital Place, số 29 đường Liễu Giai, Phường Ngọc Khánh, Quận Ba Đình, TP Hà Nội, Việt Nam. Tổng đài hỗ trợ: 19001221 - Email: cskh@hotro.shopee.vn
+        </div>
+        <div className="mt-2">Chịu Trách Nhiệm Quản Lý Nội Dung: Nguyễn Bùi Anh Tuấn</div>
+        <div className="mt-2">Mã số doanh nghiệp: 0106773786 do Sở KH&ĐT TP Hà Nội cấp ngày 10/02/2015</div>
+        <div className="mt-2">© 2015 - Bản quyền thuộc về Công ty TNHH Shopee</div>
+      </div>
+    </div>
+  );
 }
 
-export default Footer;
+export default memo(Footer);

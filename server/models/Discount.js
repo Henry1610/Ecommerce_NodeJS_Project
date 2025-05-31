@@ -7,6 +7,9 @@ const discountSchema = new mongoose.Schema({
     validFrom: { type: Date, required: true },
     validTo: { type: Date, required: true },
     isActive: { type: Boolean, default: false },
+    quantity: { type: Number, required: true, min: 0 },
+    maxDiscount: { type: Number, default: null, min: 0 },
+
 });
 
 export default mongoose.model('Discount', discountSchema);

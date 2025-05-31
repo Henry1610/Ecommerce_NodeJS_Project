@@ -10,7 +10,7 @@ import productRoutes from '../routes/user/user.product.routes.js';
 import userRoutes from '../routes/user/user.user.routes.js';
 import shippingRoutes from '../routes/user/user.shipping.routes.js';
 import reviewRoutes from '../routes/user/user.review.routes.js';
-
+import paymentRoutes from '../routes/user/user.payment.routes.js'
 // Các route cho user
 router.get('/', (req, res) => {
     res.json({ user: req.user });
@@ -20,7 +20,7 @@ router.use('/cart', authenticate, cartRoutes);
 router.use('/users', authenticate, userRoutes);
 router.use('/discounts', authenticate, discountRoutes);
 // router.use('/orders', authenticate, orderRoutes);
-// router.use('/payments', authenticate, paymentRoutes);
+router.use('/payments', authenticate, paymentRoutes);
 router.use('/products', productRoutes);
 router.use('/shippings', authenticate, shippingRoutes);
 router.use('/reviews', reviewRoutes);

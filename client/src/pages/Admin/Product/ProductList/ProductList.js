@@ -101,7 +101,7 @@ const ProductList = () => {
                   </thead>
                   <tbody>
                     {products && products.map(product => (
-                      <tr key={product.id}>
+                      <tr key={product._id}>
                         <td>
                           <label className="checkboxs">
                             <input

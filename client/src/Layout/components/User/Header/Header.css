@@ -1,0 +1,28 @@
+body {
+    font-family: "Inter", sans-serif;
+  }
+  .search-input::placeholder {
+    color: #06b6d4;
+  }
+  
+  .cart-badge {
+    font-size: 10px;
+    top: -6px;
+    right: -6px;
+  }
+  .category-text {
+    font-size: 10px;
+    font-weight: 600;
+    color: #4b5563;
+    line-height: 1.2;
+  }
+  @media (min-width: 576px) {
+    .category-text {
+      font-size: 11px;
+    }
+  }
+  @media (min-width: 768px) {
+    .category-text {
+      font-size: 14px;
+    }
+  }

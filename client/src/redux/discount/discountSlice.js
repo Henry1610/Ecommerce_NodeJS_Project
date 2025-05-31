@@ -149,7 +149,8 @@ const discountSlice = createSlice({
         resetDiscountDetail: (state) => {
             state.discount = null;
             state.error = null;
-        },
+        }
+
     },
     extraReducers: (builder) => {
         builder
@@ -193,7 +194,7 @@ const discountSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            
+
             .addCase(updateDiscount.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -208,7 +209,7 @@ const discountSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            
+
     },
 });
 

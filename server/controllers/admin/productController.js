@@ -153,8 +153,10 @@ export const deleteProduct = async (req, res) => {
             return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
         }
 
-        res.status(200).json({ message: 'Sản phẩm đã bị xóa thành công' });
-    } catch (error) {
+        res.status(200).json({
+            message: 'Sản phẩm đã bị xóa thành công',
+            id: deletedProduct._id,
+          });    } catch (error) {
         res.status(500).json({ message: 'Lỗi khi xóa sản phẩm', error: error.message });
     }
 };             

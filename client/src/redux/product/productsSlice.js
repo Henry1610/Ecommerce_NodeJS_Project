@@ -37,7 +37,7 @@ export const fetchProductById = createAsyncThunk(
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh mục');
             }
             return data;
-        }catch (error) {
+        } catch (error) {
             console.error('Network error fetching category:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
@@ -47,7 +47,7 @@ export const fetchProductById = createAsyncThunk(
 export const addProduct = createAsyncThunk(
     'products/addProduct',
     async (productData) => {
-        
+
         const res = await fetch('http://localhost:5000/api/admin/products', {
             method: 'POST',
             headers: {
@@ -64,8 +64,8 @@ export const addProduct = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
     'products/updateProduct',
     async ({ productId, productData }) => {
-        console.log('productIdSlice:',productId);
-        
+        console.log('productIdSlice:', productId);
+
         const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
             method: 'PUT',
             headers: {
@@ -180,7 +180,10 @@ const productsSlice = createSlice({
             })
             .addCase(deleteProduct.fulfilled, (state, action) => {
                 state.loading = false;
-                state.products = state.products.filter(p => p._id !== action.payload);
+                state.products = state.products.filter(product => product._id !== action.payload.id);
+                if (state.product && state.product._id === action.payload.id) {
+                    state.product = null;
+                }
             })
             .addCase(deleteProduct.rejected, (state, action) => {
                 state.loading = false;
