@@ -38,9 +38,6 @@ function Header() {
 
             .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
     }, [dispatch]);
-    console.log('cart:', cart);
-    const stripeKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
-    console.log('Dispatching with key:', stripeKey);
 
     return (
         <>

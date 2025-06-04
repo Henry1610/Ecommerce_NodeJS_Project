@@ -5,7 +5,7 @@ dotenv.config();
 import connectDB from './config/db.js';
 import route from './routes/index.js';
 import path from 'path';
-
+import { stripeWebhook } from './controllers/user/paymentController.js';
 import { fileURLToPath } from 'url';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -20,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(errorHandler)
 app.use(cors());
+app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }),stripeWebhook);
+
 app.use(express.json());
 
 connectDB();

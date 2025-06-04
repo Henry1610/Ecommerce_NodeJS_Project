@@ -1,5 +1,5 @@
 // src/redux/store.js
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore,combineReducers } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import productsReducer from './products/productsSlice'
 import cartReducer from './cart/cartSlice'
@@ -9,9 +9,20 @@ import userSliceReducer from './user/userSlice'
 import discountSliceReducer from './discount/discountSlice'
 import shippingZoneReducer from './shippingZone/shippingZoneSlice';
 import paymentReducer from './payment/paymentSlice';
-
+import shippingAddressReducer from './shippingAddress/shippingAddressSlice';
+import shippingZonesReducer from './public/shippingZoneSlice'
+const publicReducer = combineReducers({
+  publicShippingZones: shippingZonesReducer,
+});
+const userReducer = combineReducers({
+  publicShippingZones: shippingZonesReducer,
+});
+const adminReducer = combineReducers({
+  publicShippingZones: shippingZonesReducer,
+});
 const store = configureStore({
   reducer: {
+    public:publicReducer,
     products: productsReducer,
     auth: authReducer,
     cart: cartReducer,
@@ -20,8 +31,8 @@ const store = configureStore({
     users:userSliceReducer,
     discounts:discountSliceReducer,
     shippingZones: shippingZoneReducer,
-    payment:paymentReducer
-
+    payment:paymentReducer,
+    shippingAddress:shippingAddressReducer
   },
 });
 

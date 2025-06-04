@@ -20,8 +20,18 @@ const cartSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  items: [cartItemSchema]
-  
+  items: [cartItemSchema],
+  appliedDiscount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Discount',
+    default: null
+  },
+  shippingFee: {      
+    type: Number,
+    required: true,
+    default: 0
+  }
+
 });
 
 export default mongoose.model('Cart', cartSchema);

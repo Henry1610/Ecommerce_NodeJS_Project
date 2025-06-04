@@ -1,5 +1,5 @@
 import Order from '../../models/Oder.js';
-import Shipping from '../../models/Shipping.js';
+import shippingAddress from '../../models/shippingAddress.js';
 
 export const getOrders = async (req, res) => {
     try {

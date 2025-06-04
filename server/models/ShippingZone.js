@@ -5,4 +5,5 @@ const shippingZoneSchema = new mongoose.Schema({
   fee: { type: Number, required: true },
 });
 
-export default mongoose.model('ShippingZone', shippingZoneSchema);
+const ShippingZone = mongoose.models.ShippingZone || mongoose.model('ShippingZone', shippingZoneSchema);
+export default ShippingZone;

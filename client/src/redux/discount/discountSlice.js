@@ -20,7 +20,7 @@ export const fetchDiscounts = createAsyncThunk(
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách mã giảm giá');
             }
 
-            console.log('Discounts fetched successfully:', data);
+            // console.log('Discounts fetched successfully:', data);
             return data;
         } catch (error) {
             console.error('Network error fetching discounts:', error);
