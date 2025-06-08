@@ -22,6 +22,10 @@ const shippingAddressSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: true
+  },
+  isDefault:{
+    type: Boolean,
+    default: false
   }
 });
 

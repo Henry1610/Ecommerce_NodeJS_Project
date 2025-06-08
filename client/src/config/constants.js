@@ -1,0 +1,1 @@
+export const MAX_STRIPE_AMOUNT = 99999999;

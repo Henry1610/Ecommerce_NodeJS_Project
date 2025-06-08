@@ -1,5 +1,7 @@
 import Cart from '../../models/Cart.js';
 import Discount from '../../models/Discount.js'
+import { MAX_STRIPE_AMOUNT } from '../../../client/src/config/constants.js';
+import Product from '../../models/Product.js'
 export const getCart = async (req, res) => {
   const userId = req.user.id;
 
@@ -17,22 +19,56 @@ export const getCart = async (req, res) => {
   }
 };
 
+
 export const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
-
   const userId = req.user.id;
+
   try {
-    let cart = await Cart.findOne({ user: userId });
+    // Tìm hoặc tạo giỏ hàng
+    let cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+    // Clone lại mảng items để kiểm tra tổng tiền giả định
+    const clonedItems = [...cart.items];
+
+    const itemIndex = clonedItems.findIndex(
+      item => item.product._id.toString() === productId
+    );
 
     if (itemIndex !== -1) {
-      cart.items[itemIndex].quantity += quantity;
+      clonedItems[itemIndex].quantity += quantity;
     } else {
-      cart.items.push({ product: productId, quantity });
+      const product = await Product.findById(productId);
+      if (!product) return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+
+      clonedItems.push({ product, quantity }); // product ở đây là object
+    }
+
+    // Tính tổng tiền giả định
+    let total = 0;
+    for (const item of clonedItems) {
+      const price = item.product.price || 0;
+      total += price * item.quantity;
+    }
+
+    if (total > MAX_STRIPE_AMOUNT) {
+      return res.status(400).json({
+        message: 'Tổng giá trị đơn hàng không được vượt quá 100 triệu đồng.',
+      });
+    }
+
+    // Nếu hợp lệ thì mới thực sự thêm vào cart thật
+    const realItemIndex = cart.items.findIndex(
+      item => item.product._id.toString() === productId
+    );
+
+    if (realItemIndex !== -1) {
+      cart.items[realItemIndex].quantity += quantity;
+    } else {
+      cart.items.push({ product: productId, quantity }); // Dùng ObjectId
     }
 
     await cart.save();
@@ -40,25 +76,54 @@ export const addToCart = async (req, res) => {
 
     res.json(populatedCart);
   } catch (error) {
-    console.error("Error adding to cart:", error); // Log thêm lỗi để debug
-
-    res.status(500).json({ message: 'Không thể thêm vào giỏ hàng', error });
+    console.error('Error adding to cart:', error);
+    res.status(500).json({
+      message: 'Không thể thêm vào giỏ hàng',
+      error,
+    });
   }
 };
+
 export const setCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { items,appliedDiscount } = req.body || [];
-    //  console.log(' Items:', req.body);
+    const { items, appliedDiscount, shippingFee } = req.body || [];
+    let subtotal = 0;
+    //Tính tổng tiền tất cả sản phẩm đã áp mã giảm giá
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      if (!product) return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
 
- 
+      if (item.quantity > product.stock) {
+        return res.status(400).json({ message: `Sản phẩm "${product.name}" chỉ còn ${product.stock} cái` });
+      }
+
+      const discount = product.discountPercent || 0;
+      const discountedPrice = product.price * (1 - discount / 100);
+      subtotal += discountedPrice * item.quantity;
+    }    
+    // Tính tiền mã giảm giá 
+    let totalDiscount = 0;
+    if (appliedDiscount && appliedDiscount.discountPercent) {
+      const raw = subtotal * (appliedDiscount.discountPercent / 100);
+      totalDiscount = appliedDiscount.maxDiscount
+        ? Math.min(Math.round(raw), appliedDiscount.maxDiscount)
+        : Math.round(raw);
+    }
+    
+    // Tổng tiền cuối cùng
+    const finalTotal = subtotal - totalDiscount+shippingFee ;
+
+    if (finalTotal > MAX_STRIPE_AMOUNT) {
+      return res.status(400).json({ message: 'Tổng đơn hàng không được vượt quá 100 triệu!' });
+    }
+    
 
 
     const updatedCart = await Cart.findOneAndUpdate(
       { user: userId },
-      { items,appliedDiscount },
-     
+      { items, appliedDiscount },
       { new: true, upsert: true }
     ).populate('items.product appliedDiscount');
 
@@ -75,7 +140,7 @@ export const setCart = async (req, res) => {
 export const applyDiscountToCart = async (req, res) => {
   try {
     const { code } = req.body;
-    
+
     const userId = req.user.id;
 
     const discount = await Discount.findOne({ code });
@@ -104,7 +169,7 @@ export const applyDiscountToCart = async (req, res) => {
     cart = await Cart.findById(cart._id).populate('appliedDiscount');
 
     return res.json({
-      message: 'Áp dụng mã giảm giá thành công.', 
+      message: 'Áp dụng mã giảm giá thành công.',
       appliedDiscount: cart.appliedDiscount,
     });
   } catch (error) {
@@ -114,14 +179,14 @@ export const applyDiscountToCart = async (req, res) => {
 };
 export const removeDiscountFromCart = async (req, res) => {
   try {
-    const userId = req.user._id;
-
+    const userId = req.user.id;
+    
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(400).json({ message: 'Không tìm thấy giỏ hàng.' });
     }
 
-    cart.discount = null;
+    cart.appliedDiscount = null;
 
     await cart.save();
 

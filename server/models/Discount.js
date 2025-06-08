@@ -8,6 +8,7 @@ const discountSchema = new mongoose.Schema({
     validTo: { type: Date, required: true },
     isActive: { type: Boolean, default: false },
     quantity: { type: Number, required: true, min: 0 },
+    usedCount: { type: Number, default: 0, min: 0 },    
     maxDiscount: { type: Number, default: null, min: 0 },
 
 });

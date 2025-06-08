@@ -14,17 +14,7 @@ function Header() {
 
     const { cart, error, loading } = useSelector(state => state.cart);
 
-    const calculateTotal = useMemo(() => {
-        
-        if (!cart?.items?.length) return 0;
-
-        return cart.items.reduce((total, item) => {
-            const price = item.product.price || 0;
-            const quantity = item.quantity || 0;
-            return total + (price * quantity);
-        }, 0);
-    },[cart]);
-
+   
     const isAuthenticated = !!token;
 
     const handleLogout = () => {
@@ -114,7 +104,6 @@ function Header() {
                                 onClick={() => { navigate('/cart') }}
                             >
                                 <i className="fas fa-shopping-bag fs-4"></i>
-                                <span>{calculateTotal.toLocaleString()} ₫</span>
                                 <span
                                     className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                                     style={{

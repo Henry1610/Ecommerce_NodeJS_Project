@@ -1,15 +1,21 @@
-import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux'; // THÊM DÒNG NÀY
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux"
 import { addToCart } from "../../redux/cart/cartSlice";
+import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-
+import { fetchCart } from '../../redux/cart/cartSlice';
+import { MAX_STRIPE_AMOUNT } from '../../config/constants';
+import { selectCartTotalPrice } from '../../redux/cart/cartSlice';
 function ProductCard({ product }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    if (!product) {
-        return <div>Sp khon ton tai</div>
-    }
+    const totalPrice=useSelector(selectCartTotalPrice)
+    useEffect(() => {
+          dispatch(fetchCart());
+        
+      }, [dispatch]);
+
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);
     const handleShowDetail = (productId) => {
@@ -17,6 +23,13 @@ function ProductCard({ product }) {
 
     };
     const handleAddToCart = ({ productId, quantity }) => {
+     
+        const newTotal = totalPrice + discountPrice * quantity;
+        
+        if (newTotal >  MAX_STRIPE_AMOUNT) {
+            toast.warning('Tổng giá trị đơn hàng không được vượt quá 100 triệu!');
+            return;
+        }
         dispatch(addToCart({ productId, quantity }))
             .unwrap()
             .then(() => {

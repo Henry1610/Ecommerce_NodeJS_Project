@@ -26,9 +26,8 @@ const cartSchema = new mongoose.Schema({
     ref: 'Discount',
     default: null
   },
-  shippingFee: {      
+  shippingFee: {
     type: Number,
-    required: true,
     default: 0
   }
 

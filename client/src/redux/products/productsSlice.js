@@ -19,7 +19,6 @@ export const fetchProducts = createAsyncThunk(
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách sản phẩm')
             }
 
-            console.log('Products fetched successfully:', data);
             return data;
         } catch (error) {
             console.error('Network error fetching products:', error);

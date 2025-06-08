@@ -27,7 +27,8 @@ const orderSchema = new mongoose.Schema({
       }
     ],
   appliedDiscount: {
-    type: String, // discount code
+    type: mongoose.Schema.ObjectId,
+    ref:'Discount',
     default: null
   },
   totalPrice: {
@@ -39,21 +40,27 @@ const orderSchema = new mongoose.Schema({
     default: false
   },
   paidAt: {
-    type: Date
+    type: Date,
+      default: null
+
   },
   isShipped: {
     type: Boolean,
     default: false
   },
   shippedAt: {
-    type: Date
+    type: Date,
+    default: null
+
   },
   isDelivered: {
     type: Boolean,
     default: false
   },
   deliveredAt: {
-    type: Date
+    type: Date,
+    default: null
+
   }
   
 }, {

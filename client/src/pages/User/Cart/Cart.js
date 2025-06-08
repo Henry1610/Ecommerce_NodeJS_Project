@@ -1,34 +1,43 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Cart.css';
-import { useEffect, useCallback, useState, useMemo, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef,useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicShippingZones } from '../../../redux/public/shippingZoneSlice';
-import { createShippingAddress } from '../../../redux/shippingAddress/shippingAddressSlice';
-
-import { fetchCart, setCart, applyDiscount, removeDiscount } from '../../../redux/cart/cartSlice';
+import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress } from '../../../redux/shippingAddress/shippingAddressSlice';
+import { fetchCart, setCart, applyDiscount, removeDiscount, selectCartSubtotalAfterProductDiscount, selectCartTotalPrice, selectCartDiscountAmount } from '../../../redux/cart/cartSlice';
 import { fetchDiscounts } from '../../../redux/discount/discountSlice';
 import { createCheckoutSession } from '../../../redux/payment/paymentSlice';
 import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
 import VoucherCard from '../../../components/VourcherCard';
 import { Modal } from 'bootstrap';
-
+import { MAX_STRIPE_AMOUNT } from '../../../config/constants';
 function Cart() {
     // Redux hooks
+    const location = useLocation();
+    const modalRef = useRef(null);
     const dispatch = useDispatch();
     const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.cart);
-    const { selectedAddress, AddressSave } = useSelector(state => state.shippingAddress)
+    const { AddressSave, defaultAddress } = useSelector(state => state.shippingAddress)
     const { discounts } = useSelector(state => state.discounts);
     const zones = useSelector(state => state.public?.publicShippingZones?.zones || []);
-    // Local state
+    const CartSubtotalAfterProductDiscount = useSelector(selectCartSubtotalAfterProductDiscount)
+    const CartDiscountAmount = useSelector(selectCartDiscountAmount)
+    const CartTotalPrice = useSelector(selectCartTotalPrice)
+
+    const [selectedAdsId, setSelectedAdsId] = useState('')
+    const [defaultAddressId, setDefaultAddressId] = useState('');
+
     const [showModal, setShowModal] = useState(null);
-    const [selectedAds, setSelectedAds] = useState(selectedAddress);
     const [formAddress, setAddress] = useState({
         fullName: '',
         phoneNumber: '',
         city: '',
         address: '',
+        isDefault: false
     });
+
+
     const [isPaying, setIsPaying] = useState(false);
     const [localCart, setLocalCart] = useState(null);
     const [discountInput, setDiscountInput] = useState('');
@@ -37,63 +46,106 @@ function Cart() {
     const discountRef = useRef(selectedDiscountSlice);
 
     // Refs
-    const modalRef = useRef(null);
 
     // Computed values
     const isDiscountProcessing = discountLoading || isApplyingDiscount;
 
     // Effects
     useEffect(() => {
-        dispatch(fetchDiscounts())
-            .unwrap()
-            .catch(error => toast.error(`Lỗi khi tải mã giảm giá: ${error}`));
-    }, [dispatch]);
-
+        const initializeData = async () => {
+            try {
+                await Promise.allSettled([
+                    dispatch(fetchDiscounts()).unwrap(),
+                    dispatch(getSavedShippingAddresses()).unwrap(),
+                    dispatch(fetchPublicShippingZones()).unwrap(),
+                    dispatch(getDefaultShippingAddress()).unwrap(),
+                    dispatch(fetchCart()).unwrap().then(data => setLocalCart(data))
+                ]);
+            } catch (error) {
+                toast.error(`Lỗi khi tải dữ liệu: ${error}`);
+            }
+        };
+    
+        initializeData();
+    }, [dispatch]); 
     useEffect(() => {
-        dispatch(fetchPublicShippingZones())
-            .unwrap()
-            .catch(error => toast.error(`Lỗi khi tải vị trí: ${error}`));
-    }, [dispatch]);
+        const savedSelectedId = sessionStorage.getItem('selectedAdsId');
+        if (savedSelectedId && savedSelectedId !== 'undefined') {
+            setSelectedAdsId(savedSelectedId)
+            setDefaultAddressId(savedSelectedId)
+        }
+        else {
+            setSelectedAdsId(defaultAddress?._id)
+            setDefaultAddressId(defaultAddress?._id)
+            sessionStorage.setItem('selectedAdsId', defaultAddress?._id);
 
+        }
+    }, [defaultAddress?._id]);
+
+    //  Cleanup sessionStorage
     useEffect(() => {
-        dispatch(fetchCart())
-            .unwrap()
-            .then(data => setLocalCart(data))
-            .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
-    }, [dispatch]);
+        return () => {
+            sessionStorage.removeItem('selectedAdsId');
+        };
+    }, []);
 
-    // Memoized values
-    const totalAmount = useMemo(() => {
-        if (!localCart?.items?.length) return 0;
+    const defaultAddressObj = useMemo(() => {
+        if (!defaultAddressId || !AddressSave.length) {
+            return null;
+        }
+        return AddressSave.find(addr => addr._id === defaultAddressId) || null;
+    }, [defaultAddressId, AddressSave]);
 
-        return localCart.items.reduce((total, item) => {
-            const price = item.product.price || 0;
-            const quantity = item.quantity || 0;
-            return total + (price * quantity);
-        }, 0);
-    }, [localCart]);
+    const handleCheckAds = (id) => {
+        setSelectedAdsId(id)
+    }
+    const handleSelectAds = () => {
+        setShowModal(null)
+        setDefaultAddressId(selectedAdsId)
+        sessionStorage.setItem('selectedAdsId', selectedAdsId);
+    }
+    
+
+
 
 
     useEffect(() => {
         discountRef.current = selectedDiscountSlice;
     }, [selectedDiscountSlice]);
-    // Debounced functions
+
     const debounceSetCart = useCallback(
-
-        debounce(items => {
-            // console.log('selectedDiscountSlice:',discountRef.current);
-
-            dispatch(setCart({
-                items,
-                appliedDiscount: discountRef.current
-            }))
-        }, 500), [dispatch]
-    );
+        debounce(async (items) => {
+          try {
+            await dispatch(setCart({
+              items,
+              appliedDiscount: discountRef.current,
+              shippingFee: defaultAddressObj?.city.fee
+            })).unwrap(); 
+          } catch (error) {
+            toast.error(`Lỗi khi cập nhật giỏ hàng: ${error}`);
+            console.error('Lỗi khi cập nhật giỏ hàng:', error);
+          }
+        }, 500),
+        [dispatch, defaultAddressObj?.city.fee]
+      );
+      
 
     // Handler functions
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return;
 
+        const itemInCart = cart.items.find(item => item.product._id === productId);
+        if (newQuantity > itemInCart.product.stock) {
+            toast.warning(`Chỉ còn ${itemInCart.product.stock} sản phẩm trong kho`);
+            return;
+        }
+        const discountPrice = itemInCart.product.price - ((itemInCart.product.price * itemInCart.product.discountPercent) / 100);//sp vừa thêm
+        const newTotal = CartTotalPrice + discountPrice * (newQuantity - itemInCart.quantity);
+
+        if (newTotal > MAX_STRIPE_AMOUNT) {
+            toast.warning('Tổng giá trị đơn hàng không được vượt quá 100 triệu!');
+            return;
+        }
         const newItems = cart.items.map((item) => {
             if (item.product._id === productId) {
                 return { ...item, quantity: newQuantity };
@@ -184,6 +236,26 @@ function Cart() {
         setAddress(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+
+
+    const handleOpenModelUpdate = async (modalName, addressId) => {
+        setShowModal(modalName);
+
+        try {
+            const addressData = await dispatch(getShippingAddressById(addressId)).unwrap();
+
+            setAddress({
+                fullName: addressData.fullName,
+                phoneNumber: addressData.phoneNumber,
+                city: addressData.city._id,
+                address: addressData.address,
+                isDefault: addressData.isDefault || false,
+            });
+        } catch (err) {
+            toast.error(`Lấy địa chỉ thất bại: ${err?.message || 'Đã xảy ra lỗi'}`);
+        }
+    };
+
     const handleSubmitAds = async (e) => {
         e.preventDefault();
 
@@ -203,7 +275,6 @@ function Cart() {
             toast.error(`Thêm địa chỉ thất bại: ${err?.message || 'Đã xảy ra lỗi'}`);
         }
 
-        console.log(formAddress);
     };
 
     const handlePay = async (e) => {
@@ -220,19 +291,9 @@ function Cart() {
                 product: item.product._id,
                 quantity: item.quantity
             })),
-            appliedDiscount: selectedDiscountSlice?.code || null,
-            shippingAddress: {
-                _id: "682342f736f16bce68033e91sssw2",
-                user: "6819a2f736f16bce68033e91",
-                fullName: "Nguyen Van A",
-                address: "123 Đường ABC",
-                city: "Cần Thơ",
-                postalCode: "700000",
-                country: "Vietnam",
-                phoneNumber: "0912345678"
-            }
+            appliedDiscount: selectedDiscountSlice?._id || null,
+            shippingAddress: defaultAddressObj
         };
-        console.log('orderData:', orderData);
 
         const result = await dispatch(createCheckoutSession(orderData));
         if (createCheckoutSession.fulfilled.match(result)) {
@@ -240,16 +301,7 @@ function Cart() {
         }
     };
 
-    const calculateDiscountAmount = useCallback(() => {
-        if (!selectedDiscountSlice) return 0;
 
-        const rawDiscount = (totalAmount * selectedDiscountSlice.discountPercent) / 100;
-        return selectedDiscountSlice.maxDiscount
-            ? Math.min(rawDiscount, selectedDiscountSlice.maxDiscount)
-            : rawDiscount;
-    }, [selectedDiscountSlice, totalAmount]);
-
-    // Gọi: calculateDiscountAmount()
 
     // Early returns
     if (loading) {
@@ -273,8 +325,10 @@ function Cart() {
                 {/* Left - Cart Items */}
                 <div className="col-md-8">
                     {localCart.items.length > 0 ? localCart.items.map(item => {
-                        const { name, price, image, description, _id } = item.product;
+
+                        const { name, price, image, description, _id, discountPercent } = item.product;
                         const quantity = item.quantity;
+                        const discountedPrice = Math.round(price * (1 - (discountPercent || 0) / 100));
 
                         return (
                             <div key={_id} className="card mb-3 shadow-sm">
@@ -288,13 +342,13 @@ function Cart() {
                                             </div>
                                         </div>
                                         <div className="text-end">
-                                            {item.originalPrice && (
-                                                <div className="text-muted text-decoration-line-through small">
-                                                    {item.originalPrice.toLocaleString()}₫
+                                            {price && (
+                                                <div className=" text-decoration-line-through small text-danger">
+                                                    {price.toLocaleString()}₫
                                                 </div>
                                             )}
                                             <div className="fw-bold">
-                                                {price.toLocaleString()}₫
+                                                {discountedPrice.toLocaleString()}₫
                                             </div>
                                         </div>
                                     </div>
@@ -380,19 +434,19 @@ function Cart() {
                             <div className="border shadow-sm p-4 bg-white text-secondary small" >
                                 <div className="d-flex justify-content-between border-bottom pb-3 mb-3">
                                     <span className="fw-semibold text-dark">Full Name</span>
-                                    <span>{formAddress?.fullName}</span>
+                                    <span>{defaultAddressObj?.fullName}</span>
                                 </div>
                                 <div className="d-flex justify-content-between border-bottom pb-3 mb-3">
                                     <span className="fw-semibold text-dark">Address</span>
-                                    <span>{formAddress?.address}</span>
+                                    <span>{defaultAddressObj?.address}</span>
                                 </div>
                                 <div className="d-flex justify-content-between border-bottom pb-3 mb-3">
                                     <span className="fw-semibold text-dark">City</span>
-                                    <span>{formAddress?.city}</span>
+                                    <span>{defaultAddressObj?.city.city}</span>
                                 </div>
                                 <div className="d-flex justify-content-between">
                                     <span className="fw-semibold text-dark">Phone Number</span>
-                                    <span>{formAddress?.phoneNumber}</span>
+                                    <span>{defaultAddressObj?.phoneNumber}</span>
                                 </div>
                                 <div className="d-flex justify-content-end mt-4">
                                     <button
@@ -419,7 +473,10 @@ function Cart() {
                                         <div className="modal-content">
                                             <div className="modal-header border-bottom">
                                                 <h5 className="modal-title">Địa Chỉ Của Tôi</h5>
-                                                <button type="button" className="btn-close" ></button>
+                                                <button type="button" className="btn-close" onClick={() => {
+                                                    setShowModal('null')
+                                                }
+                                                }></button>
                                             </div>
                                             <form >
                                                 <div className="modal-body">
@@ -431,33 +488,38 @@ function Cart() {
                                                                 className="form-check-input mt-1"
                                                                 type="radio"
                                                                 name="address"
+                                                                value={addr._id}
+                                                                checked={selectedAdsId === addr._id}
+                                                                onChange={(e) => handleCheckAds(e.target.value)}
                                                             />
                                                             <label className="form-check-label w-100">
-                                                                <div className="d-flex align-items-center gap-2">
+                                                                <div className="d-flex align-items-center gap-1">
                                                                     <strong className="text-dark text-truncate" style={{ maxWidth: "200px" }}>
                                                                     </strong>
+                                                                    <small className="fw-semibold">{addr.fullName}</small>
+
                                                                     <span className="text-muted">|</span>
-                                                                    <small className="text-muted">{addr.phone}</small>
+                                                                    <small className="text-muted">{addr.phoneNumber}</small>
                                                                     <span
                                                                         className="ms-auto text-primary small"
                                                                         role="button"
+                                                                        onClick={() => handleOpenModelUpdate('updataOneAddress', addr._id)}
                                                                     >
                                                                         Cập nhật
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-muted small mb-0 mt-1">{addr.addressLine1}</p>
-                                                                <p className="text-muted small mb-1">{addr.addressLine2}</p>
+                                                                <div className='d-flex gap-2'>
+                                                                    <p className="text-muted small mb-0 mt-1">{addr.address}</p>
+                                                                    <p className="text-muted small mb-0 mt-1">{addr.city.city}</p>
+                                                                </div>
+
                                                                 <div className="d-flex gap-2 mt-1">
                                                                     {addr.isDefault && (
                                                                         <span className="badge text-bg-light border border-warning text-warning small">
                                                                             Mặc định
                                                                         </span>
                                                                     )}
-                                                                    {addr.isReturnAddress && (
-                                                                        <span className="badge text-bg-light border border-secondary text-muted small">
-                                                                            Địa chỉ trả hàng
-                                                                        </span>
-                                                                    )}
+
                                                                 </div>
                                                             </label>
                                                         </div>
@@ -474,10 +536,10 @@ function Cart() {
                                                     </div>
                                                 </div>
                                                 <div className="modal-footer">
-                                                    <button type="button" className="btn btn-outline-secondary" >
+                                                    <button type="button" className="btn btn-outline-secondary" onClick={() => setShowModal(null)} >
                                                         Huỷ
                                                     </button>
-                                                    <button type="submit" className="btn text-white" style={{ backgroundColor: "#ff5722" }}>
+                                                    <button type="button" className="btn text-white" style={{ backgroundColor: "#ff5722" }} onClick={ handleSelectAds}>
                                                         Xác nhận
                                                     </button>
                                                 </div>
@@ -489,72 +551,98 @@ function Cart() {
 
                         )}
                         {showModal === 'updataOneAddress' && (
-
                             <>
                                 <div className="modal-backdrop fade show" />
-
                                 <div className="modal show d-block" tabIndex="-1">
                                     <div className="modal-dialog modal-dialog-centered">
-                                        <div className="modal-content">
+                                        <div className="modal-content rounded-3 shadow-lg">
                                             <div className="modal-header">
-                                                <h5 className="modal-title">Chỉnh sửa địa chỉ</h5>
-                                                <button type="button" className="btn-close" onClick={() => setShowModal(false)} />
+                                                <h5 className="modal-title">Cập nhật địa chỉ</h5>
+                                                <button
+                                                    type="button"
+                                                    className="btn-close"
+                                                    onClick={() => setShowModal(null)}
+                                                    aria-label="Close"
+                                                ></button>
                                             </div>
-                                            <div className="modal-body ">
 
-                                                {/* Form Edit */}
-                                                <div className="mb-3 ">
-                                                    <label className="form-label fw-semibold">Full Name</label>
-                                                    <input
-                                                        type="text"
-                                                        name="fullName"
-                                                        className="form-control text-primary"
-                                                        value={formAddress?.fullName}
-                                                        onChange={handleChangeAddress}
-                                                    />
-                                                </div>
+                                            <div className="modal-body">
+                                                <form className="needs-validation" onSubmit={handleSubmitAds}>
+                                                    {/* Họ tên + SĐT */}
+                                                    <div className="row mb-3">
+                                                        <div className="col">
+                                                            <input
+                                                                name='fullName'
+                                                                type="text"
+                                                                className="form-control text-muted"
+                                                                placeholder="Họ và tên"
+                                                                value={formAddress?.fullName}
+                                                                onChange={handleChangeAddress}
+                                                            />
+                                                        </div>
+                                                        <div className="col">
+                                                            <input
+                                                                name="phoneNumber"
+                                                                type="number"
 
-                                                <div className="mb-3 ">
-                                                    <label className="form-label fw-semibold">Address</label>
-                                                    <input
-                                                        type="text"
-                                                        name="address "
-                                                        className="form-control "
-                                                        value={formAddress?.address}
-                                                        onChange={handleChangeAddress}
-                                                    />
-                                                </div>
+                                                                className="form-control text-muted"
+                                                                placeholder="Số điện thoại"
+                                                                value={formAddress?.phoneNumber}
+                                                                onChange={handleChangeAddress}
 
-                                                <div className="mb-3">
-                                                    <label className="form-label fw-semibold">City</label>
-                                                    <input
-                                                        type="text"
-                                                        name="city"
-                                                        className="form-control"
-                                                        value={formAddress?.city}
-                                                        onChange={handleChangeAddress}
-                                                    />
-                                                </div>
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    {/* Tỉnh thành */}
+                                                    <div className="mb-3">
+                                                        <select
+                                                            name="city"
+                                                            className="form-select text-muted"
+                                                            onChange={handleChangeAddress}
+                                                            value={formAddress?.city}
+                                                        >
+                                                            <option>Tỉnh/ Thành phố, Quận/Huyện, Phường/Xã</option>
+                                                            {
+                                                                zones && zones.map((zone, index) => (
+                                                                    <option key={index} value={zone._id} >
+                                                                        {zone?.city}
+                                                                    </option>
+                                                                ))}
+                                                        </select>
+                                                    </div>
 
-                                                <div className="mb-3">
-                                                    <label className="form-label fw-semibold">Phone Number</label>
-                                                    <input
-                                                        type="text"
-                                                        name="phoneNumber"
-                                                        className="form-control"
-                                                        value={formAddress?.phoneNumber}
-                                                        onChange={handleChangeAddress}
-                                                    />
-                                                </div>
+                                                    {/* Địa chỉ cụ thể */}
+                                                    <div className="mb-3">
+                                                        <textarea
+                                                            rows="2"
+                                                            name="address"
+                                                            className="form-control text-muted"
+                                                            placeholder="Địa chỉ cụ thể"
+                                                            onChange={handleChangeAddress}
+                                                            value={formAddress.address}
+                                                        ></textarea>
+                                                    </div>
 
-                                            </div>
-                                            <div className="modal-footer">
-                                                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
-                                                {/* <button className="btn btn-primary" onClick={handleSave}>Lưu</button> */}
+
+                                                    {/* Footer buttons */}
+                                                    <div className="d-flex justify-content-between mt-4">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link text-decoration-none"
+                                                            onClick={() => setShowModal('selectAddress')}
+                                                        >
+                                                            Trở Lại
+                                                        </button>
+                                                        <button type="submit" className="btn btn-info px-4" >
+                                                            Hoàn thành
+                                                        </button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                </div></>
+                                </div>
+                            </>
 
                         )}
                         {showModal === 'addOneAddress' && (
@@ -568,7 +656,7 @@ function Cart() {
                                                 <button
                                                     type="button"
                                                     className="btn-close"
-                                                    //   onClick={onClose}
+                                                    onClick={() => setShowModal(null)}
                                                     aria-label="Close"
                                                 ></button>
                                             </div>
@@ -606,6 +694,7 @@ function Cart() {
                                                             name="city"
                                                             className="form-select text-muted"
                                                             onChange={handleChangeAddress}
+                                                            value={formAddress.city._id}
                                                         >
                                                             <option>Tỉnh/ Thành phố, Quận/Huyện, Phường/Xã</option>
                                                             {
@@ -635,7 +724,7 @@ function Cart() {
                                                         <button
                                                             type="button"
                                                             className="btn btn-link text-decoration-none"
-                                                        //   onClick={onClose}
+                                                            onClick={() => setShowModal('selectAddress')}
                                                         >
                                                             Trở Lại
                                                         </button>
@@ -659,22 +748,29 @@ function Cart() {
 
                             <div className="d-flex justify-content-between">
                                 <span>Tạm tính</span>
-                                <span>{totalAmount.toLocaleString()}đ</span>
+                                <span>{CartSubtotalAfterProductDiscount.toLocaleString()}đ</span>
                             </div>
 
                             {selectedDiscountSlice && (
                                 <div className="d-flex justify-content-between text-success">
                                     <span>Giảm giá ({selectedDiscountSlice.code})</span>
-                                    <span>-{calculateDiscountAmount().toLocaleString()}đ</span>
+                                    <span>-{CartDiscountAmount.toLocaleString()}đ</span>
                                 </div>
                             )}
-
+                            {
+                                defaultAddressObj && cart.items.length > 0 && (
+                                    <div className="d-flex justify-content-between text-success">
+                                        <span>Phí ship </span>
+                                        <span>{(defaultAddressObj.city.fee).toLocaleString()}đ</span>
+                                    </div>
+                                )
+                            }
                             <hr />
 
                             <div className="d-flex justify-content-between fw-bold">
                                 <span>Tổng cộng</span>
                                 <span>
-                                    {(totalAmount - calculateDiscountAmount()).toLocaleString()}đ
+                                    {CartTotalPrice.toLocaleString()}đ
                                 </span>
                             </div>
 

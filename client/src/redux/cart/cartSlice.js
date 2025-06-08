@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
+import { selectShippingFee } from "../shippingAddress/shippingAddressSlice";
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
   try {
     const res = await fetch('http://localhost:5000/api/users/cart', {
@@ -19,17 +19,16 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) 
   }
 })
 
-export const setCart = createAsyncThunk('cart/setCart', async ({ items,appliedDiscount }, thunkAPI) => {
+export const setCart = createAsyncThunk('cart/setCart', async ({ items, appliedDiscount ,shippingFee}, thunkAPI) => {
   try {
-    console.log('items setcart_redux:', { items,appliedDiscount });
-
+    
     const res = await fetch('http://localhost:5000/api/users/cart/set', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ items,appliedDiscount })
+      body: JSON.stringify({ items, appliedDiscount,shippingFee })
     });
 
     const data = await res.json();
@@ -54,7 +53,6 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, 
       body: JSON.stringify({ productId, quantity })
     })
     const data = await res.json();
-    console.log('data:', data);
 
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật số lượng');
     return data;
@@ -68,8 +66,8 @@ export const applyDiscount = createAsyncThunk(
   'cart/applyDiscount',
   async (code, thunkAPI) => {
     try {
-      console.log('codeslice:',code);
-      
+      console.log('codeslice:', code);
+
       const token = localStorage.getItem('token');
 
       const res = await fetch('http://localhost:5000/api/users/cart/apply-discount', {
@@ -134,14 +132,13 @@ const cartSlice = createSlice({
     discountLoading: false,
   },
   reducers: {
-    // Reset error state
-    clearError: (state) => {
-      state.error = null;
-    },
-    // Reset success state
-    clearSuccess: (state) => {
+    clearCart: (state) => {
+      state.cart = null;
+      state.selectedDiscountSlice = null;
       state.success = false;
+      state.error = null;
     }
+
   },
   extraReducers: builder => {
     builder
@@ -154,7 +151,7 @@ const cartSlice = createSlice({
         state.loading = false;
         state.cart = action.payload;
         if (action.payload.appliedDiscount) {
-          
+
           state.selectedDiscountSlice = action.payload.appliedDiscount;
         }
       })
@@ -184,7 +181,7 @@ const cartSlice = createSlice({
         state.cart = action.payload;
         // Giữ nguyên discount nếu có
         // console.log('action.payload:',action.payload);
-        
+
         if (action.payload.appliedDiscount) {
           state.selectedDiscountSlice = action.payload.appliedDiscount;
 
@@ -231,7 +228,7 @@ const cartSlice = createSlice({
         state.discountLoading = false;
         state.selectedDiscountSlice = null; // Xóa discount
 
-      
+
 
         // Cập nhật cart nếu server trả về
         if (action.payload.cart) {
@@ -244,6 +241,40 @@ const cartSlice = createSlice({
       });
   }
 })
+// Tổng tiền đã áp dụng giảm giá sản phẩm (theo discountPercent của từng sản phẩm)
+export const selectCartSubtotalAfterProductDiscount = (state) => {
+  const items = state.cart.cart?.items || [];
+  return items.reduce((sum, item) => {
+    const price = item.product.price || 0;
+    const productDiscount = item.product.discountPercent || 0;
+    const quantity = item.quantity || 0;
+    const discountedPrice = price * (1 - productDiscount / 100);
+    return sum + discountedPrice * quantity;
+  }, 0);
+};
 
-export const { clearError, clearSuccess } = cartSlice.actions;
+// Tổng tiền giảm giá của mã giảm giá áp dụng trên tổng tiền đã giảm giá sản phẩm
+export const selectCartDiscountAmount = (state) => {
+  const discountInfo = state.cart.selectedDiscountSlice;
+  if (!discountInfo) return 0;
+
+  const subtotalAfterProductDiscount = selectCartSubtotalAfterProductDiscount(state);
+  const rawDiscount = subtotalAfterProductDiscount * (discountInfo.discountPercent / 100);
+
+  if (discountInfo.maxDiscount) {
+    return Math.min(Math.round(rawDiscount), discountInfo.maxDiscount);
+  }
+
+  return Math.round(rawDiscount);
+};
+
+
+// Tổng tiền cuối cùng sau khi áp dụng giảm giá sản phẩm và mã giảm giá và tiền ship
+export const selectCartTotalPrice = (state) => {
+  const shippingFee = selectShippingFee(state);  
+  const subtotalAfterProductDiscount = selectCartSubtotalAfterProductDiscount(state);
+  const discountAmount = selectCartDiscountAmount(state);
+  return subtotalAfterProductDiscount - discountAmount+ shippingFee;
+};
+export const { clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

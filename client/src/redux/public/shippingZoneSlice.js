@@ -13,7 +13,6 @@ export const fetchPublicShippingZones = createAsyncThunk(
       });
 
       const data = await res.json();
-      console.log('Discount response:', data);
 
       if (!res.ok) {
         console.error('Error fetching shipping zones:', data);
@@ -43,8 +42,7 @@ const shippingZoneSlice = createSlice({
           state.error = null;
         })
         .addCase(fetchPublicShippingZones.fulfilled, (state, action) => {
-          console.log('Full action object:', action);
-          console.log('action.payload:', action.payload);
+         
           state.loading = false;
           state.zones = action.payload;
 
