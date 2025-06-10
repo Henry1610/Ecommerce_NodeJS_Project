@@ -6,7 +6,7 @@ function route(app) {
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
     app.use('/api/admin', adminRoutes);
-    app.use('/api/public', publicRoutes); 
+    app.use('/api', publicRoutes); 
 
 }
 

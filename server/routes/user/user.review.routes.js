@@ -1,11 +1,11 @@
 import express from 'express';
-import { createReview, getReviewsByProduct, deleteReview, updateReview } from '../../controllers/user/reviewController.js';
+import { createReview, deleteReview, updateReview, getMyReviews } from '../../controllers/user/reviewController.js';
 import { authenticate } from '../../middleware/authenticate.js';
 const router = express.Router();
 
-router.post('', createReview);
+router.post('/', createReview);
 
-router.get('/:productId',authenticate, getReviewsByProduct);
+router.get('/',authenticate, getMyReviews);
 
 router.delete('/:id',authenticate, deleteReview);
 

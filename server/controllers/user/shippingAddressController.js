@@ -40,7 +40,7 @@ export const createShippingAddress = async (req, res) => {
     }
 
     const newAddress = new ShippingAddress({
-      user: req.user.id, // lấy từ middleware xác thực
+      user: req.user.id,
       fullName,
       address,
       city,

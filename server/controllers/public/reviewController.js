@@ -1,8 +1,8 @@
 import Review from "../../models/Review.js";
 
-export const getPublicReviewsByProduct = async (req, res) => {
+export const getPublicReviewsProductBySlug = async (req, res) => {
     try {
-        const reviews = await Review.find({ product: req.params.productId })
+        const reviews = await Review.find({ product: req.params.slug })
             .populate('user', 'username')
             .sort({ createdAt: -1 });
 

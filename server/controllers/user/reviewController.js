@@ -36,10 +36,9 @@ export const createReview = async (req, res) => {
     }
 };
 
-export const getReviewsByProduct = async (req, res) => {
+export const getMyReviews = async (req, res) => {
     try {
-        const reviews = await Review.find({ product: req.params.productId })
-            .populate('user', 'username')
+        const reviews = await Review.find({ user: req.user.id })
             .sort({ createdAt: -1 });
 
         res.json(reviews);

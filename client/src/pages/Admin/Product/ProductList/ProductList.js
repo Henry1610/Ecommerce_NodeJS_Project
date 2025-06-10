@@ -9,8 +9,8 @@ import './ProductList.css';
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const { products, loading, error } = useSelector(state => state.products); // tùy vào tên state trong slice của bạn
-
+  const { products, loading, error } = useSelector(state => state.product);
+  
 
   const [selectAll, setSelectAll] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -129,9 +129,9 @@ const ProductList = () => {
                           <Link to={`edit/${product._id}`} className="me-2" title="Chỉnh sửa">
                             <i className="fas fa-edit"></i>
                           </Link>
-                          <buton onClick={() => handleDelete(product._id)} className="confirm-text" title="Xóa">
+                          <button onClick={() => handleDelete(product._id)} className="confirm-text" title="Xóa">
                             <i className="fas fa-trash"></i>
-                          </buton>
+                          </button>
                         </td>
                       </tr>
                     ))}

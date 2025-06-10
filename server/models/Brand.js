@@ -6,4 +6,11 @@ const brandSchema = new mongoose.Schema({
     
 });
 
+brandSchema.pre('save', function (next) {
+    if (!this.slug && this.name) {
+        this.slug = slugify(this.name, { lower: true, strict: true })
+        next();
+
+    }
+})
 export default mongoose.model('Brand', brandSchema);

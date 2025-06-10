@@ -2,6 +2,7 @@
 import { configureStore,combineReducers } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import productsReducer from './products/productsSlice'
+import productReducer from './product/productsSlice'
 import cartReducer from './cart/cartSlice'
 import brandReducer from './brand/brandSlice'
 import categoryReducer from './category/categoriesSlice'
@@ -24,6 +25,7 @@ const store = configureStore({
   reducer: {
     public:publicReducer,
     products: productsReducer,
+    product: productReducer,
     auth: authReducer,
     cart: cartReducer,
     brands: brandReducer,

@@ -4,8 +4,7 @@ import { authenticate } from '../middleware/authenticate.js';
 
 // const paymentRoutes = require('../routes/user/user.payment.routes')
 import cartRoutes from '../routes/user/user.cart.routes.js';
-import discountRoutes from '../routes/user/user.discount.routes.js';
-import productRoutes from '../routes/user/user.product.routes.js';
+// import discountRoutes from '../routes/user/user.discount.routes.js';
 // const orderRoutes = require('../routes/user/user.order.routes')
 import userRoutes from '../routes/user/user.user.routes.js';
 import shippingAddressRoutes from './user/user.shippingAddress.routes.js';
@@ -18,10 +17,9 @@ router.get('/', (req, res) => {
 
 router.use('/cart', authenticate, cartRoutes);
 router.use('/users', authenticate, userRoutes);
-router.use('/discounts', authenticate, discountRoutes);
+// router.use('/discounts', authenticate, discountRoutes);
 // router.use('/orders', authenticate, orderRoutes);
 router.use('/payments', authenticate, paymentRoutes);
-router.use('/products', productRoutes);
 router.use('/shipping-addresses', authenticate, shippingAddressRoutes);
 router.use('/reviews', reviewRoutes);
 

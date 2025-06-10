@@ -1,5 +1,13 @@
 import express from 'express';
 const router = express.Router();
 import ShippingZoneRoutes from './public/public.shippingZone.routes.js';
-router.use('/shipping-zone', ShippingZoneRoutes)
+import ProductRoutes from './public/public.product.routes.js';
+import DiscountRoutes from './public/public.discount.routes.js';
+import BrandRoutes from './public/public.brand.routes.js';
+import CategoryRoutes from './public/public.category.routes.js';
+router.use('/shipping-zones', ShippingZoneRoutes)
+router.use('/products', ProductRoutes)
+router.use('/discounts', DiscountRoutes)
+router.use('/brands', BrandRoutes)
+router.use('/categories', CategoryRoutes)
 export default router;

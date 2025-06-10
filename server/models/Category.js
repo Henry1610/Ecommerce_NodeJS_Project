@@ -5,5 +5,11 @@ const categorySchema = new mongoose.Schema({
     description: {type: String, required: true},
 });
 
-export default mongoose.model('Category', categorySchema);
+categorySchema.pre('save', function (next) {
+    if (!this.slug && this.name) {
+        this.slug = slugify(this.name, { lower: true, strict: true })
+        next();
 
+    }
+})
+export default mongoose.model('Category', categorySchema);

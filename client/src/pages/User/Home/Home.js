@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../../../redux/products/productsSlice';
 import ProductCard from '../../../components/ProductCard/ProductCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -15,7 +14,8 @@ import './Home.css'
 function Home() {
     const dispatch = useDispatch();
     const { products, loading, error } = useSelector((state) => state.products);
-
+    console.log('pr:',products);
+    
     useEffect(() => {
         dispatch(fetchProducts()); // Lấy danh sách sản phẩm khi component được render
     }, [dispatch]);

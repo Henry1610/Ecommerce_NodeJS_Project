@@ -8,7 +8,7 @@ import ProductDetail from "../pages/User/ProductDetail/ProductDetail"
 const publicRoutes = [
     { path: "/about-us", component: AboutUs },
     { path: "/product", component: Product },
-    { path: "/product/:productId", component: ProductDetail },
+    { path: "/product/:slug", component: ProductDetail },
 
     { path: "/contact", component: Contact },
     { path: "/", component: Home },

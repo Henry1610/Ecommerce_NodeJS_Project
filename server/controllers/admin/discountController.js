@@ -28,7 +28,6 @@ export const createDiscount = async (req, res) => {
     }
 };
 
-// 2. Lấy tất cả mã giảm giá (Read All)
 export const getAllDiscounts = async (req, res) => {
     try {
         const discounts = await Discount.find();
@@ -38,7 +37,6 @@ export const getAllDiscounts = async (req, res) => {
     }
 };
 
-// 3. Lấy mã giảm giá theo ID (Read One)
 export const getDiscountById = async (req, res) => {
     try {
         const { id } = req.params;

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from "react-redux"
 import { useParams } from 'react-router-dom';
-import { fetchProductById, resetProductDetail } from '../../../redux/products/productsSlice'
+import { fetchProductBySlug, resetProductDetail } from '../../../redux/products/productsSlice'
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -26,10 +26,11 @@ function ProductDetail() {
     const doubled = [...services, ...services];
 
     const dispatch = useDispatch();
-    const { productId } = useParams();
+    const { slug }  = useParams();
+    
     const [quantity, setQuantity] = useState(1);
     const { product, loading, error } = useSelector((state) => state.products);
-
+    
     const originalPrice = product?.price ?? 0;
     const discountPercent = product?.discountPercent ?? 0;
     const discountPrice = originalPrice - (originalPrice * discountPercent) / 100;
@@ -39,9 +40,10 @@ function ProductDetail() {
     useEffect(() => {
         // Sửa lỗi useEffect async
         const fetchProduct = () => {
-            if (productId) {
-                dispatch(fetchProductById(productId))
+            if (slug) {
+                dispatch(fetchProductBySlug(slug))
                     .unwrap()
+                    
                     .catch(error => {
                         toast.error(`Lỗi khi tải sản phẩm: ${error}`);
                     });
@@ -53,7 +55,7 @@ function ProductDetail() {
         return () => {
             dispatch(resetProductDetail());
         };
-    }, [dispatch, productId]);
+    }, [dispatch, slug]);
 
 
 

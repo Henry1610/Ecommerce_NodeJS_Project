@@ -7,3 +7,8 @@ export const getPublicCategories = async (req, res) => {
       res.status(500).json({ message: 'Không lấy được danh mục', error: err.message });
     }
   };
+  export const getPublicCategoryById = async (req, res) => {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).json({ message: 'Category not found' });
+    res.json(category);
+};

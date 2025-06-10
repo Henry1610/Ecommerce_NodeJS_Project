@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts', async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/products'
+            const res = await fetch('http://localhost:5000/api/products'
                 , {
                     method: 'GET',
                     headers: {
@@ -26,11 +26,11 @@ export const fetchProducts = createAsyncThunk(
         }
     }
 )
-export const fetchProductById = createAsyncThunk(
-    'products/fetchProductById', async (productId, thunkAPI) => {
+export const fetchProductBySlug = createAsyncThunk(
+    'products/fetchProductById', async (slug, thunkAPI) => {
 
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`
+            const res = await fetch(`http://localhost:5000/api/products/${slug}`
                 , {
                     method: 'GET',
                     headers: {
@@ -42,7 +42,8 @@ export const fetchProductById = createAsyncThunk(
                 }
             )
             const data = await res.json();
-
+            console.log('da:',data);
+            
             if (!res.ok) {
                 console.error('Error fetching product:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy sản phẩm');
@@ -80,7 +81,7 @@ const productsSlice = createSlice({
             })
             .addCase(fetchProducts.fulfilled, (state, action) => {
                 state.loading = false;
-                state.products = action.payload;
+                state.products = action.payload.data;
             })
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.loading = false;
@@ -88,31 +89,21 @@ const productsSlice = createSlice({
             })
 
             // Fetch single product by ID
-            .addCase(fetchProductById.pending, (state) => {
+            .addCase(fetchProductBySlug.pending, (state) => {
                 state.loading = true;
                 state.product = null; // Reset product when starting a new fetch
                 state.error = null;
             })
-            .addCase(fetchProductById.fulfilled, (state, action) => {
-                state.loading = false;
-              
-                if (action.payload && action.payload.product) {
-                  const product = action.payload.product;
-              
-                  // Nếu sản phẩm có discount và chưa có discountedPrice thì tính luôn
-                  if (product.discountPercent && product.discountPercent > 0 && !product.discountedPrice) {
-                    product.discountedPrice = +(product.price * (1 - product.discountPercent / 100)).toFixed(2);
-                  }
-              
-                  state.product = product;
-                  state.reviews = action.payload.reviews || [];
-                } else {
-                  state.product = null;
-                  state.reviews = [];
-                }
+            .addCase(fetchProductBySlug.fulfilled, (state, action) => {
+                                   
+                  state.product = action.payload.data.product;
+                  state.reviews = action.payload.data.reviews;
+
+                  state.loading = false;
+               
               })
               
-            .addCase(fetchProductById.rejected, (state, action) => {
+            .addCase(fetchProductBySlug.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
