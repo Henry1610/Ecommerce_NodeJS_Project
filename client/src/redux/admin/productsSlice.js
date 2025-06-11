@@ -32,6 +32,8 @@ export const fetchProductById = createAsyncThunk(
                 }
             );
             const data = await res.json();
+            console.log('data:',data);
+            
             if (!res.ok) {
                 console.error('Error fetching category:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh mục');
@@ -102,6 +104,7 @@ const productsSlice = createSlice({
     name: 'products',
     initialState: {
         products: [],
+        reviews: [],
         product: null,
         loading: false,
         error: null,
@@ -122,7 +125,6 @@ const productsSlice = createSlice({
             .addCase(fetchProducts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.products = action.payload;
-                console.log('slice:',state.products);
                 
             })
             .addCase(fetchProducts.rejected, (state, action) => {
@@ -136,8 +138,9 @@ const productsSlice = createSlice({
             })
             .addCase(fetchProductById.fulfilled, (state, action) => {
                 state.loading = false;
-                state.productDetail = action.payload;
-            })
+                state.product = action.payload.data.product;
+                state.reviews = action.payload.data.reviews;
+          })
             .addCase(fetchProductById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || 'Lỗi khi tải chi tiết sản phẩm';

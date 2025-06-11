@@ -4,7 +4,7 @@ export const fetchPublicShippingZones = createAsyncThunk(
   'publicShippingZones/fetchPublicShippingZones',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/public/shipping-zone', {
+      const res = await fetch('http://localhost:5000/api/shipping-zones', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

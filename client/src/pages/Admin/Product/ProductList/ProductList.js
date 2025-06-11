@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { deleteProduct, fetchProducts } from '../../../../redux/product/productsSlice';
+import { deleteProduct, fetchProducts } from '../../../../redux/admin/productsSlice';
 import Swal from 'sweetalert2';
 
 import './ProductList.css';
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const { products, loading, error } = useSelector(state => state.product);
+  const { products, loading, error } = useSelector(state => state.admin.adminProduct);
   
 
   const [selectAll, setSelectAll] = useState(false);

@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Thumbs } from 'swiper/modules';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductById } from '../../../../redux/product/productsSlice';
+import { fetchProductById } from '../../../../redux/admin/productsSlice';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -15,8 +15,8 @@ const ProductDetail = () => {
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
     // Lấy dữ liệu từ store
-    const { product, loading, error } = useSelector((state) => state.products);
-
+    const { product, loading, error } = useSelector((state) => state.admin.adminProduct);
+    
 
     useEffect(() => {
         if (id) {

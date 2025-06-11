@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { selectShippingFee } from "../shippingAddress/shippingAddressSlice";
+import { selectShippingFee } from "./shippingAddressSlice";
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
   try {
     const res = await fetch('http://localhost:5000/api/users/cart', {
@@ -243,7 +243,7 @@ const cartSlice = createSlice({
 })
 // Tổng tiền đã áp dụng giảm giá sản phẩm (theo discountPercent của từng sản phẩm)
 export const selectCartSubtotalAfterProductDiscount = (state) => {
-  const items = state.cart.cart?.items || [];
+  const items = state.user.userCart.cart?.items || [];
   return items.reduce((sum, item) => {
     const price = item.product.price || 0;
     const productDiscount = item.product.discountPercent || 0;
@@ -255,7 +255,7 @@ export const selectCartSubtotalAfterProductDiscount = (state) => {
 
 // Tổng tiền giảm giá của mã giảm giá áp dụng trên tổng tiền đã giảm giá sản phẩm
 export const selectCartDiscountAmount = (state) => {
-  const discountInfo = state.cart.selectedDiscountSlice;
+  const discountInfo = state.user.userCart.selectedDiscountSlice;
   if (!discountInfo) return 0;
 
   const subtotalAfterProductDiscount = selectCartSubtotalAfterProductDiscount(state);

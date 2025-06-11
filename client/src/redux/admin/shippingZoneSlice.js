@@ -5,7 +5,7 @@ export const fetchShippingZones = createAsyncThunk(
   'shippingZones/fetchAll',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/shippingzones', {
+      const res = await fetch('http://localhost:5000/api/admin/shipping-zones', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -26,7 +26,7 @@ export const fetchShippingZoneById = createAsyncThunk(
     'shippingZones/fetchById',
     async (id, thunkAPI) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/admin/shippingzones/${id}`, {
+        const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -47,7 +47,7 @@ export const fetchShippingZoneById = createAsyncThunk(
     'shippingZones/update',
     async ({ id, updatedData }, thunkAPI) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/admin/shippingzones/${id}`, {
+        const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export const createShippingZone = createAsyncThunk(
   'shippingZones/create',
   async (zoneData, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/shippingzones', {
+      const res = await fetch('http://localhost:5000/api/admin/shipping-zones', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const deleteShippingZone = createAsyncThunk(
   'shippingZones/delete',
   async (id, thunkAPI) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/shippingzones/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

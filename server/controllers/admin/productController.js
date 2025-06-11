@@ -25,10 +25,13 @@ export const getProductById = async (req, res) => {
         const reviews = await Review.find({ product: product._id })
             .populate('user')
             .exec();
-        res.status(200).json({
-            product,
-            reviews
-        });
+            res.status(200).json({
+                success: true,
+                data: {
+                    product,
+                    reviews
+                }
+            });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

@@ -4,13 +4,13 @@ import './EditCategory.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { fetchCategoryById, resetCategoryDetail, updateCategory } from '../../../../redux/category/categoriesSlice';
+import { fetchCategoryById, resetCategoryDetail, updateCategory } from '../../../../redux/admin/categoriesSlice';
 
 const EditCategory = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id: categoryId } = useParams();
-    const { loading, error, category } = useSelector(state => state.categories)
+    const { loading, error, category } = useSelector(state => state.admin.adminCategory)
 
     const [formData, setFormData] = useState({
         name: '',

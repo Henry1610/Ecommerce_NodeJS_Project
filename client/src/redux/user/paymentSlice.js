@@ -75,11 +75,11 @@ const paymentSlice = createSlice({
 export const { resetPaymentState, clearPaymentError } = paymentSlice.actions;
 
 // Selectors
-export const selectPaymentState = (state) => state.payment;
-export const selectSessionUrl = (state) => state.payment.sessionUrl;
-export const selectPaymentLoading = (state) => state.payment.loading;
-export const selectPaymentError = (state) => state.payment.error;
-export const selectPaymentStatus = (state) => state.payment.status;
+export const selectPaymentState = (state) => state.user.userPayment;
+export const selectSessionUrl = (state) =>  state.user.userPayment.sessionUrl;
+export const selectPaymentLoading = (state) =>  state.user.userPayment.loading;
+export const selectPaymentError = (state) =>  state.user.userPayment.error;
+export const selectPaymentStatus = (state) =>  state.user.userPayment.status;
 
 // Export reducer
 export default paymentSlice.reducer;

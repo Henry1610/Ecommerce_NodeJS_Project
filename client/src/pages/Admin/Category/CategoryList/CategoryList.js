@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCategories } from '../../../../redux/category/categoriesSlice';
+import { fetchCategories } from '../../../../redux/admin/categoriesSlice';
 import { Link } from 'react-router-dom';
 import './CategoryList.css';
 
-import { deleteCategory } from '../../../../redux/category/categoriesSlice';
+import { deleteCategory } from '../../../../redux/admin/categoriesSlice';
 import Swal from 'sweetalert2';
 
 const CategoryList = () => {
     const dispatch = useDispatch();
     // Lấy categories, loading, error từ redux state
-    const { categories, loading, error } = useSelector(state => state.categories);
+    const { categories, loading, error } = useSelector(state => state.admin.adminCategory);
 
     const [selectAll, setSelectAll] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);

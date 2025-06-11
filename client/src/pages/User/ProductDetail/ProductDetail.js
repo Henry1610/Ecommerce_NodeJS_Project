@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from "react-redux"
 import { useParams } from 'react-router-dom';
-import { fetchProductBySlug, resetProductDetail } from '../../../redux/products/productsSlice'
+import { fetchProductBySlug, resetProductDetail } from '../../../redux/public/productsSlice'
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/thumbs';
-import { addToCart } from '../../../redux/cart/cartSlice';
+import { addToCart } from '../../../redux/user/cartSlice';
 import { toast } from 'react-toastify';
 
 
@@ -29,7 +29,7 @@ function ProductDetail() {
     const { slug }  = useParams();
     
     const [quantity, setQuantity] = useState(1);
-    const { product, loading, error } = useSelector((state) => state.products);
+    const { product, loading, error } = useSelector((state) => state.public.publicProduct);
     
     const originalPrice = product?.price ?? 0;
     const discountPercent = product?.discountPercent ?? 0;

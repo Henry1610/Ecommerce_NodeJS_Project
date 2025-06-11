@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../../redux/products/productsSlice';
+import { fetchProducts } from '../../../redux/public/productsSlice';
 import ProductCard from '../../../components/ProductCard/ProductCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -13,8 +13,7 @@ import Banner from '../../../components/Banner/Banner';
 import './Home.css'
 function Home() {
     const dispatch = useDispatch();
-    const { products, loading, error } = useSelector((state) => state.products);
-    console.log('pr:',products);
+    const { products, loading, error } = useSelector((state) => state.public.publicProduct);
     
     useEffect(() => {
         dispatch(fetchProducts()); // Lấy danh sách sản phẩm khi component được render
@@ -185,8 +184,8 @@ function Home() {
                 </div>
 
                 <div className="row g-3">
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map(pro => (
+                    {products.length > 0 ? (
+                        products.map(pro => (
                             <div className="col-6 col-md-4 col-lg-3 col-xxl-3" key={pro._id}>
                                 <ProductCard product={pro} />
                             </div>

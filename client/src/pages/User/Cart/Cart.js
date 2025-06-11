@@ -3,10 +3,10 @@ import './Cart.css';
 import { useEffect, useCallback, useState, useRef,useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicShippingZones } from '../../../redux/public/shippingZoneSlice';
-import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress } from '../../../redux/shippingAddress/shippingAddressSlice';
-import { fetchCart, setCart, applyDiscount, removeDiscount, selectCartSubtotalAfterProductDiscount, selectCartTotalPrice, selectCartDiscountAmount } from '../../../redux/cart/cartSlice';
-import { fetchDiscounts } from '../../../redux/discount/discountSlice';
-import { createCheckoutSession } from '../../../redux/payment/paymentSlice';
+import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress } from '../../../redux/user/shippingAddressSlice';
+import { fetchCart, setCart, applyDiscount, removeDiscount, selectCartSubtotalAfterProductDiscount, selectCartTotalPrice, selectCartDiscountAmount } from '../../../redux/user/cartSlice';
+import { fetchDiscounts } from '../../../redux/admin/discountSlice';
+import { createCheckoutSession } from '../../../redux/user/paymentSlice';
 import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
 import VoucherCard from '../../../components/VourcherCard';
@@ -17,9 +17,9 @@ function Cart() {
     const location = useLocation();
     const modalRef = useRef(null);
     const dispatch = useDispatch();
-    const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.cart);
-    const { AddressSave, defaultAddress } = useSelector(state => state.shippingAddress)
-    const { discounts } = useSelector(state => state.discounts);
+    const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.user.userCart);
+    const { AddressSave, defaultAddress } = useSelector(state => state.user.userShippingAddress)
+    const { discounts } = useSelector(state => state.admin.adminDiscounts);
     const zones = useSelector(state => state.public?.publicShippingZones?.zones || []);
     const CartSubtotalAfterProductDiscount = useSelector(selectCartSubtotalAfterProductDiscount)
     const CartDiscountAmount = useSelector(selectCartDiscountAmount)

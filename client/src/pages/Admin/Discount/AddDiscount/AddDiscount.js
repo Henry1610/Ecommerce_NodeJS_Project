@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { createDiscount, fetchDiscounts } from '../../../../redux/discount/discountSlice';
+import { createDiscount, fetchDiscounts } from '../../../../redux/admin/discountSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 

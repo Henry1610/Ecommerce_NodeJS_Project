@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import './EditProduct.css';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductById, resetProductDetail, updateProduct } from '../../../../redux/product/productsSlice';
+import { fetchProductById, resetProductDetail, updateProduct } from '../../../../redux/admin/productsSlice';
 import { toast } from 'react-toastify';
-import { fetchBrands } from '../../../../redux/brand/brandSlice';
-import { fetchCategories } from '../../../../redux/category/categoriesSlice'
+import { fetchBrands } from '../../../../redux/admin/brandSlice';
+import { fetchCategories } from '../../../../redux/admin/categoriesSlice'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Thumbs } from 'swiper/modules';
 import 'swiper/css';
@@ -17,7 +17,7 @@ const EditProduct = () => {
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
     const { brands } = useSelector(state => state.brands);
     const { categories } = useSelector(state => state.categories);
-    const { product, error, loading } = useSelector(state => state.products)
+    const { product, error, loading } = useSelector(state => state.admin.adminProduct)
     const [attributesList, setAttributesList] = useState([]);
 
     const { id: productId } = useParams()
@@ -53,6 +53,7 @@ const EditProduct = () => {
             });
         dispatch(fetchProductById(productId))
             .unwrap()
+          
             .catch((error) => {
                 toast.error(`Lỗi khi tải product: ${error}`);
             });

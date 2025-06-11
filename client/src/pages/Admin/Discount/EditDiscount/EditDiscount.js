@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchDiscountById, updateDiscount, resetDiscountDetail } from '../../../../redux/discount/discountSlice';
+import { fetchDiscountById, updateDiscount, resetDiscountDetail } from '../../../../redux/admin/discountSlice';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -8,7 +8,7 @@ const EditDiscount = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { discount, loading, error } = useSelector(state => state.discounts);
+    const { discount, loading, error } = useSelector(state => state.admin.adminDiscounts);
 
     const [formData, setFormData] = useState({
         code: '',

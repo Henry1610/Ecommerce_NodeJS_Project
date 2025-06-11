@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EditBrand.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBrandById, resetBrandDetail, updateBrand } from '../../../../redux/brand/brandSlice'
+import { fetchBrandById, resetBrandDetail, updateBrand } from '../../../../redux/admin/brandSlice'
 import { toast } from 'react-toastify';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ const EditBrand = () => {
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
-    const { loading, error, brand } = useSelector(state => state.brands)
+    const { loading, error, brand } = useSelector(state => state.admin.adminBrand)
     const { id: brandId } = useParams()
     const [name, setName] = useState('');
     const [logoFile, setLogoFile] = useState(null);

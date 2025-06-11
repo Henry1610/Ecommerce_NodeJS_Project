@@ -17,7 +17,6 @@ router.get('/', (req, res) => {
 
 router.use('/cart', authenticate, cartRoutes);
 router.use('/users', authenticate, userRoutes);
-// router.use('/discounts', authenticate, discountRoutes);
 // router.use('/orders', authenticate, orderRoutes);
 router.use('/payments', authenticate, paymentRoutes);
 router.use('/shipping-addresses', authenticate, shippingAddressRoutes);

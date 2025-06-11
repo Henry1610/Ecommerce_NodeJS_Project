@@ -3,9 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBrands } from '../../../../redux/brand/brandSlice';
-import { fetchCategories } from '../../../../redux/category/categoriesSlice'
-import { addProduct } from '../../../../redux/product/productsSlice';
+import { fetchBrands } from '../../../../redux/admin/brandSlice';
+import { fetchCategories } from '../../../../redux/admin/categoriesSlice'
+import { addProduct } from '../../../../redux/admin/productsSlice';
 import './AddProduct.css';
 
 const AddProduct = () => {

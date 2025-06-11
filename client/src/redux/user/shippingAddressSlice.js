@@ -214,7 +214,7 @@ const shippingAddressSlice = createSlice({
     }
 });
 export const selectShippingFee = (state) => {    
-    return state.shippingAddress.defaultAddress?.city.fee || 0;
+    return state.user.userShippingAddress.defaultAddress?.city.fee || 0;
 };
 
 export const { setSelectedAddress, clearShippingAddresses } = shippingAddressSlice.actions;

@@ -1,40 +1,49 @@
 // src/redux/store.js
 import { configureStore,combineReducers } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
-import productsReducer from './products/productsSlice'
-import productReducer from './product/productsSlice'
-import cartReducer from './cart/cartSlice'
-import brandReducer from './brand/brandSlice'
-import categoryReducer from './category/categoriesSlice'
-import userSliceReducer from './user/userSlice'
-import discountSliceReducer from './discount/discountSlice'
-import shippingZoneReducer from './shippingZone/shippingZoneSlice';
-import paymentReducer from './payment/paymentSlice';
-import shippingAddressReducer from './shippingAddress/shippingAddressSlice';
+import productsReducer from './public/productsSlice'
+import cartReducer from './user/cartSlice'
+
+import paymentReducer from './user/paymentSlice';
+import shippingAddressReducer from './user/shippingAddressSlice';
 import shippingZonesReducer from './public/shippingZoneSlice'
+
+
+
+import adminBrandReducer from './admin/brandSlice'
+import adminCategoryReducer from './admin/categoriesSlice'
+import adminUserReducer from './admin/userSlice'
+import adminDiscountReducer from './admin/discountSlice'
+import adminShippingZoneReducer from './admin/shippingZoneSlice';
+import adminProductReducer from './admin/productsSlice'
+
 const publicReducer = combineReducers({
   publicShippingZones: shippingZonesReducer,
+  publicProduct: productsReducer,
+
 });
 const userReducer = combineReducers({
-  publicShippingZones: shippingZonesReducer,
+  userCart: cartReducer,
+  userPayment:paymentReducer,
+  userShippingAddress:shippingAddressReducer
+
 });
 const adminReducer = combineReducers({
-  publicShippingZones: shippingZonesReducer,
+  adminProduct: adminProductReducer,
+    adminCategory: adminCategoryReducer,
+    adminBrand: adminBrandReducer,
+    adminDiscounts: adminDiscountReducer,
+    adminShippingZone: adminShippingZoneReducer,
+    adminUser: adminUserReducer
+
+
 });
 const store = configureStore({
   reducer: {
     public:publicReducer,
-    products: productsReducer,
-    product: productReducer,
+    admin:adminReducer,
+    user:userReducer,
     auth: authReducer,
-    cart: cartReducer,
-    brands: brandReducer,
-    categories:categoryReducer,
-    users:userSliceReducer,
-    discounts:discountSliceReducer,
-    shippingZones: shippingZoneReducer,
-    payment:paymentReducer,
-    shippingAddress:shippingAddressReducer
   },
 });
 

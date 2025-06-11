@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import './AddBrand.css';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addBrand } from '../../../../redux/brand/brandSlice';
+import { addBrand } from '../../../../redux/admin/brandSlice';
 
 const AddBrand = () => {
     const dispatch = useDispatch();

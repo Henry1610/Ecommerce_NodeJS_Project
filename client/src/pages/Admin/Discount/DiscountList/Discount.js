@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchDiscounts,deleteDiscount } from '../../../../redux/discount/discountSlice';
+import { fetchDiscounts,deleteDiscount } from '../../../../redux/admin/discountSlice';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
 const DiscountList = () => {
     const dispatch = useDispatch();
-    const { discounts, loading, error } = useSelector(state => state.discounts);
+    const { discounts, loading, error } = useSelector(state => state.admin.adminDiscounts);
     const [selectedDiscounts, setSelectedDiscounts] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
 

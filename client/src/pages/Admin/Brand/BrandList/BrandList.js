@@ -2,21 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './BrandList.css';
 import { Link } from 'react-router-dom';
-import { fetchBrands, removeBrand } from '../../../../redux/brand/brandSlice'
+import { fetchBrands, removeBrand } from '../../../../redux/admin/brandSlice'
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import ErrorPage from '../../../../components/ErrorPage/ErrorPage'
 const BrandList = () => {
     const dispatch = useDispatch();
-    const { brands, error, loading } = useSelector(state => state.brands);
+    const { brands, error, loading } = useSelector(state => state.admin.adminBrand);
 
 
     useEffect(() => {
         dispatch(fetchBrands())
             .unwrap()
-            .then(data => {
-                console.log('Brands đã tải:', data);
-            })
+          
             .catch(error => {
                 console.error('Lỗi khi tải brands:', error);
                 toast.error(`Lỗi khi tải brands: ${error}`);

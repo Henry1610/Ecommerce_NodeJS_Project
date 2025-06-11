@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, deleteUser ,updateUserRole } from '../../../redux/user/userSlice';
+import { fetchUsers, deleteUser ,updateUserRole } from '../../../redux/admin/userSlice';
 import Swal from 'sweetalert2';
 
 const UserList = () => {
     const dispatch = useDispatch();
-    const { users, loading, error } = useSelector(state => state.users);
+    const { users, loading, error } = useSelector(state => state.admin.adminUser);
 
     const [selectAll, setSelectAll] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);

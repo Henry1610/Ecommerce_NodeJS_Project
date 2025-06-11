@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from '../../../../redux/auth/authSlice';
 import { Link } from 'react-router-dom';
 import './Header.css'
-import { fetchCart } from '../../../../redux/cart/cartSlice';
+import { fetchCart } from '../../../../redux/user/cartSlice';
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 
@@ -12,7 +12,7 @@ function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { cart, error, loading } = useSelector(state => state.cart);
+    const { cart, error, loading } = useSelector(state => state.user.userCart);
 
    
     const isAuthenticated = !!token;

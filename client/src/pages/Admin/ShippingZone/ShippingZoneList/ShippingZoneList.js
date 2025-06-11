@@ -5,13 +5,13 @@ import {
   deleteShippingZone,
   createShippingZone,
   updateShippingZone, // 👈 thêm
-} from '../../../../redux/shippingZone/shippingZoneSlice';
+} from '../../../../redux/admin/shippingZoneSlice';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 
 const ShippingZoneList = () => {
   const dispatch = useDispatch();
-  const { zones, loading, error } = useSelector((state) => state.shippingZones);
+  const { zones, loading, error } = useSelector((state) => state.admin.adminshippingZone);
   const [selectedZones, setSelectedZones] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 

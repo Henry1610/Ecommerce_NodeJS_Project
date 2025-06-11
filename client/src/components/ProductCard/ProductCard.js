@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux'; // THÊM DÒNG NÀY
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux"
-import { addToCart } from "../../redux/cart/cartSlice";
+import { addToCart } from "../../redux/user/cartSlice";
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { fetchCart } from '../../redux/cart/cartSlice';
+import { fetchCart } from '../../redux/user/cartSlice';
 import { MAX_STRIPE_AMOUNT } from '../../config/constants';
-import { selectCartTotalPrice } from '../../redux/cart/cartSlice';
+import { selectCartTotalPrice } from '../../redux/user/cartSlice';
 function ProductCard({ product }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -18,8 +18,8 @@ function ProductCard({ product }) {
 
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);
-    const handleShowDetail = (productId) => {
-        navigate(`/product/${productId}`);
+    const handleShowDetail = (slug) => {
+        navigate(`/product/${slug}`);
 
     };
     const handleAddToCart = ({ productId, quantity }) => {
@@ -49,10 +49,10 @@ function ProductCard({ product }) {
                 className="card-img-top px-3"
                 alt="Laptop mỏng"
                 style={{ height: "200px", objectFit: "cover" }}
-                onClick={() => handleShowDetail(product._id)}
+                onClick={() => handleShowDetail(product.slug)}
             />
             <div className="card-body text-center p-2">
-                <h6 className="card-title fw-semibold text-truncate mb-2" style={{ fontSize: "0.9rem" }}  onClick={() => handleShowDetail(product._id)}>
+                <h6 className="card-title fw-semibold text-truncate mb-2" style={{ fontSize: "0.9rem" }}  onClick={() => handleShowDetail(product.slug)}>
                     {product.name}
                 </h6>
 
