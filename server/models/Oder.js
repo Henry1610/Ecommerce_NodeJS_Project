@@ -1,10 +1,16 @@
 import mongoose from 'mongoose';
+import { generateOrderNumber } from '../middleware/generateOrderNumber';
 
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true
+  },
+  orderNumber: {
+    type: String,
+    unique: true,
+    default: generateOrderNumber
   },
   shippingAddress: {
     type: mongoose.Schema.ObjectId,
@@ -16,19 +22,19 @@ const orderSchema = new mongoose.Schema({
     ref: 'Payment',
     required: true
   },
-    items: [
-      {
-        product: { type: mongoose.Schema.ObjectId, ref: 'Product', required: true },
-        name: { type: String, required: true }, 
-        image: { type: String },               
-        quantity: { type: Number, required: true },
-        price: { type: Number, required: true }  
+  items: [
+    {
+      product: { type: mongoose.Schema.ObjectId, ref: 'Product', required: true },
+      name: { type: String, required: true },
+      image: { type: String },
+      quantity: { type: Number, required: true },
+      price: { type: Number, required: true }
 
-      }
-    ],
+    }
+  ],
   appliedDiscount: {
     type: mongoose.Schema.ObjectId,
-    ref:'Discount',
+    ref: 'Discount',
     default: null
   },
   totalPrice: {
@@ -37,11 +43,11 @@ const orderSchema = new mongoose.Schema({
   },
   isPaid: {
     type: Boolean,
-    default: false
+    default: true
   },
   paidAt: {
     type: Date,
-      default: null
+    default: Date.now
 
   },
   isShipped: {
@@ -51,8 +57,8 @@ const orderSchema = new mongoose.Schema({
   shippedAt: {
     type: Date,
     default: null
-
   },
+
   isDelivered: {
     type: Boolean,
     default: false
@@ -62,7 +68,7 @@ const orderSchema = new mongoose.Schema({
     default: null
 
   }
-  
+
 }, {
   timestamps: true
 });

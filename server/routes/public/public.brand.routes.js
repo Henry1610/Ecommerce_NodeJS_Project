@@ -1,8 +1,8 @@
-import { getPublicBrands } from "../../controllers/public/brandController.js";
+import { getPublicBrandBySlug,getPublicBrands } from "../../controllers/public/brandController.js";
 import express from 'express'
 const router=express.Router();
 
 router.get('/',getPublicBrands)
-// router.get('/:slug',getPublicCategoryById)
+router.get('/:slug',getPublicBrandBySlug)
 
 export default router

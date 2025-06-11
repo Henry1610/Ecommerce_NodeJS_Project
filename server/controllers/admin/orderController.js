@@ -31,25 +31,44 @@ export const getOrderById = async (req, res) => {
     }
 };
 
+
 export const updateOrderStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const allowedStatuses = ['pending', 'confirmed', 'paid', 'cpod', 'shipped', 'delivered', 'cancelled'];
-    
-        if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({ message: 'Invalid status' });
-        }
-    
-        const order = await Order.findById(req.params.id);
-        if (!order) return res.status(404).json({ message: 'Order not found' });
-    
-        order.status = status;
-        order.statusUpdatedAt = new Date();
-        await order.save();
-    
-        res.json({ message: 'Order status updated', order });
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to update order status', error: error.message });
+  try {
+    const { orderId } = req.params;
+    const { isShipped, isDelivered } = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+
+    // isPaid luôn luôn true nên bỏ kiểm tra isPaid
+
+    if (typeof isShipped === 'boolean') {
+      order.isShipped = isShipped;
+      order.shippedAt = isShipped ? new Date() : null;
+    }
+
+    if (typeof isDelivered === 'boolean') {
+      if (isDelivered && !order.isShipped) {
+        return res.status(400).json({ message: 'Order must be shipped before delivery.' });
+      }
+      order.isDelivered = isDelivered;
+      order.deliveredAt = isDelivered ? new Date() : null;
+    }
+
+    await order.save();
+
+    res.status(200).json({
+      message: 'Order status updated successfully',
+      order
+    });
+
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
+
   

@@ -1,15 +1,22 @@
 // src/redux/store.js
-import { configureStore,combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+//---------------------Auth-------------------------
 import authReducer from './auth/authSlice';
+
+//---------------------User-------------------------
+
+import userCartReducer from './user/cartSlice'
+import userPaymentReducer from './user/paymentSlice';
+import userShippingAddressReducer from './user/shippingAddressSlice';
+
+//---------------------public-------------------------
 import productsReducer from './public/productsSlice'
-import cartReducer from './user/cartSlice'
-
-import paymentReducer from './user/paymentSlice';
-import shippingAddressReducer from './user/shippingAddressSlice';
 import shippingZonesReducer from './public/shippingZoneSlice'
+import brandReducer from './public/brandSlice'
+import categoryReducer from './public/categorySlice'
+import discountReducer from './public/discountSlice'
 
-
-
+//---------------------admin-------------------------
 import adminBrandReducer from './admin/brandSlice'
 import adminCategoryReducer from './admin/categoriesSlice'
 import adminUserReducer from './admin/userSlice'
@@ -20,29 +27,31 @@ import adminProductReducer from './admin/productsSlice'
 const publicReducer = combineReducers({
   publicShippingZones: shippingZonesReducer,
   publicProduct: productsReducer,
-
+  publicBrand: brandReducer,
+  publicCategory: categoryReducer,
+  publicDiscount: discountReducer,
 });
 const userReducer = combineReducers({
-  userCart: cartReducer,
-  userPayment:paymentReducer,
-  userShippingAddress:shippingAddressReducer
+  userCart: userCartReducer,
+  userPayment: userPaymentReducer,
+  userShippingAddress: userShippingAddressReducer
 
 });
 const adminReducer = combineReducers({
   adminProduct: adminProductReducer,
-    adminCategory: adminCategoryReducer,
-    adminBrand: adminBrandReducer,
-    adminDiscounts: adminDiscountReducer,
-    adminShippingZone: adminShippingZoneReducer,
-    adminUser: adminUserReducer
+  adminCategory: adminCategoryReducer,
+  adminBrand: adminBrandReducer,
+  adminDiscounts: adminDiscountReducer,
+  adminShippingZone: adminShippingZoneReducer,
+  adminUser: adminUserReducer
 
 
 });
 const store = configureStore({
   reducer: {
-    public:publicReducer,
-    admin:adminReducer,
-    user:userReducer,
+    public: publicReducer,
+    admin: adminReducer,
+    user: userReducer,
     auth: authReducer,
   },
 });
