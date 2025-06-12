@@ -1,53 +1,51 @@
-// import Stripe from 'stripe';
-// import Order from '../../models/order.js';
-// import Product from '../../models/product.js';
-// import Shipping from '../../models/shippingAddress.js';
-// import Discount from '../../models/discount.js';
-// import Payment from '../../models/payment.js';
+import Order from '../../models/Oder.js';
 
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const getMyOrders = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-// export const createCheckoutSession = async (req, res) => {
-//     try {
-//         const { items, appliedDiscount } = req.body
-//         const userId = req.user.id;
-//         const lineItems = []
-//         for (let item of items) {
-//             const product = await Product.findById(item.product);
-//             lineItems.push({
-//                 price_data: {
-//                     currency: 'vnd',
-//                     unit_amount: product.price,
-//                     product_data: {
-//                         name: product.name,
-//                     }
-//                 },
-//                 quantity: item.quantity
-
-//             })
-
-//         }
-//         const session = await stripe.checkout.sessions.create({
-//             payment_method_types: ['card'],
-//             line_items: lineItems,
-//             mode: 'payment',
-//             success_url: `${process.env.CLIENT_URL}/payment-success`,
-//             cancel_url: `${process.env.CLIENT_URL}/cart`,
-//             metadata: {
-//                 userId: req.user.id,
-//                 shippingAddress: JSON.stringify(shippingAddress),
-//                 appliedDiscount: appliedDiscount || ''
-//             }
-//         });
-//         res.json({ url: session.url });
-
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Checkout session creation failed' });
-//     }
+    const orders = await Order.find({ user: userId })
+  .populate({
+    path: 'shippingAddress',
+    populate: {
+      path: 'city',  
+      model: 'ShippingZone'
+    }
+  })
+  .sort({ createdAt: -1 });
 
 
-// };
-// export const getOrderById = async (req, res) => { /* ... */ };
-// export const updateOrder = async (req, res) => { /* ... */ };
-// export const deleteOrder = async (req, res) => { /* ... */ };
+    res.status(200).json({
+      message: 'Fetched user orders successfully',
+      orders
+    });
+
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+export const getOrderByOrderNumber = async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({ orderNumber, user: userId })
+      .populate('appliedDiscount')
+      .populate('shippingAddress')
+      .populate('payment');
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found or access denied' });
+    }
+
+    res.status(200).json({
+      message: 'Fetched order successfully',
+      order
+    });
+
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

@@ -1,5 +1,4 @@
 import Order from '../../models/Oder.js';
-import shippingAddress from '../../models/shippingAddress.js';
 
 export const getOrders = async (req, res) => {
     try {

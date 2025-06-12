@@ -2,7 +2,7 @@ import Category from '../../models/Category.js'
 import Product  from '../../models/Product.js'
 export const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find().lean(); // <- cần có await và lean()
+        const categories = await Category.find().lean(); 
 
         res.status(200).json(categories);
     } catch (err) {

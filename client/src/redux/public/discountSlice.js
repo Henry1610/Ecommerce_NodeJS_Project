@@ -5,7 +5,7 @@ export const fetchDiscounts = createAsyncThunk(
     'discounts/fetchDiscounts', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/discounts/public', {
+            const res = await fetch('http://localhost:5000/api/discounts', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

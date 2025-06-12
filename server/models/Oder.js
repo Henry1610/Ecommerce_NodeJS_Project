@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { generateOrderNumber } from '../middleware/generateOrderNumber';
+import { generateOrderNumber } from '../middleware/generateOrderNumber.js';
 
 const orderSchema = new mongoose.Schema({
   user: {

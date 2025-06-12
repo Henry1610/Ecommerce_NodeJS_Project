@@ -5,10 +5,10 @@ const router = express.Router();
 
 router.post('/', createReview);
 
-router.get('/',authenticate, getMyReviews);
+router.get('/', getMyReviews);
 
-router.delete('/:id',authenticate, deleteReview);
+router.delete('/:id', deleteReview);
 
-router.put('/:id',authenticate, updateReview);
+router.put('/:id', updateReview);
 
 export default router;

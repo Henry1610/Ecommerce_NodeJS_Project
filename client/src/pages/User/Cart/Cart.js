@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicShippingZones } from '../../../redux/public/shippingZoneSlice';
 import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress } from '../../../redux/user/shippingAddressSlice';
 import { fetchCart, setCart, applyDiscount, removeDiscount, selectCartSubtotalAfterProductDiscount, selectCartTotalPrice, selectCartDiscountAmount } from '../../../redux/user/cartSlice';
-import { fetchDiscounts } from '../../../redux/admin/discountSlice';
+import { fetchDiscounts } from '../../../redux/public/discountSlice';
 import { createCheckoutSession } from '../../../redux/user/paymentSlice';
 import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
@@ -19,7 +19,9 @@ function Cart() {
     const dispatch = useDispatch();
     const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.user.userCart);
     const { AddressSave, defaultAddress } = useSelector(state => state.user.userShippingAddress)
-    const { discounts } = useSelector(state => state.admin.adminDiscounts);
+    const { discounts } = useSelector(state => state.public.publicDiscount);
+    console.log('ds:',discounts);
+    
     const zones = useSelector(state => state.public?.publicShippingZones?.zones || []);
     const CartSubtotalAfterProductDiscount = useSelector(selectCartSubtotalAfterProductDiscount)
     const CartDiscountAmount = useSelector(selectCartDiscountAmount)

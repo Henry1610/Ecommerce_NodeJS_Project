@@ -14,7 +14,7 @@ function Header() {
 
     const { cart, error, loading } = useSelector(state => state.user.userCart);
 
-   
+
     const isAuthenticated = !!token;
 
     const handleLogout = () => {
@@ -117,7 +117,14 @@ function Header() {
                                     {cart?.items?.length}
                                 </span>
                             </button>
-
+                            <button
+                                className="btn btn-info text-black fw-bold d-flex align-items-center p-2 rounded-pill"
+                                type="button"
+                                aria-label="Shopping cart"
+                                onClick={() => { navigate('/order-history') }}
+                            >
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
                             <button
                                 className="btn btn-logout  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
                                 type="button"
