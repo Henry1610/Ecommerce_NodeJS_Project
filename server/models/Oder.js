@@ -12,6 +12,13 @@ const orderSchema = new mongoose.Schema({
     unique: true,
     default: generateOrderNumber
   },
+  discountValue:{
+    type: Number,
+  },
+  shippingFee:{
+    type: Number,
+    required: true
+  },
   shippingAddress: {
     type: mongoose.Schema.ObjectId,
     ref: 'ShippingAddress',
@@ -28,8 +35,8 @@ const orderSchema = new mongoose.Schema({
       name: { type: String, required: true },
       image: { type: String },
       quantity: { type: Number, required: true },
-      price: { type: Number, required: true }
-
+      price: { type: Number, required: true },
+      originalPrice: { type: Number, required: true }
     }
   ],
   appliedDiscount: {

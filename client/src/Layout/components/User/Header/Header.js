@@ -66,9 +66,9 @@ function Header() {
 
             <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
                 <div className="d-flex align-items-center gap-4">
-                    <div className="text-primary fw-bold" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
+                    <Link to='/' className="text-primary fw-bold" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
                         pro
-                    </div>
+                    </Link>
                     <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
                         <i className="fas fa-bars fs-4"></i>
                     </button>

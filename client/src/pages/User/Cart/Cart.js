@@ -20,7 +20,6 @@ function Cart() {
     const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.user.userCart);
     const { AddressSave, defaultAddress } = useSelector(state => state.user.userShippingAddress)
     const { discounts } = useSelector(state => state.public.publicDiscount);
-    console.log('ds:',discounts);
     
     const zones = useSelector(state => state.public?.publicShippingZones?.zones || []);
     const CartSubtotalAfterProductDiscount = useSelector(selectCartSubtotalAfterProductDiscount)
@@ -107,9 +106,6 @@ function Cart() {
         sessionStorage.setItem('selectedAdsId', selectedAdsId);
     }
     
-
-
-
 
     useEffect(() => {
         discountRef.current = selectedDiscountSlice;
@@ -748,7 +744,7 @@ function Cart() {
                         <div className="card-body">
                             <h5 className="card-title">Tóm tắt đơn hàng</h5>
 
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between text-muted small">
                                 <span>Tạm tính</span>
                                 <span>{CartSubtotalAfterProductDiscount.toLocaleString()}đ</span>
                             </div>
@@ -772,7 +768,7 @@ function Cart() {
                             <div className="d-flex justify-content-between fw-bold">
                                 <span>Tổng cộng</span>
                                 <span>
-                                    {CartTotalPrice.toLocaleString()}đ
+                                    {localCart.items.length === 0?0:CartTotalPrice.toLocaleString()}đ
                                 </span>
                             </div>
 

@@ -42,7 +42,7 @@ const OrderSuccess = () => {
 
             {/* Nút điều hướng */}
             <div className="d-flex justify-content-center gap-3 flex-wrap">
-                <Link to='/order-detail' className="btn btn-outline-info px-4 py-2 fw-bold shadow">
+                <Link to={`/order-detail/${orders[0]?.orderNumber}`} className="btn btn-outline-info px-4 py-2 fw-bold shadow">
                     <i className="ri-file-list-line me-2"></i> Xem Chi Tiết Đơn Hàng
                 </Link>
 

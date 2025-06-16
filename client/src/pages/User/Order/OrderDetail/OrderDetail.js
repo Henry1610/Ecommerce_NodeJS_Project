@@ -3,23 +3,26 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrderByOrderNumber } from '../../../../redux/user/orderSlice';
 import { fetchUserProfile } from '../../../../redux/user/userSlice';
+import formatDateTime from '../../../../untils/dateUtils';
+import { useNavigate } from 'react-router-dom';
 
 const OrderDetail = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { orderNumber } = useParams();
-  const { profile } = useSelector(state => state.user.userUser);
-  const user = profile?.user;
 
   const { orderDetail, loading, error } = useSelector(state => state.user.userOrder);
 
+
+
   useEffect(() => {
     if (orderNumber) {
-      dispatch(fetchOrderByOrderNumber(orderNumber));
+      dispatch(fetchOrderByOrderNumber(orderNumber))
     }
   }, [dispatch, orderNumber]);
-  useEffect(() => {
-    dispatch(fetchUserProfile());
-  }, [dispatch]);
+
+
   if (loading) {
     return <div>Đang tải...</div>;
   }
@@ -44,29 +47,32 @@ const OrderDetail = () => {
       icon: 'bi-cart-fill',
       label: 'Đặt hàng',
       completed: true,  // luôn hoàn thành
-      date: new Date(orderDetail.createdAt).toLocaleDateString('vi-VN')
+      date: orderDetail.createdAt
     },
     {
       icon: 'bi-credit-card-fill',
       label: 'Đã thanh toán',
       completed: orderDetail.isPaid,
-      date: orderDetail.paidAt ? new Date(orderDetail.paidAt).toLocaleDateString('vi-VN') : '-'
+      date: orderDetail.paidAt ? orderDetail.paidAt : '-'
     },
     {
       icon: 'bi-truck',
       label: 'Đang giao',
       completed: orderDetail.isShipped,
-      date: orderDetail.shippedAt ? new Date(orderDetail.shippedAt).toLocaleDateString('vi-VN') : '-'
+      date: orderDetail.shippedAt ? orderDetail.shippedAt : '-'
     },
     {
       icon: 'bi-house-door-fill',
       label: 'Đã giao',
       completed: orderDetail.isDelivered,
-      date: orderDetail.deliveredAt ? new Date(orderDetail.deliveredAt).toLocaleDateString('vi-VN') : '-'
+      date: orderDetail.deliveredAt ? orderDetail.deliveredAt : '-'
     }
   ];
-console.log('pr',steps[1].completed);
-
+  const subtotal = orderDetail.items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  console.log(orderDetail.items);
 
   return (
     <div
@@ -83,7 +89,7 @@ console.log('pr',steps[1].completed);
               <div className="d-flex align-items-center">
                 <button
                   className="btn btn-outline-primary rounded-pill me-4 shadow-sm"
-
+                  onClick={() => navigate(-1)}
                   aria-label="Quay lại"
                 >
                   <i class="fa-solid fa-person-walking-arrow-loop-left"></i>
@@ -106,13 +112,15 @@ console.log('pr',steps[1].completed);
                 <span
                   className="badge fs-6 px-3 py-2 rounded-pill shadow-sm"
                   style={{
-                    background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                    background: orderDetail.isPaid
+                      ? 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)'
+                      : 'linear-gradient(135deg, #facc15 0%, #f59e0b 100%)',
                     color: 'white'
                   }}
                 >
-                  <i className="bi bi-check-circle-fill me-2"></i>
-                  Đã thanh toán
+                  {orderDetail.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
                 </span>
+
               </div>
             </div>
           </div>
@@ -161,7 +169,7 @@ console.log('pr',steps[1].completed);
                           <span className={`d-block fw-semibold small mb-1 ${completed ? 'text-dark' : 'text-secondary'}`}>
                             {label}
                           </span>
-                          <span className="text-muted small">{date}</span>
+                          <span className="text-muted small">{formatDateTime(date)}</span>
                         </div>
                       </div>
                     ))}
@@ -190,24 +198,9 @@ console.log('pr',steps[1].completed);
                 </h2>
 
                 <div className="d-flex flex-column gap-3">
-                  {[
-                    {
-                      img: 'https://readdy.ai/api/search-image?query=a%20professional%20photo%20of%20a%20modern%20smartphone%20with%20high%20resolution%20display%2C%20sleek%20design%2C%20minimal%20bezel%2C%20in%20dark%20blue%20color%2C%20on%20white%20background%2C%20product%20photography&width=200&height=200&seq=1&orientation=squarish',
-                      title: 'Điện thoại Samsung Galaxy S25 Ultra',
-                      description: 'Màu: Xanh đậm • Bộ nhớ: 512GB',
-                      quantity: 1,
-                      price: '12.490.000đ',
-                    },
-                    {
-                      img: 'https://readdy.ai/api/search-image?query=a%20professional%20photo%20of%20wireless%20earbuds%20in%20charging%20case%2C%20premium%20design%2C%20white%20color%2C%20product%20photography%20on%20white%20background&width=200&height=200&seq=2&orientation=squarish',
-                      title: 'Tai nghe không dây Samsung Galaxy Buds Pro 2',
-                      description: 'Màu: Trắng',
-                      quantity: 1,
-                      price: '4.290.000đ',
-                    },
-                  ].map(({ img, title, description, quantity, price }, index) => (
+                  {orderDetail.items.map((item, index) => (
                     <div
-                      key={title}
+                      key={index}
                       className="d-flex align-items-center border rounded-4 p-3 shadow-sm position-relative overflow-hidden"
                       style={{
                         transition: 'all 0.3s ease',
@@ -230,11 +223,11 @@ console.log('pr',steps[1].completed);
                           background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
                         }}
                       >
-                        <img src={img} alt={title} className="img-fluid w-100 h-100 object-fit-cover" />
+                        <img src={item.product.images[0]} alt={item.name} className="img-fluid w-100 h-100 object-fit-cover" />
                       </div>
                       <div className="flex-grow-1">
-                        <h3 className="fw-bold mb-1 text-dark fs-6">{title}</h3>
-                        <p className="text-muted mb-2 small">{description}</p>
+                        <h3 className="fw-bold mb-1 text-dark fs-6">{item.name}</h3>
+                        <p className="text-muted mb-2 small">Color:   {item.product.color}</p>
                         <div className="d-flex justify-content-between align-items-center">
                           <span
                             className="badge rounded-pill px-2 py-1"
@@ -244,19 +237,31 @@ console.log('pr',steps[1].completed);
                               fontSize: '0.75rem'
                             }}
                           >
-                            Số lượng: {quantity}
+                            Số lượng: {item.quantity}
                           </span>
-                          <span
-                            className="fw-bold fs-6"
-                            style={{
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              backgroundClip: 'text'
-                            }}
-                          >
-                            {price}
-                          </span>
+
+                          <div>
+
+
+                            <span
+                              className="fw-bold fs-6 me-2"
+                              style={{
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
+                              }}
+                            >
+                              {item.price.toLocaleString()}đ
+                            </span>
+                            <span
+                              className="text-muted text-decoration-line-through small fw-semibold"
+                              style={{ fontSize: '0.9rem' }}
+                            >
+                              {item.originalPrice.toLocaleString()}đ
+                            </span>
+                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -272,7 +277,6 @@ console.log('pr',steps[1].completed);
                 </h2>
 
                 <div className="position-relative">
-
                   {/* Timeline line bên trái */}
                   <div
                     className="position-absolute top-0 bottom-0"
@@ -286,86 +290,29 @@ console.log('pr',steps[1].completed);
                   ></div>
 
                   <div className="d-flex flex-column gap-4">
-
-                    {/* Item 1 */}
-                    <div className="d-flex align-items-start position-relative">
-                      <div className="flex-shrink-0 position-relative" style={{ zIndex: 2, marginLeft: '8px', marginRight: '15px' }}>
-                        <div
-                          className="rounded-circle d-flex justify-content-center align-items-center shadow-lg text-white"
-                          style={{
-                            width: 48,
-                            height: 48,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                          }}
-                        >
-                          <i className="bi bi-bag-check-fill fs-5"></i>
+                    {steps.map((step, index) => (
+                      <div className="d-flex align-items-start position-relative" key={index}>
+                        <div className="flex-shrink-0 position-relative" style={{ zIndex: 2, marginLeft: '8px', marginRight: '15px' }}>
+                          <div
+                            className={`rounded-circle d-flex justify-content-center align-items-center shadow-lg ${step.completed ? 'text-white' : 'text-secondary'}`}
+                            style={{
+                              width: 48,
+                              height: 48,
+                              background: step.completed ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8f9fa'
+                            }}
+                          >
+                            <i className={`bi ${step.icon} fs-5`}></i>
+                          </div>
+                        </div>
+                        <div className="flex-grow-1 pt-2">
+                          <p className={`mb-1 fw-bold ${step.completed ? 'text-dark' : 'text-secondary'}`}>{step.label}</p>
+                          <p className="mb-0 text-muted small">{formatDateTime(step.date) || '-'}</p>
                         </div>
                       </div>
-                      <div className="flex-grow-1 pt-2">
-                        <p className="mb-1 fw-bold text-dark">Đơn hàng đã được tạo</p>
-                        <p className="mb-0 text-muted small">06/06/2025 14:00</p>
-                      </div>
-                    </div>
-
-                    {/* Item 2 */}
-                    <div className="d-flex align-items-start position-relative">
-                      <div className="flex-shrink-0 position-relative" style={{ zIndex: 2, marginLeft: '8px', marginRight: '15px' }}>
-                        <div
-                          className={`rounded-circle d-flex justify-content-center align-items-center shadow-lg ${steps[1].completed ? 'text-white' : 'text-secondary'}`}
-                          style={{
-                            width: 48,
-                            height: 48,
-                            background: steps[1].completed
-                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                              : '#f8f9fa' // bg-light màu hex tương đương
-                          }}
-                        >
-                          <i className="bi bi-credit-card-fill fs-5"></i>
-                        </div>
-                      </div>
-                      <div className="flex-grow-1 pt-2">
-                        <p className={`mb-1 fw-bold ${steps[1].completed ? 'text-dark' : 'text-secondary'}`}>Thanh toán thành công</p>
-                        {/* <p className="mb-0 text-muted small">{date}</p> */}
-                      </div>
-                    </div>
-
-
-                    {/* Item 3 */}
-                    <div className="d-flex align-items-start position-relative">
-                      <div className="flex-shrink-0 position-relative" style={{ zIndex: 2, marginLeft: '8px', marginRight: '15px' }}>
-                        <div
-                          className="rounded-circle d-flex justify-content-center align-items-center shadow-lg bg-light text-secondary"
-                          style={{ width: 48, height: 48 }}
-                        >
-                          <i className="bi bi-truck fs-5"></i>
-                        </div>
-                      </div>
-                      <div className="flex-grow-1 pt-2">
-                        <p className="mb-1 fw-bold text-secondary">Đang giao hàng</p>
-                        <p className="mb-0 text-muted small">-</p>
-                      </div>
-                    </div>
-
-                    {/* Item 4 */}
-                    <div className="d-flex align-items-start position-relative">
-                      <div className="flex-shrink-0 position-relative" style={{ zIndex: 2, marginLeft: '8px', marginRight: '15px' }}>
-                        <div
-                          className="rounded-circle d-flex justify-content-center align-items-center shadow-lg bg-light text-secondary"
-                          style={{ width: 48, height: 48 }}
-                        >
-                          <i className="bi bi-house-door-fill fs-5"></i>
-                        </div>
-                      </div>
-                      <div className="flex-grow-1 pt-2">
-                        <p className="mb-1 fw-bold text-secondary">Đã giao hàng</p>
-                        <p className="mb-0 text-muted small">-</p>
-                      </div>
-                    </div>
-
+                    ))}
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* Enhanced Right Column - Sidebar */}
@@ -390,21 +337,38 @@ console.log('pr',steps[1].completed);
                 <div className="d-flex flex-column gap-3">
                   <div className="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light">
                     <span className="text-muted fw-medium">Phương thức:</span>
-                    <span className="fw-bold text-dark">Thẻ tín dụng</span>
+                    <span className="fw-bold text-dark">
+                      {orderDetail.payment.paymentMethod.charAt(0).toUpperCase() + orderDetail.payment.paymentMethod.slice(1)}
+                    </span>
                   </div>
                   <div className="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light">
                     <span className="text-muted fw-medium">Trạng thái:</span>
-                    <span
-                      className="badge rounded-pill px-3 py-2"
-                      style={{
-                        background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
-                        color: 'white'
-                      }}
-                    >
-                      <i className="bi bi-check-circle me-1"></i>
-                      Đã thanh toán
-                    </span>
+
+                    {orderDetail.isPaid ? (
+                      <span
+                        className="badge rounded-pill px-3 py-2"
+                        style={{
+                          background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                          color: 'white'
+                        }}
+                      >
+                        <i className="bi bi-check-circle me-1"></i>
+                        Đã thanh toán
+                      </span>
+                    ) : (
+                      <span
+                        className="badge rounded-pill px-3 py-2"
+                        style={{
+                          background: 'linear-gradient(135deg, #facc15 0%, #f59e0b 100%)',
+                          color: 'white'
+                        }}
+                      >
+                        <i className="bi bi-exclamation-circle me-1"></i>
+                        Chưa thanh toán
+                      </span>
+                    )}
                   </div>
+
                 </div>
               </div>
 
@@ -428,15 +392,15 @@ console.log('pr',steps[1].completed);
                 <div className="d-flex flex-column gap-3">
                   <div className="p-3 rounded-3 bg-light">
                     <label className="text-muted small fw-medium mb-1 d-block">Người nhận</label>
-                    <span className="fw-bold text-dark">{user.username}</span>
+                    <span className="fw-bold text-dark">{orderDetail.shippingAddress.fullName}</span>
                   </div>
                   <div className="p-3 rounded-3 bg-light">
                     <label className="text-muted small fw-medium mb-1 d-block">Địa chỉ</label>
-                    <span className="text-dark">{orderDetail.shippingAddress.address}</span>
+                    <span className="fw-bold text-dark">{orderDetail.shippingAddress.address}</span>
                   </div>
                   <div className="p-3 rounded-3 bg-light">
                     <label className="text-muted small fw-medium mb-1 d-block">Điện thoại</label>
-                    <span className="fw-bold text-dark">0909123456</span>
+                    <span className="fw-bold text-dark">{orderDetail.shippingAddress.phoneNumber}</span>
                   </div>
                 </div>
               </div>
@@ -461,20 +425,20 @@ console.log('pr',steps[1].completed);
                 <div className="d-flex flex-column gap-3 position-relative">
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="opacity-75">Tạm tính:</span>
-                    <span className="fw-bold">16.780.000đ</span>
+                    <span className="fw-bold">{subtotal.toLocaleString()}đ</span>
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="opacity-75">Phí vận chuyển:</span>
-                    <span className="fw-bold text-warning">Miễn phí</span>
+                    <span className="fw-bold text-warning">{orderDetail.shippingFee.toLocaleString()}</span>
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="opacity-75">Giảm giá:</span>
-                    <span className="fw-bold text-warning">-0đ</span>
+                    <span className="fw-bold text-warning">-{orderDetail.discountValue.toLocaleString()}đ</span>
                   </div>
                   <hr className="border-white opacity-25" />
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="fs-5 fw-bold">Tổng cộng:</span>
-                    <span className="fs-4 fw-bold">16.780.000đ</span>
+                    <span className="fs-4 fw-bold">{orderDetail.totalPrice.toLocaleString()}đ</span>
                   </div>
                 </div>
               </div>

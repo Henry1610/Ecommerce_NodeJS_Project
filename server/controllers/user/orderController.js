@@ -27,13 +27,15 @@ export const getMyOrders = async (req, res) => {
 };
 export const getOrderByOrderNumber = async (req, res) => {
   try {
+    
     const { orderNumber } = req.params;
     const userId = req.user.id;
 
     const order = await Order.findOne({ orderNumber, user: userId })
       .populate('appliedDiscount')
       .populate('shippingAddress')
-      .populate('payment');
+      .populate('payment')
+      .populate('items.product');
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found or access denied' });
