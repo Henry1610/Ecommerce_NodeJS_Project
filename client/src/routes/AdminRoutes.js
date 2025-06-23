@@ -15,7 +15,9 @@ import DiscountList from "../pages/Admin/Discount/DiscountList/Discount";
 import AddDiscount from "../pages/Admin/Discount/AddDiscount/AddDiscount";
 import EditDiscount from "../pages/Admin/Discount/EditDiscount/EditDiscount";
 import ShippingZoneList from "../pages/Admin/ShippingZone/ShippingZoneList";
-
+import OrderList from "../pages/Admin/Order/OrderList/OrderList";
+import OrderDetail from "../pages/Admin/Order/OrderDetail";
+import RefundOrder from "../pages/Admin/Order/RefundOrder";
 const adminRoutes = [
     { path: 'dashboard', component: Dashboard },
 
@@ -37,8 +39,9 @@ const adminRoutes = [
     { path: 'discount/edit/:id', component: EditDiscount },
 
     
-    // { path: 'order', component: OrderList },
-    // { path: 'order/:id', component: OrderDetail },
+    { path: 'order', component: OrderList },
+    { path: 'order/:orderNumber', component: OrderDetail },
+    { path: 'order/refund-request', component: RefundOrder },
 
 
     { path: 'payment', component: Payment },

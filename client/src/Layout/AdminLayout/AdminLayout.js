@@ -21,7 +21,6 @@ function AdminLayout({ children }) {
                 },
             })
                 .then(async (response) => {
-                    console.log('Response Status:', response.status);
                     if (!response.ok) {
                         const errorData = await response.json();
 

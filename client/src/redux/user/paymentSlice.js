@@ -26,7 +26,32 @@ export const createCheckoutSession = createAsyncThunk(
     }
   }
 );
+export const requestRefund = createAsyncThunk(
+  'payment/requestRefund',
+  async ( orderNumber , thunkAPI) => {
+    try {
+      console.log('rss:',orderNumber);
+      
+      const res = await fetch(`http://localhost:5000/api/users/payments/refund/${orderNumber}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
 
+      const data = await res.json();
+
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Không thể gửi yêu cầu hoàn tiền');
+      }
+
+      return data; 
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Lỗi kết nối máy chủ');
+    }
+  }
+);
 // Initial state
 const initialState = {
   loading: false,
@@ -43,8 +68,6 @@ const paymentSlice = createSlice({
     resetPaymentState: (state) => {
       state.loading = false;
       state.error = null;
-      state.sessionUrl = null;
-      state.status = 'idle';
     },
     clearPaymentError: (state) => {
       state.error = null;
@@ -54,19 +77,27 @@ const paymentSlice = createSlice({
     builder
       .addCase(createCheckoutSession.pending, (state) => {
         state.loading = true;
-        state.status = 'loading';
         state.error = null;
       })
       .addCase(createCheckoutSession.fulfilled, (state, action) => {
         state.loading = false;
-        state.status = 'succeeded';
-        state.sessionUrl = action.payload.url;
       })
       .addCase(createCheckoutSession.rejected, (state, action) => {
         state.loading = false;
-        state.status = 'failed';
-        state.error = action.payload || 'Lỗi không xác định';
-        state.sessionUrl = null;
+        state.error = action.payload ;
+      })
+
+      .addCase(requestRefund.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestRefund.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = action.payload.message || 'Yêu cầu hoàn tiền thành công';
+      })
+      .addCase(requestRefund.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });
@@ -74,12 +105,6 @@ const paymentSlice = createSlice({
 // Export actions
 export const { resetPaymentState, clearPaymentError } = paymentSlice.actions;
 
-// Selectors
-export const selectPaymentState = (state) => state.user.userPayment;
-export const selectSessionUrl = (state) =>  state.user.userPayment.sessionUrl;
-export const selectPaymentLoading = (state) =>  state.user.userPayment.loading;
-export const selectPaymentError = (state) =>  state.user.userPayment.error;
-export const selectPaymentStatus = (state) =>  state.user.userPayment.status;
 
 // Export reducer
 export default paymentSlice.reducer;

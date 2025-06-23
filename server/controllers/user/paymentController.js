@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import Product from '../../models/Product.js';
 import Discount from '../../models/Discount.js';
-import Order from '../../models/Oder.js';
+import Order from '../../models/Order.js';
 import Payment from '../../models/Payment.js';
 import ShippingZone from '../../models/ShippingZone.js';
 import Cart from '../../models/Cart.js';
@@ -137,7 +137,7 @@ export const stripeWebhook = async (req, res) => {
       const appliedDiscount = session.metadata.appliedDiscount || null;
       const shippingFee = parseFloat(session.metadata.shippingFee || 0);
       const discountValue = parseFloat(session.metadata.discountValue || 0);
-      
+
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { expand: ['data.price.product'] });
 
       const items = await Promise.all(
@@ -161,9 +161,11 @@ export const stripeWebhook = async (req, res) => {
       const totalPrice = session.amount_total;
 
       const payment = await Payment.create({
+        paymentIntentId: session.payment_intent,
         stripeSessionId: session.id,
         amount: totalPrice,
-        paymentStatus: 'paid',
+        paymentStatus: 'succeeded',
+        refundStatus: 'none',
         paymentMethod: 'card',
         paidAt: new Date(),
       });
@@ -177,12 +179,13 @@ export const stripeWebhook = async (req, res) => {
         discountValue,
         shippingFee,
         totalPrice,
-        isPaid: true,
-        paidAt: new Date(),
-        isShipped: false,
-        shippedAt: null,
-        isDelivered: false,
-        deliveredAt: null,
+        status: 'pending',
+        statusHistory: [
+          {
+            status: 'pending',
+            updatedAt: new Date(),
+          }
+        ]
       });
 
       // Trừ tồn kho
@@ -208,3 +211,36 @@ export const stripeWebhook = async (req, res) => {
     res.status(200).json({ received: true });
   }
 };
+export const requestRefund = async (req, res) => {
+  try {
+    const orderNumber = req.params.orderNumber; // truyền orderNumber từ URL
+    const userId = req.user.id;
+
+    const order = await Order.findOne({ orderNumber, user: userId }).populate('payment');
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Nếu đã yêu cầu refund
+    if (order.status === 'cancel_requested' || order.payment.refundStatus === 'requested') {
+      return res.status(400).json({ message: 'Refund already requested' });
+    }
+    order.statusHistory.push({ status: 'cancel_requested', updatedAt: new Date() });
+    order.status = 'cancel_requested';
+
+    // Cập nhật payment
+    const payment = order.payment;
+    payment.refundStatus = 'requested';
+    payment.refundHistory.push({ status: 'requested', updatedAt: new Date() });
+
+    await payment.save();
+    await order.save();
+
+    res.status(200).json({ message: 'Refund request submitted' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+

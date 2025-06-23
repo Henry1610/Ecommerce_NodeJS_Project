@@ -11,8 +11,8 @@ import './AddProduct.css';
 const AddProduct = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { brands } = useSelector(state => state.brands);
-    const { categories } = useSelector(state => state.categories);
+    const { brands } = useSelector(state => state.admin.adminBrand);
+    const { categories } = useSelector(state => state.admin.adminCategory);
     const [previewImages, setPreviewImages] = useState([]);
 
     useEffect(() => {

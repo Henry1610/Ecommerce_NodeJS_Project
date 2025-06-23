@@ -1,24 +1,43 @@
 import mongoose from 'mongoose';
 
 const paymentSchema = new mongoose.Schema({
- 
-  stripeSessionId: { 
+
+  stripeSessionId: {
     type: String,
     required: false
   },
-  amount: { 
+  paymentIntentId: String,
+  amount: {
     type: Number,
     required: true
   },
-  paymentMethod: { 
+  paymentMethod: {
     type: String,
     required: true
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed'],
-    default: 'pending'
+    enum: ['succeeded', 'fail'],
+    default: 'none'
   },
+  refundStatus: {
+    type: String,
+    enum: ['none', 'requested', 'rejected', 'refunded'],
+    default: 'none'
+  },
+  refundHistory: [
+    {
+      status: {
+        type: String,
+        enum: ['requested', 'rejected', 'refunded'],
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
+
   paidAt: {
     type: Date,
     default: null

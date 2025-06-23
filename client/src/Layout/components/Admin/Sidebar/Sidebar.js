@@ -130,10 +130,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/order" className="list-group-item list-group-item-action ps-5 py-3">
-                  📋 Order List
+                   Order List
                 </Link>
-                <Link to="/admin/order/add" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Add Order
+                <Link to="/admin/order/refund-request" className="list-group-item list-group-item-action ps-5 py-3">
+                    Refund Requests Order
                 </Link>
 
               </div>

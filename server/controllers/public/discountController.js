@@ -3,7 +3,6 @@ import Discount from "../../models/Discount.js";
 export const getPublicDiscounts = async (req, res) => {
     try {
       const now = new Date();
-      console.log("Current time:", now);
 
       const discounts = await Discount.find({
         isActive: true,

@@ -32,6 +32,7 @@ export const fetchMyOrders = createAsyncThunk(
 export const fetchOrderByOrderNumber = createAsyncThunk(
   'orders/fetchOrderByOrderNumber',
   async (orderNumber, thunkAPI) => {
+    
     try {
       const res = await fetch(`http://localhost:5000/api/users/orders/${orderNumber}`, {
         method: 'GET',

@@ -3,23 +3,11 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import './Banner.css';
-
+import banner1 from '../../../src/assets/banner/banner-2400-x-600.webp'
+import banner2 from '../../../src/assets/banner/banner-summer-2400x600.webp'
 const banners = [
-  {
-    id: 1,
-    src: "https://storage.googleapis.com/a1aa/image/292d9d0e-3ccb-4937-2f9a-0e07884ea30e.jpg",
-    alt: "Banner hè rực rỡ 1"
-  },
-  {
-    id: 2,
-    src: "https://storage.googleapis.com/a1aa/image/292d9d0e-3ccb-4937-2f9a-0e07884ea30e.jpg",
-    alt: "Banner hè rực rỡ 2"
-  },
-  {
-    id: 3,
-    src: "https://storage.googleapis.com/a1aa/image/292d9d0e-3ccb-4937-2f9a-0e07884ea30e.jpg",
-    alt: "Banner hè rực rỡ 3"
-  }
+  { id: 1, src: banner1, alt: "Banner hè rực rỡ 1" },
+  { id: 2, src: banner2, alt: "Banner hè rực rỡ 2" },
 ];
 
 export default function Banner() {
