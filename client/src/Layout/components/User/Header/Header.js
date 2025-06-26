@@ -73,7 +73,7 @@ function Header() {
                         <i className="fas fa-bars fs-4"></i>
                     </button>
                     <nav className="d-none d-lg-flex align-items-center gap-4 text-secondary fw-semibold user-select-none" >
-                        <Link href="#" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3">
+                        <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3">
                             <i className="fas fa-bars"></i>
                             <span>Sản phẩm</span>
                         </Link>

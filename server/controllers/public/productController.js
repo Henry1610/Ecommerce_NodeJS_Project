@@ -1,154 +1,132 @@
-import Product from "../../models/Product.js";
-import Review from '../../models/Review.js'
+import Product from '../../models/Product.js';
+import Review from '../../models/Review.js';
+import mongoose from 'mongoose';
+
 export const getPublicProducts = async (req, res) => {
     try {
         const {
-            // Basic filters
-            category,       // Lọc theo category ID
-            brand,          // Lọc theo brand ID  
-            color,          // Lọc theo màu sắc
-
-            // Price & Stock filters
-            minPrice,       // Giá tối thiểu
-            maxPrice,       // Giá tối đa
-            inStock,        // Có hàng hay không
-
-            // Rating filters
-            minRating,      // Rating tối thiểu
-
-            // Discount
-            onSale,         // Có giảm giá hay không
-
-            // Pagination & Sort
-            page = 1,
-            limit = 12,
-            sort = 'createdAt',
-            search
+            category,
+            brand,
+            color,
+            statusCurrent,
+            minPrice,
+            maxPrice,
+            minRating,
+            name,
+            discountPercent,
+            random,
+            limit,        // có thể dùng cho random hoặc phân trang
+            page          // mới thêm
         } = req.query;
 
-        let query = { statusCurrent: 'active' }; // Chỉ lấy sản phẩm active
+        /* ---------- 1. Xây filter ---------- */
+        const filter = {};
 
-        // Tìm kiếm theo tên
-        if (search) {
-            query.name = { $regex: search, $options: 'i' };
+        if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
+            filter.category = category;
         }
-
-        // Filter theo category
-        if (category) {
-            query.category = Array.isArray(category) ? { $in: category } : category;
+        if (brand && brand !== 'null' && mongoose.Types.ObjectId.isValid(brand)) {
+            filter.brand = brand;
         }
+        if (color) filter.color = color;
+        if (statusCurrent) filter.statusCurrent = statusCurrent;
 
-        // Filter theo brand
-        if (brand) {
-            query.brand = Array.isArray(brand) ? { $in: brand } : brand;
-        }
-
-        // Filter theo màu
-        if (color) {
-            query.color = Array.isArray(color) ? { $in: color } : color;
-        }
-
-        // Filter theo giá
         if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
-        // Filter theo stock
-        if (inStock === 'true') {
-            query.stock = { $gt: 0 };
+        if (minRating) filter.ratings = { $gte: Number(minRating) };
+        if (discountPercent) filter.discountPercent = { $gte: Number(discountPercent) };
+        if (name) {
+            filter.name = { $regex: name, $options: 'i' };
         }
 
-        // Filter theo rating
-        if (minRating) {
-            query.ratings = { $gte: Number(minRating) };
+        /* ---------- 2. Random sample (giữ nguyên) ---------- */
+        if (random === 'true') {
+            const sampleLimit = parseInt(limit) || 4;
+            const products = await Product.aggregate([
+                { $match: filter },
+                { $sample: { size: sampleLimit } }
+            ]);
+
+            const populated = await Product.populate(products, [
+                { path: 'category', select: 'name' },
+                { path: 'brand', select: 'name' }
+            ]);
+
+            return res.status(200).json({
+                success: true,
+                count: populated.length,
+                products: populated,
+            });
         }
 
-        // Filter sản phẩm có giảm giá
-        if (onSale === 'true') {
-            query.discountPercent = { $gt: 0 };
-        }
+        /* ---------- 3. Pagination ---------- */
+        const pageNum = Math.max(parseInt(page) || 1, 1);
+        const limitNum = Math.max(parseInt(limit) || 20, 1);
+        const skip = (pageNum - 1) * limitNum;
 
-        // Sort options
-        let sortOptions = {};
-        switch (sort) {
-            case 'price_asc': sortOptions.price = 1; break;
-            case 'price_desc': sortOptions.price = -1; break;
-            case 'name': sortOptions.name = 1; break;
-            case 'rating': sortOptions.ratings = -1; break;
-            case 'popular': sortOptions.numReviews = -1; break;
-            case 'discount': sortOptions.discountPercent = -1; break;
-            default: sortOptions.createdAt = -1;
-        }
-
-        const skip = (page - 1) * limit;
-
-        const products = await Product.find(query)
-            .populate('category', 'name')
-            .populate('brand', 'name')
-            .sort(sortOptions)
-            .limit(parseInt(limit))
-            .skip(skip);
-
-        const total = await Product.countDocuments(query);
+        // Song song lấy total và products trang hiện tại
+        const [total, products] = await Promise.all([
+            Product.countDocuments(filter),
+            Product.find(filter)
+                .populate('category', 'name')
+                .populate('brand', 'name')
+                .skip(skip)
+                .limit(limitNum)
+                .lean()           // nhẹ hơn
+        ]);
 
         res.status(200).json({
             success: true,
-            data: products,
-            pagination: {
-                current: parseInt(page),
-                pages: Math.ceil(total / limit),
-                total,
-                count: products.length
-            }
+            total,                       // tổng số sản phẩm thỏa filter
+            totalPages: Math.ceil(total / limitNum),
+            currentPage: pageNum,
+            count: products.length,
+            products
         });
-
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Không lấy được sản phẩm',
-            error: err.message
-        });
+    } catch (error) {
+        console.error('Lỗi khi lấy sản phẩm:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};
+
+/* ------------------------------------------------------------------ */
+
 export const getPublicProductBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
-        
-        const product = await Product.findOne({ 
+
+        const product = await Product.findOne({
             slug,
-            statusCurrent: 'active' // Thêm điều kiện này để đảm bảo sản phẩm active
+            statusCurrent: 'active'
         })
-        .populate('category', 'name slug')
-        .populate('brand', 'name slug');
-        
+            .populate('category', 'name slug')
+            .populate('brand', 'name slug');
+
         if (!product) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 success: false,
-                message: 'Sản phẩm không tồn tại hoặc không được phép xem' 
+                message: 'Sản phẩm không tồn tại hoặc không được phép xem'
             });
         }
-        
+
         const reviews = await Review.find({ product: product._id })
-            .populate('user', 'name avatar') // Chỉ lấy name và avatar
-            .sort({ createdAt: -1 }) // Sắp xếp review mới nhất trước
-            .exec();
-        
-        // Trả về đúng format JSON
+            .populate('user', 'name avatar')
+            .sort({ createdAt: -1 })
+            .lean();
+
         res.status(200).json({
             success: true,
-            data: {
-                product,
-                reviews
-            }
+            data: { product, reviews }
         });
-        
     } catch (error) {
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            message: 'Lỗi khi lấy sản phẩm', 
-            error: error.message 
+            message: 'Lỗi khi lấy sản phẩm',
+            error: error.message
         });
     }
 };

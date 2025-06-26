@@ -4,7 +4,7 @@ import './AddCategory.css';
 import { addCategory } from '../../../../redux/admin/categoriesSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import { Link } from 'react-router-dom';
 const AddCategory = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -22,7 +22,11 @@ const AddCategory = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        if (!formData.name.trim() || !formData.description.trim()) {
+            toast.error('Vui lòng điền đầy đủ tên và mô tả.');
+            return;
+          }
+          
         try {
             await dispatch(addCategory(formData)).unwrap();
             toast.success('Thêm category thành công!');
@@ -77,9 +81,10 @@ const AddCategory = () => {
                                     >
                                         Submit
                                     </button>
-                                    <a href="categorylist.html" className="btn btn-cancel">
+                                    <Link to="/admin/category" className="btn btn-cancel">
                                         Cancel
-                                    </a>
+                                    </Link>
+
                                 </div>
                             </div>
                         </div>

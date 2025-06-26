@@ -20,6 +20,10 @@ const reviewSchema = new mongoose.Schema({
   comment: { 
     type: String, 
     required: true 
+  },
+  images: {
+      type: [{ type: String }],
+      required: true,
   }
 });
 

@@ -5,7 +5,7 @@ export const fetchCategories = createAsyncThunk(
     'categories/fetchCategories', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/categories/public', {
+            const res = await fetch('http://localhost:5000/api/categories', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

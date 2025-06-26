@@ -1,1240 +1,292 @@
-
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ProductCard from '../../../components/ProductCard/ProductCard';
+import { fetchProducts } from '../../../redux/public/productsSlice';
+import { fetchCategories } from '../../../redux/public/categorySlice';
+import { fetchBrands } from '../../../redux/public/brandSlice';
 
 function Product() {
-    return (<div>
-        <div class="breadcrumb-area">
-            <div class="container">
-                <div class="breadcrumb-content">
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li class="active">Shop List Left Sidebar</li>
-                    </ul>
-                </div>
+  const dispatch = useDispatch();
+  const { products, loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
+  
+  const { categories } = useSelector((state) => state.public.publicCategory || { categories: [] });
+  const { brands } = useSelector((state) => state.public.publicBrand || { brands: [] });
+  
+  const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState({
+    category: '',
+    brand: '',
+    minPrice: '',
+    maxPrice: '',
+    sortBy: '',
+  });
+  
+  const limit = 4;
+
+  const { category, brand, minPrice, maxPrice, sortBy } = filters;
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchBrands());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const filterParams = {
+      category,
+      brand,
+      minPrice,
+      maxPrice,
+      sortBy,
+    };
+
+    dispatch(fetchProducts({ page, limit, ...filterParams }));
+  }, [dispatch, page, category, brand, minPrice, maxPrice, sortBy]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      category: '',
+      brand: '',
+      minPrice: '',
+      maxPrice: '',
+      sortBy: '',
+    });
+    setPage(1);
+  };
+
+  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
+  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+
+  return (
+    <div className="container-fluid py-3">
+      <div className="row">
+        {/* Sidebar Filters */}
+        <div className="col-md-3 col-lg-2">
+          <div className="card shadow-sm border-0 sticky-top" style={{ top: '20px' }}>
+            <div className="card-header bg-primary text-white">
+              <h6 className="mb-0 d-flex align-items-center justify-content-between">
+                <span>
+                  <i className="bi bi-funnel me-2"></i>
+                  Bộ lọc
+                </span>
+                <button 
+                  className="btn btn-sm btn-outline-light" 
+                  onClick={clearFilters}
+                  title="Xóa tất cả bộ lọc"
+                >
+                  <i className="bi bi-x-circle"></i>
+                </button>
+              </h6>
             </div>
+            <div className="card-body p-3">
+              {/* Sort Filter */}
+              <div className="filter-group mb-4">
+                <label className="form-label fw-semibold text-muted small">
+                  <i className="bi bi-sort-numeric-down me-1"></i>
+                  SẮP XẾP THEO GIÁ
+                </label>
+                <select
+                  name="sortBy"
+                  className="form-select form-select-sm"
+                  value={filters.sortBy}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Mặc định</option>
+                  <option value="price_asc">Thấp đến cao</option>
+                  <option value="price_desc">Cao đến thấp</option>
+                </select>
+              </div>
+
+              {/* Price Range Filter */}
+              <div className="filter-group mb-4">
+                <label className="form-label fw-semibold text-muted small">
+                  <i className="bi bi-currency-dollar me-1"></i>
+                  KHOẢNG GIÁ
+                </label>
+                <div className="row g-2">
+                  <div className="col-6">
+                    <input
+                      type="number"
+                      name="minPrice"
+                      placeholder="Từ"
+                      className="form-control form-control-sm"
+                      value={filters.minPrice}
+                      onChange={handleFilterChange}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <input
+                      type="number"
+                      name="maxPrice"
+                      placeholder="Đến"
+                      className="form-control form-control-sm"
+                      value={filters.maxPrice}
+                      onChange={handleFilterChange}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Filter */}
+              <div className="filter-group mb-4">
+                <label className="form-label fw-semibold text-muted small">
+                  <i className="bi bi-grid me-1"></i>
+                  DANH MỤC
+                </label>
+                <select
+                  name="category"
+                  className="form-select form-select-sm"
+                  value={filters.category}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Tất cả danh mục</option>
+                  {categories.map(cat => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Brand Filter */}
+              <div className="filter-group mb-3">
+                <label className="form-label fw-semibold text-muted small">
+                  <i className="bi bi-tags me-1"></i>
+                  THƯƠNG HIỆU
+                </label>
+                <select
+                  name="brand"
+                  className="form-select form-select-sm"
+                  value={filters.brand}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Tất cả thương hiệu</option>
+                  {brands.map(br => (
+                    <option key={br._id} value={br._id}>
+                      {br.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Active Filters Summary */}
+              {(category || brand || minPrice || maxPrice || sortBy) && (
+                <div className="active-filters mt-3 pt-3 border-top">
+                  <small className="text-muted fw-semibold">BỘ LỌC ĐANG DÙNG:</small>
+                  <div className="mt-2">
+                    {sortBy && (
+                      <span className="badge bg-info me-1 mb-1">
+                        {sortBy === 'price_asc' ? 'Giá tăng dần' : 'Giá giảm dần'}
+                      </span>
+                    )}
+                    {category && (
+                      <span className="badge bg-success me-1 mb-1">
+                        {categories.find(c => c._id === category)?.name}
+                      </span>
+                    )}
+                    {brand && (
+                      <span className="badge bg-warning me-1 mb-1">
+                        {brands.find(b => b._id === brand)?.name}
+                      </span>
+                    )}
+                    {(minPrice || maxPrice) && (
+                      <span className="badge bg-secondary me-1 mb-1">
+                        {minPrice && maxPrice ? `${minPrice}đ - ${maxPrice}đ` 
+                         : minPrice ? `Từ ${minPrice}đ` 
+                         : `Đến ${maxPrice}đ`}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div class="content-wraper pt-60 pb-60">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-9 order-1 order-lg-2">
-                        <div class="single-banner shop-page-banner">
-                            <a href="#">
-                                <img src="images/bg-banner/2.jpg" alt="Li's Static Banner" />
-                            </a>
-                        </div>
+        {/* Products Content */}
+        <div className="col-md-9 col-lg-10">
+          {/* Results Header */}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0">
+              {loading ? 'Đang tải...' : `Hiển thị ${products.length} sản phẩm`}
+            </h5>
+            {!loading && products.length > 0 && (
+              <small className="text-muted">
+                Trang {currentPage} / {totalPages}
+              </small>
+            )}
+          </div>
 
-                        <div class="shop-top-bar mt-30">
-                            <div class="shop-bar-inner">
-                                <div class="product-view-mode">
-                                    <ul class="nav shop-item-filter-list" role="tablist">
-                                        <li role="presentation"><a data-toggle="tab" role="tab" aria-controls="grid-view" href="#grid-view"><i class="fa fa-th"></i></a></li>
-                                        <li class="active" role="presentation"><a aria-selected="true" class="active show" data-toggle="tab" role="tab" aria-controls="list-view" href="#list-view"><i class="fa fa-th-list"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="toolbar-amount">
-                                    <span>Showing 1 to 9 of 15</span>
-                                </div>
-                            </div>
-                            <div class="product-select-box">
-                                <div class="product-short">
-                                    <p>Sort By:</p>
-                                    <select class="nice-select">
-                                        <option value="trending">Relevance</option>
-                                        <option value="sales">Name (A - Z)</option>
-                                        <option value="sales">Name (Z - A)</option>
-                                        <option value="rating">Price (Low &gt; High)</option>
-                                        <option value="date">Rating (Lowest)</option>
-                                        <option value="price-asc">Model (A - Z)</option>
-                                        <option value="price-asc">Model (Z - A)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="shop-products-wrapper">
-                            <div class="tab-content">
-                                <div id="grid-view" class="tab-pane fade" role="tabpanel">
-                                    <div class="product-area shop-product-area">
-                                        <div class="row">
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/1.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/2.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/3.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/4.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/5.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/6.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/7.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/8.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/9.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/10.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/11.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-6 mt-40">
-                                                <div class="single-product-wrap">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/12.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Accusantium dolorem1</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="add-actions">
-                                                            <ul class="add-actions-link">
-                                                                <li class="add-cart active"><a href="shopping-cart.html">Add to cart</a></li>
-                                                                <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                                <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="list-view" class="tab-pane fade product-list-view active show" role="tabpanel">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/12.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/11.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/10.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/9.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/8.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/7.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/6.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/5.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/4.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/3.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/2.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action mb-xs-30">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row product-layout-list last-child">
-                                                <div class="col-lg-3 col-md-5 ">
-                                                    <div class="product-image">
-                                                        <a href="single-product.html">
-                                                            <img src="images/product/large-size/1.jpg" alt="Li's Product Image" />
-                                                        </a>
-                                                        <span class="sticker">New</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5 col-md-7">
-                                                    <div class="product_desc">
-                                                        <div class="product_desc_info">
-                                                            <div class="product-review">
-                                                                <h5 class="manufacturer">
-                                                                    <a href="product-details.html">Graphic Corner</a>
-                                                                </h5>
-                                                                <div class="rating-box">
-                                                                    <ul class="rating">
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                        <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <h4><a class="product_name" href="single-product.html">Hummingbird printed t-shirt</a></h4>
-                                                            <div class="price-box">
-                                                                <span class="new-price">$46.80</span>
-                                                            </div>
-                                                            <p>Beach Camera Exclusive Bundle - Includes Two Samsung Radiant 360 R3 Wi-Fi Bluetooth Speakers. Fill The Entire Room With Exquisite Sound via Ring Radiator Technology. Stream And Control R3 Speakers Wirelessly With Your Smartphone. Sophisticated, Modern Desig</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="shop-add-action">
-                                                        <ul class="add-actions-link">
-                                                            <li class="add-cart"><a href="#">Add to cart</a></li>
-                                                            <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
-                                                            <li><a class="quick-view" data-toggle="modal" data-target="#exampleModalCenter" href="#"><i class="fa fa-eye"></i>Quick view</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="paginatoin-area">
-                                    <div class="row">
-                                        <div class="col-lg-6 col-md-6">
-                                            <p>Showing 1-12 of 13 item(s)</p>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6">
-                                            <ul class="pagination-box">
-                                                <li><a href="#" class="Previous"><i class="fa fa-chevron-left"></i> Previous</a>
-                                                </li>
-                                                <li class="active"><a href="#">1</a></li>
-                                                <li><a href="#">2</a></li>
-                                                <li><a href="#">3</a></li>
-                                                <li>
-                                                    <a href="#" class="Next"> Next <i class="fa fa-chevron-right"></i></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 order-2 order-lg-1">
-                        <div class="sidebar-categores-box mt-sm-30 mt-xs-30">
-                            <div class="sidebar-title">
-                                <h2>Laptop</h2>
-                            </div>
-                            <div class="category-sub-menu">
-                                <ul>
-                                    <li class="has-sub"><a href="# ">Prime Video</a>
-                                        <ul>
-                                            <li><a href="#">All Videos</a></li>
-                                            <li><a href="#">Blouses</a></li>
-                                            <li><a href="#">Evening Dresses</a></li>
-                                            <li><a href="#">Summer Dresses</a></li>
-                                            <li><a href="#">T-Rent or Buy</a></li>
-                                            <li><a href="#">Your Watchlist</a></li>
-                                            <li><a href="#">Watch Anywhere</a></li>
-                                            <li><a href="#">Getting Started</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="has-sub"><a href="#">Computer</a>
-                                        <ul>
-                                            <li><a href="#">TV & Video</a></li>
-                                            <li><a href="#">Audio & Theater</a></li>
-                                            <li><a href="#">Camera, Photo</a></li>
-                                            <li><a href="#">Cell Phones</a></li>
-                                            <li><a href="#">Headphones</a></li>
-                                            <li><a href="#">Video Games</a></li>
-                                            <li><a href="#">Wireless Speakers</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="has-sub"><a href="#">Electronics</a>
-                                        <ul>
-                                            <li><a href="#">Amazon Home</a></li>
-                                            <li><a href="#">Kitchen & Dining</a></li>
-                                            <li><a href="#">Bed & Bath</a></li>
-                                            <li><a href="#">Appliances</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="sidebar-categores-box">
-                            <div class="sidebar-title">
-                                <h2>Filter By</h2>
-                            </div>
-                            <button class="btn-clear-all mb-sm-30 mb-xs-30">Clear all</button>
-
-                            <div class="filter-sub-area">
-                                <h5 class="filter-sub-titel">Brand</h5>
-                                <div class="categori-checkbox">
-                                    <form action="#">
-                                        <ul>
-                                            <li>
-                                                <label>
-                                                    <input type="checkbox" name="product-category" />
-                                                    <a href="#">Prime Video (13)</a>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label>
-                                                    <input type="checkbox" name="product-category" />
-                                                    <a href="#">Computers (12)</a>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label>
-                                                    <input type="checkbox" name="product-category" />
-                                                    <a href="#">Electronics (11)</a>
-                                                </label>
-                                            </li>
-                                        </ul>
-
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-area pt-sm-10 pt-xs-10">
-                                <h5 class="filter-sub-titel">Categories</h5>
-                                <div class="categori-checkbox">
-                                    <form action="#">
-                                        <ul>
-                                            <li><input type="checkbox" name="product-categori" /><a href="#">Graphic Corner (10)</a></li>
-                                            <li><input type="checkbox" name="product-categori" /><a href="#"> Studio Design (6)</a></li>
-                                        </ul>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-area pt-sm-10 pt-xs-10">
-                                <h5 class="filter-sub-titel">Size</h5>
-                                <div class="size-checkbox">
-                                    <form action="#">
-                                        <ul>
-                                            <li><input type="checkbox" name="product-size" /><a href="#">S (3)</a></li>
-                                            <li><input type="checkbox" name="product-size" /><a href="#">M (3)</a></li>
-                                            <li><input type="checkbox" name="product-size" /><a href="#">L (3)</a></li>
-                                            <li><input type="checkbox" name="product-size" /><a href="#">XL (3)</a></li>
-                                        </ul>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-area pt-sm-10 pt-xs-10">
-                                <h5 class="filter-sub-titel">Color</h5>
-                                <div class="color-categoriy">
-                                    <form action="#">
-                                        <ul>
-                                            <li><span class="white"></span><a href="#">White (1)</a></li>
-                                            <li><span class="black"></span><a href="#">Black (1)</a></li>
-                                            <li><span class="Orange"></span><a href="#">Orange (3) </a></li>
-                                            <li><span class="Blue"></span><a href="#">Blue  (2) </a></li>
-                                        </ul>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-area pt-sm-10 pb-sm-15 pb-xs-15">
-                                <h5 class="filter-sub-titel">Dimension</h5>
-                                <div class="categori-checkbox">
-                                    <form action="#">
-                                        <ul>
-                                            <li><input type="checkbox" name="product-categori" /><a href="#">40x60cm (6)</a></li>
-                                            <li><input type="checkbox" name="product-categori" /><a href="#">60x90cm (6)</a></li>
-                                            <li><input type="checkbox" name="product-categori" /><a href="#">80x120cm (6)</a></li>
-                                        </ul>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="sidebar-categores-box mb-sm-0">
-                            <div class="sidebar-title">
-                                <h2>Laptop</h2>
-                            </div>
-                            <div class="category-tags">
-                                <ul>
-                                    <li><a href="# ">Devita</a></li>
-                                    <li><a href="# ">Cameras</a></li>
-                                    <li><a href="# ">Sony</a></li>
-                                    <li><a href="# ">Computer</a></li>
-                                    <li><a href="# ">Big Sale</a></li>
-                                    <li><a href="# ">Accessories</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Đang tải...</span>
+              </div>
+              <p className="mt-2 text-muted">Đang tải sản phẩm...</p>
             </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="mb-3">
+                <i className="bi bi-search display-1 text-muted"></i>
+              </div>
+              <h6 className="text-muted">Không tìm thấy sản phẩm nào</h6>
+              <p className="text-muted small">Hãy thử điều chỉnh bộ lọc của bạn</p>
+              <button className="btn btn-outline-primary btn-sm" onClick={clearFilters}>
+                Xóa tất cả bộ lọc
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="row g-3">
+                {products.map(product => (
+                  <div className="col-6 col-lg-4 col-xl-3" key={product._id}>
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-center align-items-center gap-3 mt-4 py-3">
+                  <button 
+                    className="btn btn-outline-primary btn-sm d-flex align-items-center" 
+                    onClick={handlePrev} 
+                    disabled={page <= 1}
+                  >
+                    <i className="bi bi-chevron-left me-1"></i>
+                    Trang trước
+                  </button>
+
+                  <div className="pagination-info px-3">
+                    <span className="badge bg-primary">
+                      {currentPage} / {totalPages}
+                    </span>
+                  </div>
+
+                  <button 
+                    className="btn btn-outline-primary btn-sm d-flex align-items-center" 
+                    onClick={handleNext} 
+                    disabled={page >= totalPages}
+                  >
+                    Trang sau
+                    <i className="bi bi-chevron-right ms-1"></i>
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
+      </div>
     </div>
-    )
+  );
 }
-export default Product
+
+export default Product;

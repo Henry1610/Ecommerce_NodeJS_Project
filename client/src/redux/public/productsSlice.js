@@ -1,31 +1,35 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchProducts = createAsyncThunk(
-    'products/fetchProducts', async (_, thunkAPI) => {
+    'products/fetchProducts',
+    async (params = {}, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/products'
-                , {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                }
-            )
+            const query = new URLSearchParams(params).toString();
+            console.log(query);
+
+            const url = `http://localhost:5000/api/products/filter?${query}`;
+
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
             const data = await res.json();
 
             if (!res.ok) {
-                console.error('Error fetching products:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách sản phẩm')
+                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách sản phẩm');
             }
 
             return data;
         } catch (error) {
-            console.error('Network error fetching products:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
-)
+);
+
 export const fetchProductBySlug = createAsyncThunk(
     'products/fetchProductById', async (slug, thunkAPI) => {
 
@@ -42,8 +46,8 @@ export const fetchProductBySlug = createAsyncThunk(
                 }
             )
             const data = await res.json();
-            console.log('da:',data);
-            
+            console.log('da:', data);
+
             if (!res.ok) {
                 console.error('Error fetching product:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy sản phẩm');
@@ -63,6 +67,9 @@ const productsSlice = createSlice({
         products: [],
         reviews: [],
         product: null,
+        total: 0,
+        totalPages: 1,
+        currentPage: 1,
         loading: false,
         error: null,
     },
@@ -81,8 +88,12 @@ const productsSlice = createSlice({
             })
             .addCase(fetchProducts.fulfilled, (state, action) => {
                 state.loading = false;
-                state.products = action.payload.data;
-            })
+                state.products = action.payload.products;
+                state.total = action.payload.total;
+                state.totalPages = action.payload.totalPages;
+                state.currentPage = action.payload.currentPage;
+              })
+            
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
@@ -91,18 +102,18 @@ const productsSlice = createSlice({
             // Fetch single product by ID
             .addCase(fetchProductBySlug.pending, (state) => {
                 state.loading = true;
-                state.product = null; // Reset product when starting a new fetch
+                state.product = null;
                 state.error = null;
             })
             .addCase(fetchProductBySlug.fulfilled, (state, action) => {
-                                   
-                  state.product = action.payload.data.product;
-                  state.reviews = action.payload.data.reviews;
 
-                  state.loading = false;
-               
-              })
-              
+                state.product = action.payload.data.product;
+                state.reviews = action.payload.data.reviews;
+
+                state.loading = false;
+
+            })
+
             .addCase(fetchProductBySlug.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;

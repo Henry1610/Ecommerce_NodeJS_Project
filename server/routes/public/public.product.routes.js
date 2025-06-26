@@ -2,7 +2,7 @@ import { getPublicProductBySlug,getPublicProducts } from "../../controllers/publ
 import express from 'express'
 const router=express.Router();
 
-router.get('/',getPublicProducts)
+router.get('/filter',getPublicProducts)
 router.get('/:slug',getPublicProductBySlug)
 
 export default router

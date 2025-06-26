@@ -1,116 +1,337 @@
-import { useSelector } from 'react-redux'; // THÊM DÒNG NÀY
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux"
 import { addToCart } from "../../redux/user/cartSlice";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetchCart } from '../../redux/user/cartSlice';
 import { MAX_STRIPE_AMOUNT } from '../../config/constants';
 import { selectCartTotalPrice } from '../../redux/user/cartSlice';
+
 function ProductCard({ product }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const totalPrice=useSelector(selectCartTotalPrice)
+    const totalPrice = useSelector(selectCartTotalPrice);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
-          dispatch(fetchCart());
-        
-      }, [dispatch]);
+        dispatch(fetchCart());
+    }, [dispatch]);
 
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);
+    
     const handleShowDetail = (slug) => {
         navigate(`/product/${slug}`);
-
     };
-    const handleAddToCart = ({ productId, quantity }) => {
-     
+
+    const handleAddToCart = async ({ productId, quantity }) => {
+        setIsLoading(true);
         const newTotal = totalPrice + discountPrice * quantity;
         
-        if (newTotal >  MAX_STRIPE_AMOUNT) {
+        if (newTotal > MAX_STRIPE_AMOUNT) {
             toast.warning('Tổng giá trị đơn hàng không được vượt quá 100 triệu!');
+            setIsLoading(false);
             return;
         }
-        dispatch(addToCart({ productId, quantity }))
-            .unwrap()
-            .then(() => {
-                toast.success('Sản phẩm đã được thêm vào giỏ hàng!');
-            })
-            .catch((error) => {
-                toast.error(error || 'Thêm vào giỏ hàng thất bại!');
-            });
+
+        try {
+            await dispatch(addToCart({ productId, quantity })).unwrap();
+            toast.success('Sản phẩm đã được thêm vào giỏ hàng!');
+        } catch (error) {
+            toast.error(error || 'Thêm vào giỏ hàng thất bại!');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
+    const handleQuickBuy = () => {
+        handleAddToCart({ productId: product._id, quantity: 1 });
+        setTimeout(() => {
+            navigate('/cart');
+        }, 1000);
+    };
 
     return (
-
-        <div className="card shadow-sm rounded-4 overflow-hidden mx-auto " style={{ width: "100%" }} >
-            <img
-                src="https://storage.googleapis.com/a1aa/image/821514f3-0a04-418f-30e9-be563b4f05cb.jpg"
-                className="card-img-top px-3"
-                alt="Laptop mỏng"
-                style={{ height: "200px", objectFit: "cover" }}
-                onClick={() => handleShowDetail(product.slug)}
-            />
-            <div className="card-body text-center p-2">
-                <h6 className="card-title fw-semibold text-truncate mb-2" style={{ fontSize: "0.9rem" }}  onClick={() => handleShowDetail(product.slug)}>
-                    {product.name}
-                </h6>
-
-                <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
-                    <div className="text-warning star-shadow" style={{ fontSize: "0.75rem" }}>
-                        {[...Array(5)].map((_, index) => {
-                            const full = index + 1 <= product.ratings;
-                            const half = !full && index + 0.5 <= product.ratings;
-
-                            return full ? (
-                                <i key={index} className="fas fa-star text-warning" />
-                            ) : half ? (
-                                <i key={index} className="fas fa-star-half-alt text-warning" />
-                            ) : (
-                                <i key={index} className="far fa-star text-warning" />
-                            );
-                        })}
-                    </div>
-                    <span className="text-muted fw-medium" style={{ fontSize: "0.75rem" }}>
-                        {product.ratings}
-                    </span>
-                    <span className="text-muted small" style={{ fontSize: "0.7rem" }}>
-                        | Còn lại <strong className="text-dark">{product.numReviews}</strong>
-                    </span>
-                </div>
-
-
-                <div className="mb-2">
-                    <h6 className="text-danger fw-bold mb-1" style={{ fontSize: "1rem" }}>{discountPrice?.toLocaleString('vi-VN')}đ</h6>
-                    {product.discountPercent && (
-                        <div className="d-flex justify-content-center align-items-center gap-1">
-                            <span className="text-decoration-line-through text-secondary" style={{ fontSize: "0.75rem" }}>
-                                {originalPrice?.toLocaleString('vi-VN')}₫
-                            </span>
-                            <span className="badge bg-danger-subtle text-danger rounded-pill fw-semibold" style={{ fontSize: "0.65rem" }}>
-                                -{product.discountPercent}%
-                            </span>
+        <div 
+            className="product-card-container"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{
+                borderRadius: '20px',
+                padding: '2px',
+                transition: 'all 0.3s ease',
+                transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
+                boxShadow: isHovered 
+                    ? '0 20px 40px rgba(102, 126, 234, 0.3)' 
+                    : '0 8px 25px rgba(0, 0, 0, 0.1)',
+            }}
+        >
+            <div 
+                className="card border-0 h-100"
+                style={{
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    background: 'white',
+                    position: 'relative',
+                }}
+            >
+                {/* Discount Badge - Fixed height container */}
+                <div 
+                    className="position-absolute top-0 start-0 m-2"
+                    style={{ 
+                        zIndex: 2,
+                        height: '24px', // Fixed height
+                        minWidth: '40px' // Minimum width to maintain space
+                    }}
+                >
+                    {product.discountPercent > 0 && (
+                        <div
+                            className="badge text-white fw-bold px-2 py-1"
+                            style={{
+                                background: 'linear-gradient(45deg, #ff6b6b, #ee5a52)',
+                                borderRadius: '8px',
+                                fontSize: '0.7rem',
+                                boxShadow: '0 2px 8px rgba(238, 90, 82, 0.3)',
+                            }}
+                        >
+                            -{product.discountPercent}%
                         </div>
                     )}
-
-
-
                 </div>
 
-                <div className="text-success fw-semibold d-flex justify-content-center align-items-center gap-1 mb-3" style={{ fontSize: "0.75rem" }}>
-                    <i className="fas fa-credit-card fs-6"></i>
-                    <span>Trả góp 0%</span>
+                {/* Heart Icon */}
+                <div 
+                    className="position-absolute top-0 end-0 m-2"
+                    style={{ zIndex: 2 }}
+                >
+                    <button
+                        className="btn btn-sm border-0 bg-white rounded-circle"
+                        style={{
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.transform = 'scale(1.1)';
+                            e.target.style.color = '#ff6b6b';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.transform = 'scale(1)';
+                            e.target.style.color = '#6c757d';
+                        }}
+                    >
+                        <i className="fas fa-heart" style={{ fontSize: '0.8rem' }}></i>
+                    </button>
                 </div>
 
-                {/* Nút hành động với màu info */}
-                <div className="d-flex justify-content-center gap-2 ">
-                    <button className="btn btn-outline-info btn-sm px-3 fw-bold rounded-4" onClick={() => handleAddToCart({ productId: product._id, quantity: 1 })}>Thêm vào giỏ</button>
-                    <button className="btn btn-info btn-sm text-white px-3 fw-bold rounded-4">Mua ngay</button>
+                {/* Product Image */}
+                <div 
+                    className="position-relative overflow-hidden"
+                    style={{ height: '200px', cursor: 'pointer' }}
+                    onClick={() => handleShowDetail(product.slug)}
+                >
+                    <img
+                        src={product.image || "https://storage.googleapis.com/a1aa/image/821514f3-0a04-418f-30e9-be563b4f05cb.jpg"}
+                        className="w-100 h-100"
+                        alt={product.name}
+                        style={{
+                            objectFit: 'cover',
+                            transition: 'transform 0.3s ease',
+                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                        }}
+                    />
+                    
+                    {/* Overlay gradient on hover */}
+                    <div
+                        className="position-absolute top-0 start-0 w-100 h-100"
+                        style={{
+                            background: isHovered 
+                                ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%)'
+                                : 'transparent',
+                            transition: 'background 0.3s ease',
+                        }}
+                    />
+                </div>
+
+                {/* Card Body */}
+                <div className="card-body p-3">
+                    {/* Product Name - Fixed height */}
+                    <h6 
+                        className="card-title fw-bold mb-2"
+                        style={{ 
+                            fontSize: '0.95rem',
+                            color: '#2d3748',
+                            cursor: 'pointer',
+                            lineHeight: '1.3',
+                            height: '2.6rem', // Fixed height for 2 lines
+                            overflow: 'hidden',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                        }}
+                        onClick={() => handleShowDetail(product.slug)}
+                    >
+                        {product.name}
+                    </h6>
+
+                    {/* Rating - Fixed height */}
+                    <div className="d-flex align-items-center justify-content-between mb-2" style={{ height: '20px' }}>
+                        <div className="d-flex align-items-center gap-1">
+                            <div className="d-flex" style={{ fontSize: '0.75rem' }}>
+                                {[...Array(5)].map((_, index) => {
+                                    const full = index + 1 <= product.ratings;
+                                    const half = !full && index + 0.5 <= product.ratings;
+                                    return (
+                                        <i 
+                                            key={index} 
+                                            className={`fas ${full ? 'fa-star' : half ? 'fa-star-half-alt' : 'far fa-star'}`}
+                                            style={{ color: '#fbbf24' }}
+                                        />
+                                    );
+                                })}
+                            </div>
+                            <span 
+                                className="text-muted fw-medium"
+                                style={{ fontSize: '0.75rem' }}
+                            >
+                                ({product.numReviews})
+                            </span>
+                        </div>
+                        
+                        {/* Stock indicator */}
+                        <div className="d-flex align-items-center">
+                            <div
+                                className="rounded-circle me-1"
+                                style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    backgroundColor: product.stock > 0 ? '#10b981' : '#ef4444',
+                                }}
+                            />
+                            <span 
+                                className="small"
+                                style={{ 
+                                    fontSize: '0.7rem',
+                                    color: product.stock > 0 ? '#10b981' : '#ef4444',
+                                }}
+                            >
+                                {product.stock > 0 ? 'Còn hàng' : 'Hết hàng'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Price - Fixed height container */}
+                    <div className="mb-3" style={{ minHeight: '45px' }}>
+                        <div className="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 
+                                    className="text-danger fw-bold mb-0"
+                                    style={{ fontSize: '1.1rem' }}
+                                >
+                                    {discountPrice?.toLocaleString('vi-VN')}đ
+                                </h6>
+                                {/* Fixed height container for original price */}
+                                <div style={{ height: '16px', marginTop: '2px' }}>
+                                    {product.discountPercent > 0 && (
+                                        <span 
+                                            className="text-decoration-line-through text-muted small"
+                                            style={{ fontSize: '0.8rem' }}
+                                        >
+                                            {originalPrice?.toLocaleString('vi-VN')}đ
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            {/* Installment badge */}
+                            <div
+                                className="badge text-white px-2 py-1"
+                                style={{
+                                    background: 'linear-gradient(45deg, #10b981, #059669)',
+                                    borderRadius: '6px',
+                                    fontSize: '0.65rem',
+                                }}
+                            >
+                                Trả góp 0%
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="d-flex gap-2">
+                        <button 
+                            className="btn flex-1 fw-bold"
+                            style={{
+                                background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                                border: 'none',
+                                color: 'white',
+                                borderRadius: '10px',
+                                padding: '8px 16px',
+                                fontSize: '0.85rem',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.2)',
+                            }}
+                            onClick={() => handleAddToCart({ productId: product._id, quantity: 1 })}
+                            disabled={isLoading || product.stock === 0}
+                            onMouseEnter={(e) => {
+                                if (!isLoading && product.stock > 0) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.3)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.2)';
+                            }}
+                        >
+                            {isLoading ? (
+                                <div className="d-flex align-items-center justify-content-center">
+                                    <div 
+                                        className="spinner-border spinner-border-sm me-1"
+                                        style={{ width: '12px', height: '12px' }}
+                                    />
+                                    <span>Thêm...</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <i className="fas fa-shopping-cart me-1"></i>
+                                    Thêm vào giỏ
+                                </>
+                            )}
+                        </button>
+                        
+                        <button
+                            className="btn btn-outline-primary fw-bold"
+                            style={{
+                                borderRadius: '10px',
+                                padding: '8px 12px',
+                                fontSize: '0.85rem',
+                                transition: 'all 0.2s ease',
+                                minWidth: '44px',
+                            }}
+                            onClick={handleQuickBuy}
+                            disabled={product.stock === 0}
+                            onMouseEnter={(e) => {
+                                if (product.stock > 0) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                            }}
+                        >
+                            <i className="fas fa-bolt"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-
-
     );
 }
 

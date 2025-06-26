@@ -5,7 +5,7 @@ export const fetchBrands = createAsyncThunk(
     'brands/fetchBrands', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/brands/public', {
+            const res = await fetch('http://localhost:5000/api/brands', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
