@@ -36,7 +36,8 @@ const orderSchema = new mongoose.Schema({
       image: { type: String },
       quantity: { type: Number, required: true },
       price: { type: Number, required: true },
-      originalPrice: { type: Number, required: true }
+      originalPrice: { type: Number, required: true },
+      reviewed: { type: Boolean, default: false },
     }
   ],
   appliedDiscount: {

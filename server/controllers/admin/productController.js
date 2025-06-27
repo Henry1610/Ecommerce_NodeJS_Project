@@ -79,7 +79,6 @@ export const addProduct = async (req, res,next) => {
 
         const product = await newProduct.save();
         req.product = product;
-        console.log('product:',product);
         next();
     } catch (error) {
         console.error('[ADD PRODUCT ERROR]', error); // Ghi log ra terminal

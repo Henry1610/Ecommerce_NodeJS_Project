@@ -1,40 +1,90 @@
 import Review from '../../models/Review.js';
 import Product from '../../models/Product.js';
+import Order from '../../models/Order.js';
+import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 
+const getPublicIdFromUrl = (url) => {
+    const parts = url.split('/');
+    const filename = parts[parts.length - 1]; // ảnh.png
+    const nameWithoutExt = filename.split('.')[0]; // bỏ đuôi .png
+  
+    // Lấy phần sau 'upload' đến trước filename (bỏ version v...)
+    const uploadIndex = parts.indexOf('upload');
+    const folderPath = parts.slice(uploadIndex + 2, parts.length - 1).join('/'); // bỏ v123456
+  
+    return `${folderPath}/${nameWithoutExt}`;
+  };
+  
 export const createReview = async (req, res) => {
     try {
-        const { product, rating, comment } = req.body;
-        const alreadyReview = await Review.findOne({
-            user: req.user._id,
-            product,
-        });
-        if (alreadyReview) {
-            return res.status(400).json({ message: 'Bạn đã đánh giá sản phẩm này rồi!' });
+        const { product, rating, comment, orderNumber } = req.body;
+        const userId = req.user.id;
+
+        // Validate input
+        if (!product || !rating || !comment) {
+            return res.status(400).json({ message: 'Thiếu thông tin bắt buộc.' });
         }
 
-        const review = new Review({
-            user: req.user._id,  // sửa lại đây
+        // Kiểm tra xem user đã mua sản phẩm và đánh giá sản phẩm chưa 
+        const order = await Order.findOne({
+            orderNumber,
+            user: req.user.id,
+            status: 'delivered',
+            items: {
+                $elemMatch: {
+                    product: new mongoose.Types.ObjectId(product),
+                    reviewed: false
+                }
+            }
+        });
+
+        // Validate input
+        if (!order) {
+            return res.status(400).json({ message: 'Bạn chưa mua hoặc đã đánh giá sản phẩm!' });
+        }
+        // Xử lý ảnh nếu có
+        const images = req.files?.map(file => file.path) || [];
+        // tìm Id hiện tại của sản phẩm đang đánh giá
+        const item = order.items.find(
+            i => i.product.toString() === product && i.reviewed === false
+        );
+        // Tạo review
+        const review = await Review.create({
+            user: userId,
             product,
             rating,
             comment,
+            images,
+            orderNumber: order.orderNumber,
         });
-        await review.save();
 
-        // Cập nhật đánh giá trung bình cho sản phẩm
-        const reviews = await Review.find({ product: review.product });
-        const avgRating = reviews.length > 0
-            ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-            : 0;
+        // Cập nhật lại rating trung bình và số lượng đánh giá của product (tuỳ chọn)
+        const reviews = await Review.find({ product });
+        const avgRating = (
+            reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+        ).toFixed(1);
+
         await Product.findByIdAndUpdate(product, {
             ratings: avgRating,
-            numReviews: reviews.length,
+            numReviews: reviews.length
         });
+        // Cập nhật reviewed: true cho sản phẩm đã đánh giá trong đơn hàng
+        order.items = order.items.map(item => {
+            if (item.product.toString() === product) {
+                item.reviewed = true;
+            }
+            return item;
+        });
+        await order.save();
 
         res.status(201).json({ message: 'Đánh giá thành công', review });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi tạo đánh giá', error });
+        console.error('Tạo review thất bại:', error);
+        res.status(500).json({ message: 'Lỗi server khi tạo review' });
     }
 };
+
 
 export const getMyReviews = async (req, res) => {
     try {
@@ -47,67 +97,73 @@ export const getMyReviews = async (req, res) => {
     }
 };
 
-// [DELETE] Người dùng xóa review của họ
-export const deleteReview = async (req, res) => {
+export const getReviewByOrderNumberAndProduct = async (req, res) => {
     try {
-        const review = await Review.findOne({
-            _id: req.params.id,
-            user: req.user._id,
-        });
+        const { orderNumber, productId } = req.params;
 
-        if (!review) {
-            return res.status(404).json({ message: 'Không tìm thấy review để xóa' });
+        const userId = req.user.id;
+
+
+        // Kiểm tra hợp lệ ObjectId
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: 'ID mục đơn hàng không hợp lệ' });
         }
 
-        await review.remove();
-
-        // Cập nhật lại điểm trung bình cho sản phẩm
-        const reviews = await Review.find({ product: review.product });
-        const avgRating = reviews.length > 0
-            ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-            : 0;
-
-        await Product.findByIdAndUpdate(review.product, {
-            ratings: avgRating,
-            numReviews: reviews.length,
-        });
-
-        res.json({ message: 'Xóa đánh giá thành công' });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi xóa đánh giá', error });
-    }
-};
-// [PUT] Người dùng sửa đánh giá của họ
-export const updateReview = async (req, res) => {
-    try {
-        const { rating, comment } = req.body;
+        // Tìm review
         const review = await Review.findOne({
-            _id: req.params.id,
-            user: req.user._id,
-        });
+            user: userId,
+            orderNumber,
+            product: productId
+        }).populate('product');
 
         if (!review) {
-            return res.status(404).json({ message: 'Không tìm thấy đánh giá để sửa' });
+            return res.status(404).json({ message: 'Không tìm thấy đánh giá' });
         }
 
-        // Cập nhật đánh giá
-        review.rating = rating;
-        review.comment = comment;
-        await review.save();
-
-        // Cập nhật lại điểm trung bình cho sản phẩm
-        const reviews = await Review.find({ product: review.product });
-        const avgRating = reviews.length > 0
-            ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-            : 0;
-
-        await Product.findByIdAndUpdate(review.product, {
-            ratings: avgRating,
-            numReviews: reviews.length,
-        });
-
-        res.json({ message: 'Sửa đánh giá thành công', review });
+        res.status(200).json({ review });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi sửa đánh giá', error });
+        console.error('Lỗi khi tìm đánh giá:', error);
+        res.status(500).json({ message: 'Lỗi server khi tìm đánh giá' });
     }
 };
+
+export const updateReviewByOrderNumberAndProduct = async (req, res) => {
+    const { orderNumber, productId } = req.params;
+    console.log(req.params);
+    
+    const { rating, comment } = req.body;
+    console.log(req.body);
+    
+    const oldImages = Array.isArray(req.body.oldImages)
+      ? req.body.oldImages
+      : [req.body.oldImages].filter(Boolean); // Nếu chỉ 1 ảnh hoặc không có
+  
+    try {
+      const review = await Review.findOne({ orderNumber, product: productId });
+      if (!review) return res.status(404).json({ message: 'Review not found' });
+  
+      // Tìm ảnh giữ lại
+      const keptImages = review.images.filter(img => oldImages.includes(img));
+  
+      // Tìm ảnh bị xoá và gọi xoá từ Cloudinary
+      const deletedImages = review.images.filter(img => !oldImages.includes(img));
+      for (const url of deletedImages) {
+        const publicId = getPublicIdFromUrl(url);
+        await cloudinary.uploader.destroy(publicId);
+      }
+  
+      // Thêm ảnh mới (req.files chứa array các file được Multer + Cloudinary xử lý)
+      const newUploadedImages = req.files?.map(file => file.path) || [];
+  
+      // Cập nhật lại review
+      review.rating = rating;
+      review.comment = comment;
+      review.images = [...keptImages, ...newUploadedImages];
+      await review.save();
+  
+      res.json({ message: 'Review updated successfully', review });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  };

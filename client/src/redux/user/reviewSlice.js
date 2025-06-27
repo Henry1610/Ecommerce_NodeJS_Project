@@ -3,26 +3,30 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // Thêm review mới
 export const createReview = createAsyncThunk(
   'reviews/createReview',
-  async (reviewData, thunkAPI) => {
+  async ({ slug, formData }, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/reviews', {
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+      }
+
+      const res = await fetch(`http://localhost:5000/api/users/reviews/${slug}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(reviewData)
+        body: formData // Dạng multipart/form-data, không set Content-Type
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || "Không thể tạo review");
+        return thunkAPI.rejectWithValue(data.message || 'Không thể tạo đánh giá');
       }
 
       return data;
     } catch (error) {
-      return thunkAPI.rejectWithValue("Lỗi kết nối server");
+      console.error('Lỗi kết nối server khi tạo đánh giá:', error);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
@@ -53,42 +57,15 @@ export const fetchMyReviews = createAsyncThunk(
   }
 );
 
-// Cập nhật review
-export const updateReview = createAsyncThunk(
-  'reviews/updateReview',
-  async ({ id, updatedData }, thunkAPI) => {
+// Async thunk: Lấy review theo orderNumber và productId
+export const getReviewByOrderNumberAndProduct = createAsyncThunk(
+  'reviews/getReviewByOrderNumberAndProduct',
+  async ({ orderNumber, productId }, thunkAPI) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
-        method: 'PUT',
+
+
+      const res = await fetch(`http://localhost:5000/api/users/reviews/${orderNumber}/${productId}`, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(updatedData)
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || "Không thể cập nhật review");
-      }
-
-      return data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue("Lỗi kết nối server");
-    }
-  }
-);
-
-// Xóa review
-export const deleteReview = createAsyncThunk(
-  'reviews/deleteReview',
-  async (id, thunkAPI) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
@@ -96,19 +73,58 @@ export const deleteReview = createAsyncThunk(
       const data = await res.json();
 
       if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || "Không thể xóa review");
+        return thunkAPI.rejectWithValue(data.message || 'Không thể lấy đánh giá');
       }
 
-      return { id };
+      return data;
+
     } catch (error) {
-      return thunkAPI.rejectWithValue("Lỗi kết nối server");
+      console.error('Lỗi lấy đánh giá theo đơn hàng và sản phẩm:', error);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
 
+
+// Cập nhật review
+export const updateReviewByOrderNumberAndProduct = createAsyncThunk(
+  'reviews/updateReview',
+  async ({ orderNumber, productId, formData }, thunkAPI) => {
+    try {
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+      }
+
+      const res = await fetch(`http://localhost:5000/api/users/reviews/${orderNumber}/${productId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+          // Không set Content-Type cho FormData
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Không thể cập nhật đánh giá');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Lỗi kết nối server khi cập nhật đánh giá:', error);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
+    }
+  }
+);
+
+
+
+
 const reviewSlice = createSlice({
   name: 'reviews',
   initialState: {
+    review: null,
     myReviews: [],
     loading: false,
     error: null,
@@ -149,12 +165,28 @@ const reviewSlice = createSlice({
         state.error = action.payload;
       })
 
+
+      .addCase(getReviewByOrderNumberAndProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.review = null;
+      })
+      .addCase(getReviewByOrderNumberAndProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.review = action.payload.review;
+
+      })
+      .addCase(getReviewByOrderNumberAndProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // Update review
-      .addCase(updateReview.pending, (state) => {
+      .addCase(updateReviewByOrderNumberAndProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateReview.fulfilled, (state, action) => {
+      .addCase(updateReviewByOrderNumberAndProduct.fulfilled, (state, action) => {
         state.loading = false;
         const updatedReview = action.payload.review;
         const index = state.myReviews.findIndex(r => r._id === updatedReview._id);
@@ -162,24 +194,11 @@ const reviewSlice = createSlice({
           state.myReviews[index] = updatedReview;
         }
       })
-      .addCase(updateReview.rejected, (state, action) => {
+      .addCase(updateReviewByOrderNumberAndProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Delete review
-      .addCase(deleteReview.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteReview.fulfilled, (state, action) => {
-        state.loading = false;
-        state.myReviews = state.myReviews.filter(r => r._id !== action.payload.id);
-      })
-      .addCase(deleteReview.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
   }
 });
 

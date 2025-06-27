@@ -10,6 +10,7 @@ import userPaymentReducer from './user/paymentSlice';
 import userShippingAddressReducer from './user/shippingAddressSlice';
 import userOrderReducer from './user/orderSlice'
 import userUserReducer from './user/userSlice'
+import userReviewReducer from './user/reviewSlice'
 //---------------------public-------------------------
 import productsReducer from './public/productsSlice'
 import shippingZonesReducer from './public/shippingZoneSlice'
@@ -39,7 +40,8 @@ const userReducer = combineReducers({
   userPayment: userPaymentReducer,
   userShippingAddress: userShippingAddressReducer,
   userOrder:userOrderReducer,
-  userUser:userUserReducer
+  userUser:userUserReducer,
+  userReview:userReviewReducer,
 });
 const adminReducer = combineReducers({
   adminProduct: adminProductReducer,

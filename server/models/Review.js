@@ -22,9 +22,14 @@ const reviewSchema = new mongoose.Schema({
     required: true 
   },
   images: {
-      type: [{ type: String }],
-      required: true,
-  }
+    type: [String], 
+    validate: [arr => arr.length <= 3, 'Chỉ cho phép tối đa 3 ảnh']
+  },
+  orderNumber: {
+    type: String,
+    required: true
+  },
+  
 });
 
 export default mongoose.model('Review', reviewSchema);
