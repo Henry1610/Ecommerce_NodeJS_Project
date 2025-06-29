@@ -25,32 +25,36 @@ export const addToCart = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // Tìm hoặc tạo giỏ hàng
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    // Clone lại mảng items để kiểm tra tổng tiền giả định
-    const clonedItems = [...cart.items];
+    const clonedItems = cart.items.map(item => ({
+      product: item.product._id,
+      quantity: item.quantity
+    }));
 
     const itemIndex = clonedItems.findIndex(
-      item => item.product._id.toString() === productId
+      item => item.product.toString() === productId
     );
 
     if (itemIndex !== -1) {
       clonedItems[itemIndex].quantity += quantity;
     } else {
+      // Kiểm tra product tồn tại
       const product = await Product.findById(productId);
-      if (!product) return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
-
-      clonedItems.push({ product, quantity }); // product ở đây là object
+      if (!product) {
+        return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+      }
+      clonedItems.push({ product: productId, quantity });
     }
 
-    // Tính tổng tiền giả định
+    // Tính tổng tiền
     let total = 0;
     for (const item of clonedItems) {
-      const price = item.product.price || 0;
+      const product = await Product.findById(item.product);
+      const price = product?.price || 0;
       total += price * item.quantity;
     }
 
@@ -60,7 +64,7 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // Nếu hợp lệ thì mới thực sự thêm vào cart thật
+    // Cập nhật cart thật
     const realItemIndex = cart.items.findIndex(
       item => item.product._id.toString() === productId
     );
@@ -68,12 +72,11 @@ export const addToCart = async (req, res) => {
     if (realItemIndex !== -1) {
       cart.items[realItemIndex].quantity += quantity;
     } else {
-      cart.items.push({ product: productId, quantity }); // Dùng ObjectId
+      cart.items.push({ product: productId, quantity });
     }
 
     await cart.save();
     const populatedCart = await cart.populate('items.product');
-
     res.json(populatedCart);
   } catch (error) {
     console.error('Error adding to cart:', error);
@@ -83,6 +86,7 @@ export const addToCart = async (req, res) => {
     });
   }
 };
+
 
 export const setCart = async (req, res) => {
   try {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createReview, getReviewByOrderNumberAndProduct, updateReviewByOrderNumberAndProduct, getMyReviews } from '../../controllers/user/reviewController.js';
+import { createReview, getReviewByOrderNumberAndProduct, updateReviewByOrderNumberAndProduct, getMyReviews,getReviewsByProductSlug } from '../../controllers/user/reviewController.js';
 import { reviewImageUploader } from '../../config/cloudinary.js';
 import Product from '../../models/Product.js';
 const router = express.Router();
@@ -16,6 +16,7 @@ router.post('/:slug', (req, res, next) => {
 }, createReview);
 
 router.get('/', getMyReviews);
+router.get('/:slug', getReviewsByProductSlug);
 
 router.get('/:orderNumber/:productId', getReviewByOrderNumberAndProduct);
 

@@ -6,7 +6,7 @@ import { requestRefund } from '../../../../redux/user/paymentSlice';
 
 import formatDateTime from '../../../../untils/dateUtils';
 import Swal from 'sweetalert2';
-import { createReview, getReviewByOrderNumberAndProduct } from '../../../../redux/user/reviewSlice';
+import { createReview, getReviewByOrderNumberAndProduct, updateReviewByOrderNumberAndProduct } from '../../../../redux/user/reviewSlice';
 const MAX_IMAGES = 3;
 const MAX_REVIEW_LENGTH = 500;
 const OrderDetail = () => {
@@ -581,51 +581,47 @@ const OrderDetail = () => {
       </div>
     );
   };
-  const ViewReviewModal = ({ review, onClose }) => {
-    console.log('re:', review);
 
-    const [rating, setRating] = useState(review?.rating);
+  const ViewReviewModal = ({ review, onClose }) => {
+    const dispatch = useDispatch();
+
+    const [rating, setRating] = useState(review?.rating || 0);
     const [hoverRating, setHoverRating] = useState(0);
-    const [comment, setComment] = useState(review?.comment);
-    const [previewImages, setPreviewImages] = useState(review?.images); // base64 dùng để hiển thị
-    const [imageFiles, setImageFiles] = useState([]); // File dùng để upload
-    
+    const [comment, setComment] = useState(review?.comment || '');
+
+    const [imagesFromServer, setImagesFromServer] = useState(review?.images || []); // ảnh cũ (URL)
+    const [imageFiles, setImageFiles] = useState([]); // ảnh mới (File)
     const fileInputRef = useRef(null);
 
-    const handleRatingClick = (value) => setRating(value);
-    const handleRatingHover = (value) => setHoverRating(value);
-    const handleRatingLeave = () => setHoverRating(0);
-
-    const handleCommentChange = (e) => {
-      if (e.target.value.length <= MAX_REVIEW_LENGTH) {
-        setComment(e.target.value);
-      }
-    };
-
+    // Xử lý khi người dùng chọn file mới
     const handleImageUpload = (e) => {
-      if (e.target.files && previewImages.length < MAX_IMAGES) {
+      if (e.target.files && imageFiles.length + imagesFromServer.length < MAX_IMAGES) {
         const file = e.target.files[0];
-
-        // Preview
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (typeof event.target.result === 'string') {
-            setPreviewImages((prev) => [...prev, event.target.result]);
-            setImageFiles((prev) => [...prev, file]); // Save real file
-          }
-        };
-        reader.readAsDataURL(file);
+        setImageFiles((prev) => [...prev, file]);
       }
     };
 
-
-    const triggerFileInput = () => fileInputRef.current?.click();
+    // Gộp ảnh từ server và ảnh mới để render
+    const renderedImages = [
+      ...imagesFromServer.map((src) => ({
+        src,
+        isNew: false,
+      })),
+      ...imageFiles.map((file) => ({
+        src: URL.createObjectURL(file),
+        isNew: true,
+        file,
+      })),
+    ];
 
     const removeImage = (index) => {
-      setPreviewImages((prev) => prev.filter((_, i) => i !== index));
-      setImageFiles((prev) => prev.filter((_, i) => i !== index));
+      const image = renderedImages[index];
+      if (image.isNew) {
+        setImageFiles((prev) => prev.filter((_, i) => i !== index - imagesFromServer.length));
+      } else {
+        setImagesFromServer((prev) => prev.filter((_, i) => i !== index));
+      }
     };
-
 
     const handleSubmit = async () => {
       if (rating > 0) {
@@ -640,59 +636,58 @@ const OrderDetail = () => {
 
         if (result.isConfirmed) {
           const formData = new FormData();
-          // formData.append('product', product._id);
           formData.append('rating', rating);
           formData.append('comment', comment);
-          formData.append('orderNumber', orderDetail.orderNumber);
 
-          imageFiles.slice(0, 3).forEach((file) => {
-            formData.append('images', file);
-          });
+          // Ảnh cũ cần giữ lại
+          imagesFromServer.forEach((img) => formData.append('oldImages', img));
+          // Ảnh mới upload
+          imageFiles.forEach((file) => formData.append('images', file));
 
-          // Gửi đánh giá
-          // dispatch(createReview({ slug: product.slug, formData }));
-
-          // Hiển thị thông báo thành công
-          Swal.fire('Đã gửi!', 'Cảm ơn bạn đã đánh giá sản phẩm.', 'success');
-
-          // Reset state
-          setRating(0);
-          setHoverRating(0);
-          setComment('');
-          setPreviewImages([]);
-          setImageFiles([]);
-
-          // Đóng modal
-          onClose();
+          dispatch(
+            updateReviewByOrderNumberAndProduct({
+              orderNumber: review.orderNumber,
+              productId: review.product._id,
+              formData,
+            })
+          )
+            .unwrap()
+            .then(() => {
+              Swal.fire('Đã cập nhật!', 'Cảm ơn bạn đã đánh giá sản phẩm.', 'success');
+              onClose();
+            })
+            .catch((err) => {
+              Swal.fire('Lỗi', err.message || 'Cập nhật đánh giá thất bại', 'error');
+            });
         }
       }
     };
 
+    const triggerFileInput = () => fileInputRef.current?.click();
 
+    const handleRatingClick = (value) => setRating(value);
+    const handleRatingHover = (value) => setHoverRating(value);
+    const handleRatingLeave = () => setHoverRating(0);
+    const handleCommentChange = (e) => {
+      if (e.target.value.length <= MAX_REVIEW_LENGTH) {
+        setComment(e.target.value);
+      }
+    };
 
     return (
-      <div
-        className="modal show fade d-block"
-        tabIndex="-1"
-        role="dialog"
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-      >
-        <div className="modal-dialog modal-dialog-centered modal-md" role="document"
-        >
-          <div className="modal-content" style={{ height: '650px' }}
-          >
-            {/* Header */}
+      <div className="modal show fade d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal-dialog modal-dialog-centered modal-md" role="document">
+          <div className="modal-content" style={{ height: '650px' }}>
             <div className="modal-header">
               <h5 className="modal-title">Đánh giá sản phẩm</h5>
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
 
-            {/* Body */}
             <div className="modal-body">
-              {/* product content */}
+              {/* Product Info */}
               <div className="d-flex p-3 border-bottom gap-3 align-items-center">
                 <img
-                  src={review?.images[0]}
+                  src={review?.images?.[0]}
                   alt={review?.product.slug}
                   style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 8 }}
                 />
@@ -702,7 +697,7 @@ const OrderDetail = () => {
                 </div>
               </div>
 
-              {/* Rating stars */}
+              {/* Rating */}
               <div className="my-3">
                 <label className="form-label fw-semibold">Đánh giá của bạn:</label>
                 <div>
@@ -716,8 +711,7 @@ const OrderDetail = () => {
                       onMouseLeave={handleRatingLeave}
                     >
                       <i
-                        className={`fas fa-star fs-4 ${(hoverRating || rating) >= star ? 'text-warning' : 'text-secondary'
-                          }`}
+                        className={`fas fa-star fs-4 ${((hoverRating || rating) >= star ? 'text-warning' : 'text-secondary')}`}
                       ></i>
                     </button>
                   ))}
@@ -739,21 +733,23 @@ const OrderDetail = () => {
                 </div>
               </div>
 
-              {/* Image upload */}
+              {/* Image Upload */}
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <label className="form-label fw-bold mb-0">Thêm hình ảnh</label>
-                  <small className="text-muted">{previewImages?.length}/{MAX_IMAGES}</small>
+                  <small className="text-muted">
+                    {renderedImages.length}/{MAX_IMAGES}
+                  </small>
                 </div>
                 <div className="d-flex flex-wrap gap-2">
-                  {previewImages?.map((image, index) => (
+                  {renderedImages.map((image, index) => (
                     <div
                       key={index}
                       className="position-relative border rounded overflow-hidden"
                       style={{ width: 80, height: 80 }}
                     >
                       <img
-                        src={image}
+                        src={image.src}
                         alt={`Uploaded ${index + 1}`}
                         className="w-100 h-100 object-fit-cover"
                       />
@@ -767,7 +763,7 @@ const OrderDetail = () => {
                     </div>
                   ))}
 
-                  {previewImages?.length < MAX_IMAGES && (
+                  {renderedImages.length < MAX_IMAGES && (
                     <div
                       className="d-flex flex-column justify-content-center align-items-center border rounded text-center text-muted"
                       style={{ width: 80, height: 80, cursor: 'pointer' }}
@@ -788,7 +784,6 @@ const OrderDetail = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
                 Hủy
@@ -797,7 +792,7 @@ const OrderDetail = () => {
                 type="button"
                 className={`btn ${rating > 0 ? 'btn-primary' : 'btn-secondary disabled'}`}
                 disabled={rating === 0}
-              onClick={handleSubmit}
+                onClick={handleSubmit}
               >
                 Sửa đánh giá
               </button>

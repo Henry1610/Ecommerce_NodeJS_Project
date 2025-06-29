@@ -31,10 +31,13 @@ export const fetchProducts = createAsyncThunk(
 );
 
 export const fetchProductBySlug = createAsyncThunk(
-    'products/fetchProductById', async (slug, thunkAPI) => {
+    'products/fetchProductBySlug', async ({ slug, rating }, thunkAPI) => {
 
         try {
-            const res = await fetch(`http://localhost:5000/api/products/${slug}`
+
+            const queryParams = new URLSearchParams();
+            if (rating) queryParams.append('rating', rating);
+            const res = await fetch(`http://localhost:5000/api/products/${slug}?${queryParams.toString()}`
                 , {
                     method: 'GET',
                     headers: {
@@ -60,11 +63,37 @@ export const fetchProductBySlug = createAsyncThunk(
         }
     }
 )
+export const getProductSuggestions = createAsyncThunk(
+    'products/getProductSuggestions',
+    async (keyword, thunkAPI) => {
+        try {
+            const query = new URLSearchParams({ keyword, limit: 10 }).toString();
+            const res = await fetch(`http://localhost:5000/api/products/suggestions?${query}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Không thể gợi ý sản phẩm');
+            }
+            
+            return data.suggestions;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
 
 const productsSlice = createSlice({
     name: 'products',
     initialState: {
         products: [],
+        productSuggestions: [], 
         reviews: [],
         product: null,
         total: 0,
@@ -77,8 +106,12 @@ const productsSlice = createSlice({
         resetProductDetail: (state) => {
             state.product = null;
             state.error = null;
-        }
-    },
+        },
+        resetSuggestions: (state) => {
+            state.productSuggestions = [];
+        },
+    }
+    ,
     extraReducers: (builder) => {
         builder
             // Fetch all products
@@ -92,8 +125,8 @@ const productsSlice = createSlice({
                 state.total = action.payload.total;
                 state.totalPages = action.payload.totalPages;
                 state.currentPage = action.payload.currentPage;
-              })
-            
+            })
+
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
@@ -111,15 +144,26 @@ const productsSlice = createSlice({
                 state.reviews = action.payload.data.reviews;
 
                 state.loading = false;
-
             })
-
             .addCase(fetchProductBySlug.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(getProductSuggestions.pending, (state) => {
+                state.productSuggestions = [];
+                state.error = null;
+            })
+            .addCase(getProductSuggestions.fulfilled, (state, action) => {
+                state.loading = false;
+                state.productSuggestions = action.payload;
+            })
+            .addCase(getProductSuggestions.rejected, (state, action) => {
+                state.productSuggestions = [];
+                state.error = action.payload;
             });
+            
     },
 });
 
-export const { resetProductDetail } = productsSlice.actions;
+export const { resetProductDetail, resetSuggestions } = productsSlice.actions;
 export default productsSlice.reducer;

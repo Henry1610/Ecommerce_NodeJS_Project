@@ -15,17 +15,18 @@ export const getPublicProducts = async (req, res) => {
             name,
             discountPercent,
             random,
-            limit,        // có thể dùng cho random hoặc phân trang
-            page          // mới thêm
+            limit,
+            page,
+            sortBy, 
         } = req.query;
 
-        /* ---------- 1. Xây filter ---------- */
+        /* 1. Tạo object filter dựa trên FE gửi */
         const filter = {};
 
-        if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
+        if (category && mongoose.Types.ObjectId.isValid(category)) {
             filter.category = category;
         }
-        if (brand && brand !== 'null' && mongoose.Types.ObjectId.isValid(brand)) {
+        if (brand && mongoose.Types.ObjectId.isValid(brand)) {
             filter.brand = brand;
         }
         if (color) filter.color = color;
@@ -37,13 +38,28 @@ export const getPublicProducts = async (req, res) => {
             if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
-        if (minRating) filter.ratings = { $gte: Number(minRating) };
-        if (discountPercent) filter.discountPercent = { $gte: Number(discountPercent) };
-        if (name) {
-            filter.name = { $regex: name, $options: 'i' };
+        if (minRating) {
+            filter.ratings = { $gte: Number(minRating) };
         }
 
-        /* ---------- 2. Random sample (giữ nguyên) ---------- */
+        if (discountPercent) {
+            filter.discountPercent = { $gte: Number(discountPercent) };
+        }
+
+        if (name) {
+            filter.name = { $regex: name, $options: 'i' }; // tìm theo tên (không phân biệt hoa thường)
+        }
+
+        /* 2. Xử lý sắp xếp */
+        let sort = {};
+        if (sortBy) {
+            const [field, order] = sortBy.split('_'); // ví dụ: 'price_asc'
+            if (field && order) {
+                sort[field] = order === 'asc' ? 1 : -1;
+            }
+        }
+
+        /* 3. Nếu FE muốn random sản phẩm (ví dụ: banner nổi bật) */
         if (random === 'true') {
             const sampleLimit = parseInt(limit) || 4;
             const products = await Product.aggregate([
@@ -63,25 +79,25 @@ export const getPublicProducts = async (req, res) => {
             });
         }
 
-        /* ---------- 3. Pagination ---------- */
+        /* 4. Phân trang */
         const pageNum = Math.max(parseInt(page) || 1, 1);
         const limitNum = Math.max(parseInt(limit) || 20, 1);
         const skip = (pageNum - 1) * limitNum;
 
-        // Song song lấy total và products trang hiện tại
         const [total, products] = await Promise.all([
             Product.countDocuments(filter),
             Product.find(filter)
+                .sort(sort)
                 .populate('category', 'name')
                 .populate('brand', 'name')
                 .skip(skip)
                 .limit(limitNum)
-                .lean()           // nhẹ hơn
+                .lean()
         ]);
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            total,                       // tổng số sản phẩm thỏa filter
+            total,
             totalPages: Math.ceil(total / limitNum),
             currentPage: pageNum,
             count: products.length,
@@ -89,7 +105,7 @@ export const getPublicProducts = async (req, res) => {
         });
     } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
 
@@ -98,10 +114,10 @@ export const getPublicProducts = async (req, res) => {
 export const getPublicProductBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
+        const { rating } = req.query;
 
         const product = await Product.findOne({
             slug,
-            statusCurrent: 'active'
         })
             .populate('category', 'name slug')
             .populate('brand', 'name slug');
@@ -113,8 +129,13 @@ export const getPublicProductBySlug = async (req, res) => {
             });
         }
 
-        const reviews = await Review.find({ product: product._id })
-            .populate('user', 'name avatar')
+        const reviewFilter = { product: product._id };
+        if (rating) {
+            reviewFilter.rating = Number(rating); 
+        }
+
+        const reviews = await Review.find(reviewFilter)
+            .populate('user', 'username avatar') 
             .sort({ createdAt: -1 })
             .lean();
 
@@ -128,5 +149,29 @@ export const getPublicProductBySlug = async (req, res) => {
             message: 'Lỗi khi lấy sản phẩm',
             error: error.message
         });
+    }
+};
+
+export const getProductSuggestions = async (req, res) => {
+    try {
+        const { keyword } = req.query;
+
+        if (!keyword || keyword.trim() === '') {
+            return res.status(400).json({ success: false, message: 'Thiếu từ khóa tìm kiếm' });
+        }
+
+        const suggestions = await Product.find({
+            name: { $regex: keyword, $options: 'i' }
+        })
+            .select('name slug') // Chỉ trả về những gì cần thiết
+            .limit(8);           // Giới hạn gợi ý để phản hồi nhanh
+
+        return res.status(200).json({
+            success: true,
+            suggestions
+        });
+    } catch (err) {
+        console.error('Lỗi suggestion:', err);
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 };

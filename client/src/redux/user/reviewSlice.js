@@ -30,7 +30,24 @@ export const createReview = createAsyncThunk(
     }
   }
 );
+export const getReviewsByProductSlug = createAsyncThunk(
+  'reviews/getReviewsByProductSlug',
+  async (slug, thunkAPI) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/users/reviews/${slug}`);
 
+      const data = await res.json();
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Không thể tải đánh giá');
+      }
+
+      return data; // { reviews: [...] }
+    } catch (error) {
+      console.error('Lỗi khi lấy review theo slug:', error);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
+    }
+  }
+);
 // Lấy tất cả review của người dùng
 export const fetchMyReviews = createAsyncThunk(
   'reviews/fetchMyReviews',
@@ -128,6 +145,7 @@ const reviewSlice = createSlice({
     myReviews: [],
     loading: false,
     error: null,
+    productReviews: [],
   },
   reducers: {
     resetReviewError: (state) => {
@@ -198,7 +216,18 @@ const reviewSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      .addCase(getReviewsByProductSlug.pending, (state) => {
+        state.loadingReviews = true;
+        state.error = null;
+      })
+      .addCase(getReviewsByProductSlug.fulfilled, (state, action) => {
+        state.loadingReviews = false;
+        state.productReviews = action.payload.reviews;
+      })
+      .addCase(getReviewsByProductSlug.rejected, (state, action) => {
+        state.loadingReviews = false;
+        state.error = action.payload;
+      });
   }
 });
 

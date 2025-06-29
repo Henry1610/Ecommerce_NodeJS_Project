@@ -8,14 +8,14 @@ const getPublicIdFromUrl = (url) => {
     const parts = url.split('/');
     const filename = parts[parts.length - 1]; // ảnh.png
     const nameWithoutExt = filename.split('.')[0]; // bỏ đuôi .png
-  
+
     // Lấy phần sau 'upload' đến trước filename (bỏ version v...)
     const uploadIndex = parts.indexOf('upload');
     const folderPath = parts.slice(uploadIndex + 2, parts.length - 1).join('/'); // bỏ v123456
-  
+
     return `${folderPath}/${nameWithoutExt}`;
-  };
-  
+};
+
 export const createReview = async (req, res) => {
     try {
         const { product, rating, comment, orderNumber } = req.body;
@@ -129,41 +129,71 @@ export const getReviewByOrderNumberAndProduct = async (req, res) => {
 
 export const updateReviewByOrderNumberAndProduct = async (req, res) => {
     const { orderNumber, productId } = req.params;
-    console.log(req.params);
-    
     const { rating, comment } = req.body;
-    console.log(req.body);
-    
+
     const oldImages = Array.isArray(req.body.oldImages)
-      ? req.body.oldImages
-      : [req.body.oldImages].filter(Boolean); // Nếu chỉ 1 ảnh hoặc không có
-  
+        ? req.body.oldImages
+        : [req.body.oldImages].filter(Boolean); // nếu không có thì []
+
     try {
-      const review = await Review.findOne({ orderNumber, product: productId });
-      if (!review) return res.status(404).json({ message: 'Review not found' });
-  
-      // Tìm ảnh giữ lại
-      const keptImages = review.images.filter(img => oldImages.includes(img));
-  
-      // Tìm ảnh bị xoá và gọi xoá từ Cloudinary
-      const deletedImages = review.images.filter(img => !oldImages.includes(img));
-      for (const url of deletedImages) {
-        const publicId = getPublicIdFromUrl(url);
-        await cloudinary.uploader.destroy(publicId);
-      }
-  
-      // Thêm ảnh mới (req.files chứa array các file được Multer + Cloudinary xử lý)
-      const newUploadedImages = req.files?.map(file => file.path) || [];
-  
-      // Cập nhật lại review
-      review.rating = rating;
-      review.comment = comment;
-      review.images = [...keptImages, ...newUploadedImages];
-      await review.save();
-  
-      res.json({ message: 'Review updated successfully', review });
+        const review = await Review.findOne({ orderNumber, product: productId });
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+
+        // Giữ ảnh cũ
+        const keptImages = review.images.filter(img => oldImages.includes(img));
+
+        // Xoá ảnh bị gỡ bỏ
+        const deletedImages = review.images.filter(img => !oldImages.includes(img));
+        for (const url of deletedImages) {
+            const publicId = getPublicIdFromUrl(url);
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        // Thêm ảnh mới
+        const newUploadedImages = req.files?.map(file => file.path) || [];
+
+        // Cập nhật review
+        review.rating = rating;
+        review.comment = comment;
+        review.images = [...keptImages, ...newUploadedImages];
+        await review.save();
+
+        // ✅ Cập nhật lại rating trung bình và số đánh giá của sản phẩm
+        const reviews = await Review.find({ product: productId });
+        const avgRating = (
+            reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+        ).toFixed(1);
+
+        await Product.findByIdAndUpdate(productId, {
+            ratings: Number(avgRating),
+            numReviews: reviews.length
+        });
+
+        res.json({ message: 'Review updated successfully', review });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error', error: err.message });
+        console.error(err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
-  };
+};
+
+export const getReviewsByProductSlug = async (req, res) => {
+    const { slug } = req.params;
+
+    try {
+        const product = await Product.findOne({ slug });
+
+        if (!product) {
+            return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+        }
+
+        // Tìm tất cả review theo _id của product
+        const reviews = await Review.find({ product: product._id })
+            .populate('user', 'username')
+            .sort({ createdAt: -1 });
+
+        res.json({ reviews });
+    } catch (err) {
+        console.error('Lỗi khi lấy review theo slug:', err);
+        res.status(500).json({ message: 'Lỗi server khi lấy review' });
+    }
+};

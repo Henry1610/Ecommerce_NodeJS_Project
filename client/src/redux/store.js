@@ -17,7 +17,7 @@ import shippingZonesReducer from './public/shippingZoneSlice'
 import brandReducer from './public/brandSlice'
 import categoryReducer from './public/categorySlice'
 import discountReducer from './public/discountSlice'
-
+import reviewReducer from './public/reviewSlice'
 //---------------------admin-------------------------
 import adminBrandReducer from './admin/brandSlice'
 import adminCategoryReducer from './admin/categoriesSlice'
@@ -34,6 +34,7 @@ const publicReducer = combineReducers({
   publicBrand: brandReducer,
   publicCategory: categoryReducer,
   publicDiscount: discountReducer,
+  publicReview: reviewReducer,
 });
 const userReducer = combineReducers({
   userCart: userCartReducer,

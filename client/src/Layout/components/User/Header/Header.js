@@ -6,13 +6,42 @@ import './Header.css'
 import { fetchCart } from '../../../../redux/user/cartSlice';
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-
+import { fetchProducts, resetSuggestions } from '../../../../redux/public/productsSlice';
+import { getProductSuggestions } from '../../../../redux/public/productsSlice';
+import useDebounce from '../../../../hooks/useDebounce';
 function Header() {
     const token = useSelector((state) => state.auth.token);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { productSuggestions } = useSelector(state => state.public.publicProduct);
 
     const { cart, error, loading } = useSelector(state => state.user.userCart);
+    const [keyword, setKeyword] = useState('');
+    const debouncedKeyword = useDebounce(keyword, 500);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+
+        const trimmed = keyword.trim();
+        if (trimmed) {
+            dispatch(fetchProducts({ name: trimmed }));
+            setKeyword('')
+            navigate('/product');
+        }
+    };
+    const handleChangeKeyword = (e) => {
+        setKeyword(e.target.value); // Không gọi dispatch ở đây nữa
+    };
+    useEffect(() => {
+        const trimmed = debouncedKeyword.trim();
+
+        if (trimmed.length >= 2) {
+            dispatch(getProductSuggestions(trimmed));
+        } else {
+            dispatch(resetSuggestions());
+        }
+    }, [debouncedKeyword, dispatch]);
+
 
 
     const isAuthenticated = !!token;
@@ -78,16 +107,54 @@ function Header() {
                             <span>Sản phẩm</span>
                         </Link>
                     </nav>
-                    <form className="d-none d-md-flex align-items-center border  border-info bg-opacity-25 rounded-pill px-3 py-1" style={{ width: "320px", maxWidth: "100%" }}>
-                        <i className="fas fa-search text-info fs-5"></i>
-                        <input
-                            type="search"
-                            placeholder="Xin chào, bạn đang tìm gì?"
-                            className="form-control border-0 bg-transparent ms-2 p-0 search-input py-2  "
-                            style={{ color: "#0e7490", fontSize: "0.875rem" }}
-                        />
+                    <div className="position-relative d-none d-md-block" style={{ width: "320px", maxWidth: "100%" }}>
+                        <form
+                            className="d-flex align-items-center border border-info bg-white rounded-pill px-3 py-1 shadow-sm"
+                            onSubmit={handleSearch}
+                        >
+                            <i className="fas fa-search text-info fs-5"></i>
+                            <input
+                                type="search"
+                                placeholder="Xin chào, bạn đang tìm gì?"
+                                className="form-control border-0 bg-transparent ms-2 p-0 py-2"
+                                style={{
+                                    color: "#0e7490",
+                                    fontSize: "0.875rem",
+                                    outline: "none",
+                                    boxShadow: "none",
+                                }}
+                                value={keyword}
+                                onChange={handleChangeKeyword}
+                            />
+                        </form>
 
-                    </form>
+                        {productSuggestions.length > 0 && (
+                            <ul
+                                className="list-group position-absolute z-3 bg-white w-100 shadow rounded mt-1"
+                                style={{ top: "100%", left: 0, maxHeight: "300px", overflowY: "auto" }}
+                            >
+                                {productSuggestions.map(product => (
+                                    <li
+                                        key={product._id}
+                                        className="list-group-item list-group-item-action"
+                                        onClick={() => {
+                                            navigate(`/product/${product.slug}`);
+                                            dispatch(resetSuggestions());
+                                        }}
+                                        style={{
+                                            cursor: 'pointer',
+                                            fontSize: "0.875rem"
+                                        }}
+                                    >
+                                        {product.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+
+
                 </div>
                 <div className="d-flex align-items-center gap-3 text-secondary fw-semibold user-select-none">
                     {isAuthenticated ? (
