@@ -15,8 +15,8 @@ import 'swiper/css/thumbs';
 const EditProduct = () => {
     const dispatch = useDispatch()
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
-    const { brands } = useSelector(state => state.brands);
-    const { categories } = useSelector(state => state.categories);
+    const { brands } = useSelector(state => state.admin.adminBrand);
+    const { categories } = useSelector(state => state.admin.adminCategory);
     const { product, error, loading } = useSelector(state => state.admin.adminProduct)
     const [attributesList, setAttributesList] = useState([]);
 
@@ -156,11 +156,10 @@ const EditProduct = () => {
         try {
           const productData = new FormData();
       
+          // Append từng key
           for (const key in formData) {
             if (key === "images") {
-              for (let i = 0; i < newFiles.length; i++) {
-                productData.append("newImages", newFiles[i]); // <-- Nếu backend expect "images[]", đổi tên này
-              }
+              newFiles.forEach((file) => productData.append("newImages", file));
             } else if (key === "attributes") {
               productData.append(key, JSON.stringify(formData[key]));
             } else {
@@ -168,7 +167,8 @@ const EditProduct = () => {
             }
           }
       
-          productData.append("oldImages", JSON.stringify(imagesFromServer));
+          // Đổi từ JSON.stringify sang append nhiều lần
+          imagesFromServer.forEach((img) => productData.append("oldImages", img));
       
           await dispatch(updateProduct({ productId, productData })).unwrap();
           toast.success("Cập nhật sản phẩm thành công!");
@@ -176,16 +176,13 @@ const EditProduct = () => {
           toast.error("Cập nhật sản phẩm thất bại!");
           console.error("Update error:", err);
         }
-    //    const debugData = Object.fromEntries(productData.entries());
-    //     console.log("Dữ liệu gửi lên:", debugData);
-        // Debug log
-       
       };
+      
       
       
     const renderedImages = [
         ...imagesFromServer.map(name => ({
-            src: `http://localhost:5000/uploads/products/${product._id}/${name}`, // hoặc Cloudinary link
+            src: name, // hoặc Cloudinary link
             name,
             isNew: false
         })),

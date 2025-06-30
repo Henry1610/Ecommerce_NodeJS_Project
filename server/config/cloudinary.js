@@ -30,6 +30,15 @@ export const productImageUploader = (slug) => multer({
     }
   })
 });
+export const productImageUploaderTemp =()=> multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: 'products/temp',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp']
+    }
+  })
+});
 
 // Upload ảnh review (tối đa 3 ảnh)
 export const reviewImageUploader = (slug, userId) => multer({

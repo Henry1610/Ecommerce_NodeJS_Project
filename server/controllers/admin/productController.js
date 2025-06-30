@@ -1,5 +1,8 @@
 import Product from '../../models/Product.js'
 import Review from '../../models/Review.js'
+import { getPublicIdFromUrl } from '../../utils/getPublicIdFromUrl.js';
+import { v2 as cloudinary } from 'cloudinary';
+
 export const getProducts = async (req, res) => {
 
     try {
@@ -25,18 +28,18 @@ export const getProductById = async (req, res) => {
         const reviews = await Review.find({ product: product._id })
             .populate('user')
             .exec();
-            res.status(200).json({
-                success: true,
-                data: {
-                    product,
-                    reviews
-                }
-            });
+        res.status(200).json({
+            success: true,
+            data: {
+                product,
+                reviews
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-export const addProduct = async (req, res,next) => {
+export const addProduct = async (req, res, next) => {
     try {
         const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color, attributes } = req.body;
 
@@ -86,65 +89,91 @@ export const addProduct = async (req, res,next) => {
     }
 };
 
-export const updateProduct = async (req, res,next) => {
-    try {
 
+export const updateProduct = async (req, res, next) => {
+    try {
         const { id } = req.params;
-        let { attributes } = req.body
-        const { name, description, price, stock, category, brand, statusCurrent, discountPercent, color } = req.body;
+
+        const {
+            name,
+            description,
+            price,
+            stock,
+            category,
+            brand,
+            statusCurrent,
+            discountPercent,
+            color,
+            attributes
+        } = req.body;
+
+        // Xử lý attributes (có thể là stringified JSON hoặc object)
         let processedAttributes = {};
         if (attributes) {
             try {
-                if (typeof attributes === 'string') {
-                    processedAttributes = JSON.parse(attributes);
-                } else {
-                    processedAttributes = attributes;
-                }
-
-            } catch (error) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid attributes format'
-                });
+                processedAttributes = typeof attributes === 'string'
+                    ? JSON.parse(attributes)
+                    : attributes;
+            } catch (err) {
+                return res.status(400).json({ message: 'Invalid attributes format' });
             }
         }
-        const newImagesFiles = req.files;
-        const oldImagesJson = req.body.oldImages;
 
-        const oldImages = oldImagesJson ? JSON.parse(oldImagesJson) : [];//nếu mà  có content ở  header thì nó tự chuyển thành object trường hợp này gửi file nên k dùng nên phải thêm bước này
-        const newImagesNames = newImagesFiles ? newImagesFiles.map(f => f.filename) : [];
+        // Lấy oldImages (từ client gửi lên)
+        const oldImages = Array.isArray(req.body.oldImages)
+            ? req.body.oldImages
+            : [req.body.oldImages].filter(Boolean);
 
-        const newImg = [...oldImages, ...newImagesNames];
+        console.log('OLD IMAGES:', oldImages);
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
+        // Tìm product để cập nhật
+        const product = await Product.findById(id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+
+        // Lọc ảnh giữ lại
+        const keptImages = product.images.filter(img => oldImages.includes(img));
+        console.log('KEEP IMAGES:', keptImages);
+
+        // Xoá ảnh đã bị gỡ khỏi Cloudinary
+        const deletedImages = product.images.filter(img => !oldImages.includes(img));
+        for (const url of deletedImages) {
+            const publicId = getPublicIdFromUrl(url);
+            if (publicId) await cloudinary.uploader.destroy(publicId);
+        }
+
+        // Ảnh mới (upload)
+        const newImages = req.files?.map(file => file.path) || [];
+        console.log('NEW IMAGES:', newImages);
+
+        await Product.findByIdAndUpdate(id, {
             name,
-            stock,
-            discountPercent,
-            statusCurrent,
             description,
             price,
+            stock,
             category,
             brand,
             color,
-            attributes:processedAttributes,
-            images: newImg,
+            statusCurrent,
+            discountPercent,
+            attributes: processedAttributes,
+            images: [...keptImages, ...newImages],
+        });
 
-        }, { new: true });
 
-        if (!updatedProduct) {
-            return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
-        }
-        req.product=updatedProduct;
-        next();
-        // res.status(200).json({
-        //     message: 'Brand updated successfully',
-        //     product: updatedProduct
-        // }
-        // );
+        res.status(200).json({
+            message: 'Product updated successfully',
+            product,
+        });
+
     } catch (error) {
-        next(error);
+        console.error(error);
+        res.status(500).json({
+            message: 'Server error',
+            error: error.message,
+        });
     }
 };
+
 export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -157,7 +186,8 @@ export const deleteProduct = async (req, res) => {
         res.status(200).json({
             message: 'Sản phẩm đã bị xóa thành công',
             id: deletedProduct._id,
-          });    } catch (error) {
+        });
+    } catch (error) {
         res.status(500).json({ message: 'Lỗi khi xóa sản phẩm', error: error.message });
     }
 };             
