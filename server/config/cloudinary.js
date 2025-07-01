@@ -24,7 +24,7 @@ export const uploadBrandImageForCreate = () =>
         return {
           folder: `brands/${slug}`,
           allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-          public_id: file.originalname.split('.')[0],
+          public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
         };
       },
     }),

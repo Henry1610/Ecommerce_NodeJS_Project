@@ -16,7 +16,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseProduct"
             >
-              🛍️ Product
+              <i className="fa-brands fa-unity me-2"></i>Product
             </button>
           </h2>
           <div
@@ -28,10 +28,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/product" className="list-group-item list-group-item-action ps-5 py-3">
-                  📦 Product List
+                <i className="fa-solid fa-list me-2"></i> Product List
                 </Link>
                 <Link to="/admin/product/add" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Add Product
+                <i className="fa-solid fa-circle-plus me-2"></i> Add Product
                 </Link>
 
               </div>
@@ -50,7 +50,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseCategory"
             >
-              🗂️ Category
+              <i className="fa-brands fa-microsoft me-2"></i> Category
             </button>
           </h2>
           <div
@@ -62,10 +62,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/category" className="list-group-item list-group-item-action ps-5 py-3">
-                  📁 Category List
+                <i className="fa-solid fa-list me-2"></i> Category List
                 </Link>
                 <Link to="/admin/category/add" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Add Category
+                <i className="fa-solid fa-circle-plus me-2"></i> Add Category
                 </Link>
 
               </div>
@@ -84,7 +84,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseBrand"
             >
-              🏷️ Brand
+              <i className="fa-brands fa-opera me-2"></i> Brand
             </button>
           </h2>
           <div
@@ -96,10 +96,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/brand" className="list-group-item list-group-item-action ps-5 py-3">
-                  📜 Brand List
+                <i className="fa-solid fa-list me-2"></i> Brand List
                 </Link>
                 <Link to="/admin/brand/add" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Add Brand
+                <i className="fa-solid fa-circle-plus me-2"></i> Add Brand
                 </Link>
 
               </div>
@@ -118,7 +118,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseOrder"
             >
-              📦 Order
+              <i className="fa-solid fa-chart-simple me-2"></i> Order
             </button>
           </h2>
           <div
@@ -130,10 +130,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/order" className="list-group-item list-group-item-action ps-5 py-3">
-                   Order List
+                <i className="fa-solid fa-list me-2"></i> Order List
                 </Link>
                 <Link to="/admin/order/refund-request" className="list-group-item list-group-item-action ps-5 py-3">
-                    Refund Requests Order
+                <i className="fa-solid fa-bell-concierge  me-2"></i>Refund Requests Order
                 </Link>
 
               </div>
@@ -152,7 +152,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseDiscount"
             >
-              💸 Discount
+              <i className="fa-solid fa-tag me-2"></i> Discount
             </button>
           </h2>
           <div
@@ -164,10 +164,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/discount" className="list-group-item list-group-item-action ps-5 py-3">
-                  🧾 Discount List
+                <i className="fa-solid fa-list me-2"></i> Discount List
                 </Link>
                 <Link to="/admin/discount/add" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Add Discount
+                <i className="fa-solid fa-circle-plus me-2"></i> Add Discount
                 </Link>
 
               </div>
@@ -186,7 +186,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseUser"
             >
-              💸 User
+              <i className="fa-solid fa-user me-2"></i> User
             </button>
           </h2>
           <div
@@ -198,7 +198,7 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/user" className="list-group-item list-group-item-action ps-5 py-3">
-                  🧾 User List
+                <i className="fa-solid fa-user me-2"></i> User List
                 </Link>
 
 
@@ -218,7 +218,7 @@ const Sidebar = () => {
               aria-expanded="false"
               aria-controls="collapseShippingZone"
             >
-              🚚 Shipping Zone
+              <i className="fa-solid fa-city me-2"></i> Shipping Zone
             </button>
           </h2>
           <div
@@ -230,10 +230,10 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/shipping-zones" className="list-group-item list-group-item-action ps-5 py-3">
-                  📦 Zone List
+                <i className="fa-solid fa-user me-2"></i>  Zone List
                 </Link>
                 <Link to="/admin/shipping-zones/create" className="list-group-item list-group-item-action ps-5 py-3">
-                  ➕ Create Zone
+                <i className="fa-solid fa-circle-plus me-2"></i> Create Zone
                 </Link>
               </div>
             </div>

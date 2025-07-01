@@ -4,6 +4,7 @@ import slugify from 'slugify';
 const categorySchema = new mongoose.Schema({
     name: {type: String, required: true, unique: true},
     description: {type: String, required: true},
+    slug: { type: String, unique: true }
 });
 
 categorySchema.pre('save', function (next) {

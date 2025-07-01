@@ -106,37 +106,46 @@ export const updateBrand = async (req, res) => {
 
 
 export const deleteBrand = async (req, res) => {
-    try {
-      const { id } = req.params;
-  
-      // Kiểm tra xem brand có đang được sử dụng bởi sản phẩm nào không
-      const isLinked = await Product.exists({ brand: id });
-      if (isLinked) {
-        return res.status(400).json({
-          message: 'Không thể xóa. Thương hiệu này đang được sử dụng bởi một hoặc nhiều sản phẩm.',
-        });
-      }
-  
-      // Lấy brand trước khi xoá
-      const brand = await Brand.findById(id);
-      if (!brand) {
-        return res.status(404).json({ message: 'Brand not found' });
-      }
-  
-      // ✅ Xoá folder Cloudinary nếu có slug
-      if (brand.slug) {
-        await deleteCloudinaryFolder(`brands/${brand.slug}`);
-      }
-  
-      // ✅ Xoá khỏi DB sau khi xử lý xong cloud
-      await Brand.findByIdAndDelete(id);
-  
-      res.status(200).json({
-        message: 'Brand deleted successfully',
-        id: brand._id,
+  try {
+    const { id } = req.params;
+
+    // 1. Kiểm tra xem brand có đang được sử dụng bởi sản phẩm nào không
+    const isLinked = await Product.exists({ brand: id });
+    if (isLinked) {
+      return res.status(400).json({
+        message: 'Không thể xóa. Thương hiệu này đang được sử dụng bởi một hoặc nhiều sản phẩm.',
       });
-    } catch (error) {
-      res.status(500).json({ message: 'Server error', error: error.message });
     }
-  };
+
+    // 2. Lấy brand trước khi xoá
+    const brand = await Brand.findById(id);
+    if (!brand) {
+      return res.status(404).json({ message: 'Brand not found' });
+    }
+
+    console.log('👉 Brand tìm được:', brand.name, '| Slug:', brand.slug);
+
+    // 3. Xoá folder Cloudinary nếu có slug
+    if (brand.slug) {
+      console.log(`🗑 Đang xoá folder Cloudinary: brands/${brand.slug}`);
+      await deleteCloudinaryFolder(`brands/${brand.slug}`);
+      console.log(`✅ Đã xoá folder Cloudinary: brands/${brand.slug}`);
+    } else {
+      console.log('⚠️ Không có slug — bỏ qua xoá folder Cloudinary');
+    }
+
+    // 4. Xoá khỏi MongoDB
+    await Brand.findByIdAndDelete(id);
+    console.log(`✅ Đã xoá brand trong MongoDB: ${brand._id}`);
+
+    res.status(200).json({
+      message: 'Brand deleted successfully',
+      id: brand._id,
+    });
+  } catch (error) {
+    console.error('❌ Lỗi khi xoá brand:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
   

@@ -244,15 +244,23 @@ const cartSlice = createSlice({
 })
 // Tổng tiền đã áp dụng giảm giá sản phẩm (theo discountPercent của từng sản phẩm)
 export const selectCartSubtotalAfterProductDiscount = (state) => {
-  const items = state.user.userCart.cart?.items || [];
+  const items = state.user?.userCart?.cart?.items || [];
+
+  if (!Array.isArray(items) || items.length === 0) return 0;
+
   return items.reduce((sum, item) => {
-    const price = item.product.price || 0;
-    const productDiscount = item.product.discountPercent || 0;
+    const product = item?.product;
+    if (!product) return sum;
+
+    const price = product.price || 0;
+    const discount = product.discountPercent || 0;
     const quantity = item.quantity || 0;
-    const discountedPrice = price * (1 - productDiscount / 100);
+
+    const discountedPrice = price * (1 - discount / 100);
     return sum + discountedPrice * quantity;
   }, 0);
 };
+
 
 // Tổng tiền giảm giá của mã giảm giá áp dụng trên tổng tiền đã giảm giá sản phẩm
 export const selectCartDiscountAmount = (state) => {

@@ -324,7 +324,7 @@ function Cart() {
                 <div className="col-md-8">
                     {localCart.items.length > 0 ? localCart.items.map(item => {
 
-                        const { name, price, image, description, _id, discountPercent } = item.product;
+                        const { name, price, image, description, _id, discountPercent } = item?.product;
                         const quantity = item.quantity;
                         const discountedPrice = Math.round(price * (1 - (discountPercent || 0) / 100));
 
