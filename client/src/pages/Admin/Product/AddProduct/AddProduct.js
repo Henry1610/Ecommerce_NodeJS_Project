@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import { generateSlug } from '../../../../untils/generateSlug';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBrands } from '../../../../redux/admin/brandSlice';
 import { fetchCategories } from '../../../../redux/admin/categoriesSlice'
@@ -105,7 +105,8 @@ const AddProduct = () => {
         if (!validateForm()) return;
       
         const productData = new FormData();
-      
+        const slug = generateSlug(formData.name);
+        productData.append('slug', slug);
         for (const key in formData) {
           if (key === "images" && formData.images) {
             for (let i = 0; i < formData.images.length; i++) {
@@ -123,10 +124,11 @@ const AddProduct = () => {
             productData.append(key, formData[key]);
           }
         }
-      
+        
+        
         try {
           // Debug formData nếu cần
-          console.log('FormData entries:', [...productData.entries()]);
+        //   console.log('FormData entries:', [...productData.entries()]);
       
           await dispatch(addProduct(productData)).unwrap(); // unwrap giúp bắt lỗi chính xác
           toast.success("Thêm sản phẩm thành công!");

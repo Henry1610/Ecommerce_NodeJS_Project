@@ -118,10 +118,10 @@ const ProductList = () => {
                           </a>
                           <a href="#">{product.name}</a>
                         </td>
-                        <td>{product.category.name}</td>
-                        <td>{product.brand.name}</td>
-                        <td>{product.price}</td>
-                        <td>{product.stock}</td>
+                        <td>{product?.category.name}</td>
+                        <td>{product?.brand.name}</td>
+                        <td>{(product?.price).toLocaleString('vi-VN')}đ</td>
+                        <td>{product?.stock}</td>
                         <td className="action-icons">
                           <Link to={`${product._id}`} className="me-2" title="Xem chi tiết">
                             <i className="fas fa-eye"></i>

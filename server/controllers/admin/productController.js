@@ -2,7 +2,7 @@ import Product from '../../models/Product.js'
 import Review from '../../models/Review.js'
 import { getPublicIdFromUrl } from '../../utils/getPublicIdFromUrl.js';
 import { v2 as cloudinary } from 'cloudinary';
-
+import { deleteCloudinaryFolder } from '../../utils/deleteCloudinaryFolder.js';
 export const getProducts = async (req, res) => {
 
     try {
@@ -64,8 +64,8 @@ export const addProduct = async (req, res, next) => {
             return res.status(400).json({ message: 'Vui lòng upload ít nhất 1 ảnh.' });
         }
 
-        const imagesPaths = files.map(file => file.filename);
-
+        const imagesPaths = files.map(file => file.path);
+        
         const newProduct = new Product({
             name,
             description,
@@ -81,8 +81,13 @@ export const addProduct = async (req, res, next) => {
         });
 
         const product = await newProduct.save();
-        req.product = product;
-        next();
+        // req.product = product;
+        // next();
+        res.status(201).json({
+            success: true,
+            message: 'Thêm sản phẩm thành công',
+            product
+          });
     } catch (error) {
         console.error('[ADD PRODUCT ERROR]', error); // Ghi log ra terminal
         res.status(500).json({ message: 'Lỗi khi thêm sản phẩm', error: error.message });
@@ -124,7 +129,6 @@ export const updateProduct = async (req, res, next) => {
             ? req.body.oldImages
             : [req.body.oldImages].filter(Boolean);
 
-        console.log('OLD IMAGES:', oldImages);
 
         // Tìm product để cập nhật
         const product = await Product.findById(id);
@@ -132,7 +136,6 @@ export const updateProduct = async (req, res, next) => {
 
         // Lọc ảnh giữ lại
         const keptImages = product.images.filter(img => oldImages.includes(img));
-        console.log('KEEP IMAGES:', keptImages);
 
         // Xoá ảnh đã bị gỡ khỏi Cloudinary
         const deletedImages = product.images.filter(img => !oldImages.includes(img));
@@ -182,7 +185,9 @@ export const deleteProduct = async (req, res) => {
         if (!deletedProduct) {
             return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
         }
-
+        await deleteCloudinaryFolder(`products/${deletedProduct.slug}`);
+       
+        
         res.status(200).json({
             message: 'Sản phẩm đã bị xóa thành công',
             id: deletedProduct._id,

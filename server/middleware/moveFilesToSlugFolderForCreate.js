@@ -5,7 +5,8 @@ import { getPublicIdFromUrl } from '../utils/getPublicIdFromUrl.js';
 export const moveFilesToSlugFolderForCreate = async (req, res) => {
   try {
     const product = req.product;
-
+    console.log('product:',product);
+    
     if (!product || !product.slug) {
       return res.status(400).json({ message: 'Không có thông tin sản phẩm hoặc slug.' });
     }
@@ -13,14 +14,18 @@ export const moveFilesToSlugFolderForCreate = async (req, res) => {
     const newImageUrls = [];
 
     for (const imageUrl of product.images) {
-      const publicId = getPublicIdFromUrl(imageUrl); // ex: products/temp/abc123
+      const publicId = imageUrl; // ex: products/temp/abc123
+      console.log('📦 publicId:', publicId); // ex: products/temp/abc123
+
       if (!publicId) continue;
 
       const fileName = publicId.split('/').pop(); // abc123
       const newPublicId = `products/${product.slug}/${fileName}`;
-
+      console.log('📦 newPublicId:', newPublicId); // ex: products/laptop-asus/abc123
       try {
         const result = await cloudinary.uploader.rename(publicId, newPublicId);
+        console.log('✅ Secure URL:', result.secure_url);
+
         newImageUrls.push(result.secure_url); // ✅ chỉ lưu URL
       } catch (err) {
         console.warn(`❌ Không thể di chuyển file ${publicId}:`, err.message);
@@ -29,7 +34,7 @@ export const moveFilesToSlugFolderForCreate = async (req, res) => {
     }
 
     product.images = newImageUrls;
-    await product.save();
+    await Product.updateOne({ _id: product._id }, { images: newImageUrls });
 
     res.status(201).json({
       message: 'Tạo sản phẩm thành công và ảnh đã được di chuyển',

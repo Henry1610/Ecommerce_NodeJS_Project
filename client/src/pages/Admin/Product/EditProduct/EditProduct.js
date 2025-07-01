@@ -12,6 +12,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
+import { generateSlug } from '../../../../untils/generateSlug';
 const EditProduct = () => {
     const dispatch = useDispatch()
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -155,7 +156,9 @@ const EditProduct = () => {
       
         try {
           const productData = new FormData();
-      
+          const name = formData.name || "";
+          const slug = generateSlug(name);
+          productData.append("slug", slug);
           // Append từng key
           for (const key in formData) {
             if (key === "images") {
@@ -166,8 +169,6 @@ const EditProduct = () => {
               productData.append(key, formData[key]);
             }
           }
-      
-          // Đổi từ JSON.stringify sang append nhiều lần
           imagesFromServer.forEach((img) => productData.append("oldImages", img));
       
           await dispatch(updateProduct({ productId, productData })).unwrap();
