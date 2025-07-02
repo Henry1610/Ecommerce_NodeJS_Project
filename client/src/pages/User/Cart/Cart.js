@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import './Cart.css';
-import { useEffect, useCallback, useState, useRef,useMemo } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicShippingZones } from '../../../redux/public/shippingZoneSlice';
-import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress } from '../../../redux/user/shippingAddressSlice';
+import { createShippingAddress, getSavedShippingAddresses, getShippingAddressById, getDefaultShippingAddress, updateShippingAddress, setDefaultShippingAddress, deleteShippingAddress } from '../../../redux/user/shippingAddressSlice';
 import { fetchCart, setCart, applyDiscount, removeDiscount, selectCartSubtotalAfterProductDiscount, selectCartTotalPrice, selectCartDiscountAmount } from '../../../redux/user/cartSlice';
 import { fetchDiscounts } from '../../../redux/public/discountSlice';
 import { createCheckoutSession } from '../../../redux/user/paymentSlice';
@@ -12,6 +12,7 @@ import debounce from 'lodash.debounce';
 import VoucherCard from '../../../components/VourcherCard';
 import { Modal } from 'bootstrap';
 import { MAX_STRIPE_AMOUNT } from '../../../config/constants';
+import Swal from 'sweetalert2';
 function Cart() {
     // Redux hooks
     const location = useLocation();
@@ -20,7 +21,7 @@ function Cart() {
     const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.user.userCart);
     const { AddressSave, defaultAddress } = useSelector(state => state.user.userShippingAddress)
     const { discounts } = useSelector(state => state.public.publicDiscount);
-    
+
     const zones = useSelector(state => state.public?.publicShippingZones?.zones || []);
     const CartSubtotalAfterProductDiscount = useSelector(selectCartSubtotalAfterProductDiscount)
     const CartDiscountAmount = useSelector(selectCartDiscountAmount)
@@ -31,6 +32,7 @@ function Cart() {
 
     const [showModal, setShowModal] = useState(null);
     const [formAddress, setAddress] = useState({
+        idForUpdate: '',
         fullName: '',
         phoneNumber: '',
         city: '',
@@ -66,9 +68,9 @@ function Cart() {
                 toast.error(`Lỗi khi tải dữ liệu: ${error}`);
             }
         };
-    
+
         initializeData();
-    }, [dispatch]); 
+    }, [dispatch]);
     useEffect(() => {
         const savedSelectedId = sessionStorage.getItem('selectedAdsId');
         if (savedSelectedId && savedSelectedId !== 'undefined') {
@@ -105,7 +107,7 @@ function Cart() {
         setDefaultAddressId(selectedAdsId)
         sessionStorage.setItem('selectedAdsId', selectedAdsId);
     }
-    
+
 
     useEffect(() => {
         discountRef.current = selectedDiscountSlice;
@@ -113,20 +115,20 @@ function Cart() {
 
     const debounceSetCart = useCallback(
         debounce(async (items) => {
-          try {
-            await dispatch(setCart({
-              items,
-              appliedDiscount: discountRef.current,
-              shippingFee: defaultAddressObj?.city.fee
-            })).unwrap(); 
-          } catch (error) {
-            toast.error(`Lỗi khi cập nhật giỏ hàng: ${error}`);
-            console.error('Lỗi khi cập nhật giỏ hàng:', error);
-          }
+            try {
+                await dispatch(setCart({
+                    items,
+                    appliedDiscount: discountRef.current,
+                    shippingFee: defaultAddressObj?.city.fee
+                })).unwrap();
+            } catch (error) {
+                toast.error(`Lỗi khi cập nhật giỏ hàng: ${error}`);
+                console.error('Lỗi khi cập nhật giỏ hàng:', error);
+            }
         }, 500),
         [dispatch, defaultAddressObj?.city.fee]
-      );
-      
+    );
+
 
     // Handler functions
     const handleQuantityChange = (productId, newQuantity) => {
@@ -243,6 +245,7 @@ function Cart() {
             const addressData = await dispatch(getShippingAddressById(addressId)).unwrap();
 
             setAddress({
+                idForUpdate: addressId,
                 fullName: addressData.fullName,
                 phoneNumber: addressData.phoneNumber,
                 city: addressData.city._id,
@@ -274,7 +277,19 @@ function Cart() {
         }
 
     };
+    const handleUpdateAds = async (e) => {
 
+        e.preventDefault();
+        try {
+            await dispatch(updateShippingAddress({ addressId: formAddress.idForUpdate, updates: formAddress })).unwrap();
+            await dispatch(getSavedShippingAddresses()); 
+
+            toast.success('Cập nhật địa chỉ thành công!');
+            setShowModal(null);
+        } catch (err) {
+            toast.error(`Cập nhật địa chỉ thất bại: ${err?.message || 'Đã xảy ra lỗi'}`);
+        }
+    };
     const handlePay = async (e) => {
         e.preventDefault();
 
@@ -298,8 +313,50 @@ function Cart() {
             window.location.href = result.payload.url; // điều hướng đến Stripe Checkout
         }
     };
+    const handleSetDefaultAddress = async (id) => {
+        
+        try {
+          await dispatch(setDefaultShippingAddress(id)).unwrap();
+          await dispatch(getSavedShippingAddresses());
+          toast.success("Đã đặt làm mặc định");
 
-
+        } catch (err) {
+          toast.error("Lỗi khi đặt mặc định");
+        }
+      };
+      
+      const handleDeleteAddress = async (addressId) => {
+        const result = await Swal.fire({
+          title: 'Bạn có chắc muốn xoá địa chỉ này?',
+          text: "Hành động này không thể hoàn tác!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Xoá',
+          cancelButtonText: 'Huỷ'
+        });
+      
+        if (!result.isConfirmed) return;
+      
+        try {
+          await dispatch(deleteShippingAddress(addressId)).unwrap();
+          Swal.fire({
+            icon: 'success',
+            title: 'Đã xoá!',
+            text: 'Địa chỉ đã được xoá thành công.',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } catch (err) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: err || 'Xoá địa chỉ thất bại',
+          });
+        }
+      };
+      
 
     // Early returns
     if (loading) {
@@ -476,10 +533,11 @@ function Cart() {
                                                 }
                                                 }></button>
                                             </div>
-                                            <form >
+                                            <div >
                                                 <div className="modal-body">
                                                     {AddressSave.map((addr) => (
                                                         <div
+                                                            key={addr._id}
                                                             className="form-check p-3 border-bottom d-flex align-items-start gap-3"
                                                         >
                                                             <input
@@ -490,12 +548,10 @@ function Cart() {
                                                                 checked={selectedAdsId === addr._id}
                                                                 onChange={(e) => handleCheckAds(e.target.value)}
                                                             />
-                                                            <label className="form-check-label w-100">
+                                                            <div className=" w-100">
                                                                 <div className="d-flex align-items-center gap-1">
-                                                                    <strong className="text-dark text-truncate" style={{ maxWidth: "200px" }}>
-                                                                    </strong>
+                                                                    <strong className="text-dark text-truncate" style={{ maxWidth: "200px" }}></strong>
                                                                     <small className="fw-semibold">{addr.fullName}</small>
-
                                                                     <span className="text-muted">|</span>
                                                                     <small className="text-muted">{addr.phoneNumber}</small>
                                                                     <span
@@ -505,23 +561,43 @@ function Cart() {
                                                                     >
                                                                         Cập nhật
                                                                     </span>
+                                                                    <span
+                                                                        className="ms-auto text-danger small"
+                                                                        role="button"
+                                                                        onClick={
+                                                                            
+                                                                            () => handleDeleteAddress( addr._id)}
+                                                                    >
+                                                                        Xóa
+                                                                    </span>
                                                                 </div>
-                                                                <div className='d-flex gap-2'>
+
+                                                                <div className="d-flex gap-2">
                                                                     <p className="text-muted small mb-0 mt-1">{addr.address}</p>
                                                                     <p className="text-muted small mb-0 mt-1">{addr.city.city}</p>
                                                                 </div>
 
-                                                                <div className="d-flex gap-2 mt-1">
+                                                                <div className="d-flex gap-2 mt-1 align-items-center ">
                                                                     {addr.isDefault && (
                                                                         <span className="badge text-bg-light border border-warning text-warning small">
                                                                             Mặc định
                                                                         </span>
                                                                     )}
 
+                                                                    {!addr.isDefault && (
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-sm btn-outline-primary "
+                                                                        onClick={() => handleSetDefaultAddress(addr._id)}
+                                                                        >
+                                                                            Đặt làm mặc định
+                                                                        </button>
+                                                                    )}
                                                                 </div>
-                                                            </label>
+                                                            </div>
                                                         </div>
                                                     ))}
+
                                                     <div className="mt-3">
                                                         <button
                                                             onClick={() => setShowModal('addOneAddress')}
@@ -537,11 +613,11 @@ function Cart() {
                                                     <button type="button" className="btn btn-outline-secondary" onClick={() => setShowModal(null)} >
                                                         Huỷ
                                                     </button>
-                                                    <button type="button" className="btn text-white" style={{ backgroundColor: "#ff5722" }} onClick={ handleSelectAds}>
+                                                    <button type="button" className="btn text-white" style={{ backgroundColor: "#ff5722" }} onClick={handleSelectAds}>
                                                         Xác nhận
                                                     </button>
                                                 </div>
-                                            </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -565,7 +641,7 @@ function Cart() {
                                             </div>
 
                                             <div className="modal-body">
-                                                <form className="needs-validation" onSubmit={handleSubmitAds}>
+                                                <form className="needs-validation" onSubmit={handleUpdateAds}>
                                                     {/* Họ tên + SĐT */}
                                                     <div className="row mb-3">
                                                         <div className="col">
@@ -768,7 +844,7 @@ function Cart() {
                             <div className="d-flex justify-content-between fw-bold">
                                 <span>Tổng cộng</span>
                                 <span>
-                                    {localCart.items.length === 0?0:CartTotalPrice.toLocaleString()}đ
+                                    {localCart.items.length === 0 ? 0 : CartTotalPrice.toLocaleString()}đ
                                 </span>
                             </div>
 

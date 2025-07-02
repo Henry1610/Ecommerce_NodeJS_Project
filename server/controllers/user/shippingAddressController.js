@@ -18,7 +18,6 @@ export const updateShippingAddress = async (req, res) => {
     const updatedAddress = await ShippingAddress.findByIdAndUpdate(
       addressId,
       { $set: updates },
-      { new: true }
     );
 
     if (!updatedAddress) {
@@ -93,3 +92,48 @@ export const getDefaultShippingAddress = async (req, res) => {
   }
 };
 
+export const setDefaultShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { addressId } = req.params;
+
+    const address = await ShippingAddress.findOne({ _id: addressId, user: userId });
+    if (!address) {
+      return res.status(404).json({ message: 'Không tìm thấy địa chỉ để đặt mặc định' });
+    }
+
+    // Bỏ trạng thái mặc định của các địa chỉ khác
+    await ShippingAddress.updateMany(
+      { user: userId, isDefault: true },
+      { $set: { isDefault: false } }
+    );
+
+    // Đặt mặc định cho địa chỉ này
+    address.isDefault = true;
+    await address.save();
+
+    res.status(200).json({ message: 'Đã đặt làm địa chỉ mặc định', address });
+  } catch (error) {
+    console.error('Lỗi khi đặt mặc định:', error);
+    res.status(500).json({ message: 'Đã xảy ra lỗi khi đặt mặc định địa chỉ' });
+  }
+};
+export const deleteShippingAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const userId = req.user.id;
+
+    const address = await ShippingAddress.findOne({ _id: addressId, user: userId });
+
+    if (!address) {
+      return res.status(404).json({ message: 'Không tìm thấy địa chỉ để xóa' });
+    }
+
+    await address.deleteOne();
+
+    res.status(200).json({ message: 'Đã xóa địa chỉ thành công' });
+  } catch (error) {
+    console.error('Lỗi khi xóa địa chỉ:', error);
+    res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa địa chỉ' });
+  }
+};

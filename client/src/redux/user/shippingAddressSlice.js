@@ -125,7 +125,54 @@ export const getDefaultShippingAddress = createAsyncThunk(
         }
     }
 );
+export const setDefaultShippingAddress = createAsyncThunk(
+    'shippingAddress/setDefaultShippingAddress',
+    async (addressId, thunkAPI) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}/default`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
 
+            const data = await res.json();
+
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi đặt mặc định địa chỉ');
+            }
+
+            return data; // Trả về address đã được cập nhật
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+        }
+    }
+);
+export const deleteShippingAddress = createAsyncThunk(
+    'shippingAddress/deleteShippingAddress',
+    async (addressId, thunkAPI) => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+  
+        const data = await res.json();
+  
+        if (!res.ok) {
+          return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xóa địa chỉ');
+        }
+  
+        return addressId; // Trả về ID đã xóa để cập nhật store
+      } catch (error) {
+        return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+      }
+    }
+  );
 // Slice
 const shippingAddressSlice = createSlice({
     name: 'shippingAddress',
@@ -210,11 +257,39 @@ const shippingAddressSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+            // set default
+            .addCase(setDefaultShippingAddress.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(setDefaultShippingAddress.fulfilled, (state, action) => {
+                state.loading = false;
+                const updated = action.payload;
+            
+                // Cập nhật lại danh sách AddressSave: chỉ 1 địa chỉ có isDefault = true
+                state.AddressSave = state.AddressSave.map(addr =>
+                    addr._id === updated._id
+                        ? { ...addr, isDefault: true }
+                        : { ...addr, isDefault: false }
+                );
+            
+                state.defaultAddress = updated; // gán vào default
+            })
+            .addCase(setDefaultShippingAddress.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            // delete
+            .addCase(deleteShippingAddress.fulfilled, (state, action) => {
+                state.AddressSave = state.AddressSave.filter(addr => addr._id !== action.payload);
+              })
+              
 
     }
 });
+
 export const selectShippingFee = (state) => {    
-    return state.user.userShippingAddress.defaultAddress?.city.fee || 0;
+    return state.user.userShippingAddress.defaultAddress?.city?.fee || 0;
 };
 
 export const { setSelectedAddress, clearShippingAddresses } = shippingAddressSlice.actions;
