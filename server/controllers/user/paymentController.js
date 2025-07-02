@@ -190,8 +190,16 @@ export const stripeWebhook = async (req, res) => {
 
       // Trừ tồn kho
       await Promise.all(
-        items.map(item => Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } }))
+        items.map(item =>
+          Product.findByIdAndUpdate(item.product, {
+            $inc: {
+              stock: -item.quantity,
+              sold: item.quantity
+            }
+          })
+        )
       );
+      
 
       // Trừ lượt mã giảm giá
       if (appliedDiscount) {

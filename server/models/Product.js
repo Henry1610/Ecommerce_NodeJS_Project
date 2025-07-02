@@ -55,7 +55,12 @@ const productSchema = new mongoose.Schema(
             type: Map,
             of: mongoose.Schema.Types.Mixed,
             default: {}
-        }
+        },
+        sold: {
+            type: Number,
+            default: 0,
+            min: 0
+          },
     }
 );
 

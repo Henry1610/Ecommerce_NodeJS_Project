@@ -5,6 +5,7 @@ const Sidebar = () => {
   return (
     <div className="mt-3" id="sidebar-wrapper">
       <div className="accordion" id="sidebarAccordion">
+        
         {/* PRODUCT */}
         <div className="accordion-item">
           <h2 className="accordion-header" id="headingProduct">

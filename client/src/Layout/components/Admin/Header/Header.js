@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Header.css';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -11,10 +12,14 @@ const Header = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
       <div className="container-fluid">
-        <a className="navbar-brand d-flex align-items-center" href="index.html">
-          <i className="fas fa-store fs-3 text-primary me-2"></i>
-          <span className="d-none d-lg-inline">MyShop</span>
-        </a>
+        <h2 className="accordion-header" id="headingProduct">
+          <Link
+            to="/admin/dashboard"
+            className="accordion-button collapsed bg-light text-decoration-none"
+          >
+            <i className="fa-brands fa-unity me-2"></i> Dashboard
+          </Link>
+        </h2>
 
         <button
           className="navbar-toggler"

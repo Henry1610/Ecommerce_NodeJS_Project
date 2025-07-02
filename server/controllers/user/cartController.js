@@ -39,22 +39,32 @@ export const addToCart = async (req, res) => {
       item => item.product.toString() === productId
     );
 
+    // Lấy thông tin sản phẩm
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+    }
+
+    // Kiểm tra tồn kho
+    const currentQuantityInCart = itemIndex !== -1 ? clonedItems[itemIndex].quantity : 0;
+    if (currentQuantityInCart + quantity > product.stock) {
+      return res.status(400).json({
+        message: `Sản phẩm "${product.name}" chỉ còn ${product.stock} cái trong kho.`,
+      });
+    }
+
+    // Cập nhật quantity
     if (itemIndex !== -1) {
       clonedItems[itemIndex].quantity += quantity;
     } else {
-      // Kiểm tra product tồn tại
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
-      }
       clonedItems.push({ product: productId, quantity });
     }
 
     // Tính tổng tiền
     let total = 0;
     for (const item of clonedItems) {
-      const product = await Product.findById(item.product);
-      const price = product?.price || 0;
+      const prod = await Product.findById(item.product);
+      const price = prod?.price || 0;
       total += price * item.quantity;
     }
 
@@ -86,6 +96,7 @@ export const addToCart = async (req, res) => {
     });
   }
 };
+
 
 
 export const setCart = async (req, res) => {
