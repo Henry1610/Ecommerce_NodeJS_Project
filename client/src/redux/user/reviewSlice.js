@@ -53,7 +53,7 @@ export const fetchMyReviews = createAsyncThunk(
   'reviews/fetchMyReviews',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/reviews/my', {
+      const res = await fetch('http://localhost:5000/api/users/reviews', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

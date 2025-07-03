@@ -354,7 +354,7 @@ const OrderDetail = () => {
 
                     <li>
                       <span className="fw-semibold">User ID:</span>{' '}
-                      <span className="text-muted">{selectedOrder?.shippingAddress.user}</span>
+                      <span className="text-muted">{selectedOrder?.user?._id || selectedOrder?.user}</span>
                     </li>
                   </ul>
                 </div>
@@ -368,7 +368,8 @@ const OrderDetail = () => {
                   <h6 className="border-bottom pb-2 fw-bold text-primary fs-6 mb-3">📦 Shipping Address</h6>
                   <div className="small text-secondary">
                     <p className="mb-1">{selectedOrder?.shippingAddress.address}</p>
-                    {/* <p className="mb-1">{selectedOrder?.shippingAddress.city.city}</p> */}
+                    <p className="mb-1">{selectedOrder?.shippingAddress.city}</p>
+                    <p className="mb-1"><span className="fw-semibold">Shipping Zone:</span> {selectedOrder?.shippingAddress.shippingZoneName}</p>
 
                     <p className="mt-3"><span className="fw-semibold">📞 Phone:</span> {selectedOrder?.shippingAddress.phoneNumber}</p>
                   </div>

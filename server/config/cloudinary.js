@@ -99,3 +99,16 @@ export const reviewImageUploader = (slug, userId) => multer({
   }),
   limits: { files: 3 }
 });
+
+// Upload avatar for user profile
+export const uploadAvatar = () =>
+  multer({
+    storage: new CloudinaryStorage({
+      cloudinary,
+      params: async (req, file) => ({
+        folder: `avatars`,
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        public_id: `${req.user ? req.user.id : 'guest'}-${Date.now()}`
+      }),
+    }),
+  });

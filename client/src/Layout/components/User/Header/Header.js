@@ -19,6 +19,11 @@ function Header() {
     const [keyword, setKeyword] = useState('');
     const debouncedKeyword = useDebounce(keyword, 500);
 
+    const userProfile = useSelector(state => state.user.userProfile.profile);
+    const authUser = useSelector(state => state.auth.user);
+    const username = userProfile?.user?.username || authUser?.username || 'Tài khoản';
+    const avatar = userProfile?.user?.avatar || authUser?.avatar || '';
+
     const handleSearch = (e) => {
         e.preventDefault();
 
@@ -159,10 +164,21 @@ function Header() {
                 <div className="d-flex align-items-center gap-3 text-secondary fw-semibold user-select-none">
                     {isAuthenticated ? (
                         <>
-                            <span className="d-flex align-items-center gap-2">
-                                <i className="far fa-user-circle fs-4"></i>
-                                <span className="fw-bold fs-6">Truong</span>
-                            </span>
+                            <Link to='/profile'>
+                                <span className="d-flex align-items-center gap-2">
+                                    {avatar ? (
+                                        <img
+                                            src={avatar}
+                                            alt="avatar"
+                                            style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <i className="far fa-user-circle fs-4"></i>
+                                    )}
+                                    <span className="fw-bold fs-6">{username}</span>
+                                </span>
+                            </Link>
+                            
 
                             <button
                                 className="btn btn-info text-black fw-bold d-flex align-items-center gap-1 rounded-pill position-relative"

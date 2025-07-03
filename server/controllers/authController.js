@@ -36,9 +36,14 @@ export const login = async function (req, res) {
 export const register = async function (req, res) {
     try {
         const { username, email, password } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Username hoặc email đã tồn tại' });
+        const existingUsername = await User.findOne({ username });
+        const existingEmail = await User.findOne({ email });
+        if (existingUsername && existingEmail) {
+            return res.status(400).json({ message: 'Tên đăng nhập và email đã tồn tại' });
+        } else if (existingUsername) {
+            return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
+        } else if (existingEmail) {
+            return res.status(400).json({ message: 'Email đã được sử dụng' });
         }
 
         const user = await User.create({

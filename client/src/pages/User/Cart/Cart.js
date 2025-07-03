@@ -297,7 +297,10 @@ function Cart() {
             toast.error("Giỏ hàng trống!");
             return;
         }
-
+        if (!defaultAddressObj) {
+            toast.error("Bạn chưa chọn địa chỉ!");
+            return;
+        }
         setIsPaying(true);
         const orderData = {
             items: localCart.items.map(item => ({
@@ -305,7 +308,7 @@ function Cart() {
                 quantity: item.quantity
             })),
             appliedDiscount: selectedDiscountSlice?._id || null,
-            shippingAddress: defaultAddressObj
+            shippingAddressId: defaultAddressObj._id
         };
 
         const result = await dispatch(createCheckoutSession(orderData));

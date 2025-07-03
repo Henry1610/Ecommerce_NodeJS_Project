@@ -3,15 +3,24 @@ import './Profile.css';
 
 const Profile = () => {
     const [formData, setFormData] = useState({
-        firstName: 'William',
-        lastName: 'Castillo',
-        email: 'william@example.com',
-        phone: '+1452 876 5432',
-        username: 'williamc',
+        username: '',
+        email: '',
         password: '',
+        avatar: '',
     });
-    const [profileImage, setProfileImage] = useState('assets/img/customer/customer5.jpg');
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        // Fetch user info from API and setFormData
+        // Example: fetch('/api/users/me').then(...)
+        // For now, just set dummy data
+        setFormData({
+            username: 'williamc',
+            email: 'william@example.com',
+            password: '',
+            avatar: 'assets/img/customer/customer5.jpg',
+        });
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -23,7 +32,7 @@ const Profile = () => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
-                setProfileImage(event.target.result);
+                setFormData({ ...formData, avatar: event.target.result });
             };
             reader.readAsDataURL(file);
         }
@@ -35,8 +44,9 @@ const Profile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', { ...formData, profileImage });
-        // Add logic to send form data (e.g., API call) here
+        // Send formData to backend (API call)
+        // Example: fetch('/api/users/me', { method: 'PUT', body: JSON.stringify(formData) })
+        console.log('Form submitted:', formData);
     };
 
     return (
@@ -54,7 +64,7 @@ const Profile = () => {
                                 <div className="profile-top d-flex justify-content-between align-items-center">
                                     <div className="profile-content d-flex align-items-center">
                                         <div className="profile-contentimg position-relative">
-                                            <img src={profileImage} alt="profile" id="blah" className="profile-img" />
+                                            <img src={formData.avatar || '/default-avatar.png'} alt="profile" id="blah" className="profile-img" />
                                             <div className="profileupload">
                                                 <input
                                                     type="file"
@@ -68,7 +78,7 @@ const Profile = () => {
                                             </div>
                                         </div>
                                         <div className="profile-contentname ms-3">
-                                            <h2>{formData.firstName} {formData.lastName}</h2>
+                                            <h2>{formData.username}</h2>
                                             <h4>Update Your Photo and Personal Details.</h4>
                                         </div>
                                     </div>
@@ -85,32 +95,6 @@ const Profile = () => {
                             <div className="row g-3 mt-4">
                                 <div className="col-lg-6 col-sm-12">
                                     <div className="form-group">
-                                        <label className="form-label">First Name</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleInputChange}
-                                            placeholder="William"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-sm-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Last Name</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleInputChange}
-                                            placeholder="Castillo"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-sm-12">
-                                    <div className="form-group">
                                         <label className="form-label">Email</label>
                                         <input
                                             type="email"
@@ -119,19 +103,6 @@ const Profile = () => {
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             placeholder="william@example.com"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-sm-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Phone</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
-                                            placeholder="+1452 876 5432"
                                         />
                                     </div>
                                 </div>

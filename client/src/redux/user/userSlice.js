@@ -25,26 +25,51 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
-// Cập nhật thông tin user
+// Cập nhật thông tin user (chỉ tên và avatar)
 export const updateUserProfile = createAsyncThunk(
   'user/updateProfile',
   async (updatedData, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/me', {
+      let options = {
         method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: updatedData
+      };
+      if (!(updatedData instanceof FormData)) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(updatedData);
+      }
+      const res = await fetch('http://localhost:5000/api/users/me', options);
+      const data = await res.json();
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Failed to update user');
+      }
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Server error');
+    }
+  }
+);
+
+// Đổi mật khẩu user
+export const changePassword = createAsyncThunk(
+  'user/changePassword',
+  async (passwordData, thunkAPI) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/users/change-password', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(updatedData)
+        body: JSON.stringify(passwordData)
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || 'Failed to update user');
+        return thunkAPI.rejectWithValue(data.message || 'Failed to change password');
       }
-
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue('Server error');
@@ -90,6 +115,19 @@ const userProfileSlice = createSlice({
         state.profile = action.payload;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Change password
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

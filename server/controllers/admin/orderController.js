@@ -21,13 +21,7 @@ export const getOrderByOrderNumber = async (req, res) => {
     const { orderNumber } = req.params
     const order = await Order.findOne({ orderNumber })
       .populate('user')
-      .populate({
-        path: 'shippingAddress',
-        populate: {
-          path: 'city',
-          model: 'ShippingZone'
-        }
-      })
+      .populate('shippingAddress.cityId') // Only populate cityId reference if needed
       .populate('payment');
 
 

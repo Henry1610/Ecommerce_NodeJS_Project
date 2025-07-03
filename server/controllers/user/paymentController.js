@@ -4,7 +4,9 @@ import Discount from '../../models/Discount.js';
 import Order from '../../models/Order.js';
 import Payment from '../../models/Payment.js';
 import ShippingZone from '../../models/ShippingZone.js';
+import ShippingAddress from '../../models/shippingAddress.js';
 import Cart from '../../models/Cart.js';
+import { calculateShippingFee } from '../../utils/calculateShippingFee.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -47,7 +49,7 @@ const calculateGlobalDiscount = (discount, totalOriginal) => {
 
 export const createCheckoutSession = async (req, res) => {
   try {
-    const { items, appliedDiscount, shippingAddress } = req.body;
+    const { items, appliedDiscount, shippingAddressId } = req.body;
     const userId = req.user.id;
 
     const discount = appliedDiscount ? await Discount.findById(appliedDiscount) : null;
@@ -55,12 +57,18 @@ export const createCheckoutSession = async (req, res) => {
     if (discount && discount.quantity <= 0) {
       return res.status(400).json({ message: 'Mã giảm giá đã hết lượt sử dụng' });
     }
-
-    const zone = await ShippingZone.findOne({ city: shippingAddress.city.city });
-    if (!zone) {
-      return res.status(400).json({ message: 'Không tìm thấy khu vực giao hàng cho thành phố này' });
+    if (!shippingAddressId) {
+      return res.status(400).json({ message: 'Bạn chưa chọn địa chỉ' });
     }
-    const shippingFee = zone.fee;
+
+    // Get shipping address with populated city
+    const shippingAddress = await ShippingAddress.findById(shippingAddressId).populate('city');
+    if (!shippingAddress) {
+      return res.status(400).json({ message: 'Không tìm thấy địa chỉ giao hàng' });
+    }
+    
+    // Calculate shipping fee using utility function
+    const { fee: shippingFee, zone } = await calculateShippingFee(shippingAddress.city.city);
 
     // Xử lý giỏ hàng
     const { processedItems, totalOriginal } = await processCartItems(items);
@@ -170,9 +178,20 @@ export const stripeWebhook = async (req, res) => {
         paidAt: new Date(),
       });
 
+      // Prepare embedded shipping address data
+      const embeddedShippingAddress = {
+        fullName: shippingAddressData.fullName,
+        address: shippingAddressData.address,
+        city: shippingAddressData.city.city, // Extract city name
+        cityId: shippingAddressData.city._id, // Keep reference to ShippingZone
+        phoneNumber: shippingAddressData.phoneNumber,
+        originalAddressId: shippingAddressData._id, // Keep reference to original address
+        shippingZoneName: shippingAddressData.city.city // Store city name for shipping zone lookup
+      };
+
       const order = await Order.create({
         user: userId,
-        shippingAddress: shippingAddressData._id,
+        shippingAddress: embeddedShippingAddress,
         payment: payment._id,
         items,
         appliedDiscount,

@@ -20,9 +20,34 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   shippingAddress: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'ShippingAddress',
-    required: true
+    fullName: {
+      type: String,
+      required: true
+    },
+    address: {
+      type: String,
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    },
+    cityId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'ShippingZone'
+    },
+    phoneNumber: {
+      type: String,
+      required: true
+    },
+    originalAddressId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'ShippingAddress'
+    },
+    shippingZoneName: {
+      type: String,
+      required: true
+    }
   },
   payment: {
     type: mongoose.Schema.ObjectId,

@@ -4,77 +4,178 @@ import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../../../redux/admin/orderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import formatDateTime from '../../../../untils/dateUtils'
+import { FaEye, FaBox, FaUser, FaMoneyBillWave, FaClock, FaCog } from 'react-icons/fa';
+
 const OrderList = () => {
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
   const { orders } = useSelector(state => state.admin.adminOrder)
-  const getStatusBadgeClass = (status) => {
+  
+  const getStatusBadgeStyle = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-secondary'; // Xám
+        return { background: '#f3f4f6', color: '#374151' }; // Xám
       case 'processing':
-        return 'bg-primary'; // Xanh dương
+        return { background: '#dbeafe', color: '#1d4ed8' }; // Xanh dương
       case 'shipped':
-        return 'bg-info'; // Xanh lơ
+        return { background: '#e0f2fe', color: '#0369a1' }; // Xanh lơ
       case 'delivered':
-        return 'bg-success'; // Xanh lá
+        return { background: '#dcfce7', color: '#16a34a' }; // Xanh lá
       case 'cancel_requested':
-        return 'bg-warning text-dark'; // Vàng
+        return { background: '#fef3c7', color: '#d97706' }; // Vàng
       case 'cancelled':
-        return 'bg-danger'; // Đỏ
+        return { background: '#fee2e2', color: '#dc2626' }; // Đỏ
       case 'cancel_rejected':
-        return 'bg-dark'; // Đen hoặc màu riêng
+        return { background: '#f3f4f6', color: '#1f2937' }; // Đen
       default:
-        return 'bg-light text-dark'; // Trạng thái không xác định
+        return { background: '#f9fafb', color: '#374151' }; // Trạng thái không xác định
     }
   };
 
   return (
-    <div className="container my-5">
-      <h2 className="mb-4 fw-bold text-primary">🧾 Danh sách đơn hàng</h2>
+    <div style={{
+      maxWidth: 1200,
+      margin: "40px auto",
+      fontFamily: "Inter, Arial, sans-serif",
+      background: "#f6f8fa",
+      minHeight: "100vh",
+      padding: "32px 32px"
+    }}>
+      <div style={{
+        background: "#fff",
+        borderRadius: 16,
+        padding: 28,
+        marginBottom: 28,
+        boxShadow: "0 2px 12px rgba(59,130,246,0.08)"
+      }}>
+        <h2 style={{ 
+          fontWeight: 700, 
+          marginBottom: 24, 
+          color: "#3b82f6", 
+          fontSize: 24,
+          display: "flex",
+          alignItems: "center",
+          gap: 12
+        }}>
+          <FaBox size={28} />
+          Danh sách đơn hàng
+        </h2>
 
-      <div className="table-responsive shadow-sm rounded-3 border bg-white">
-        <table className="table table-hover align-middle modern-table">
-          <thead className="table-light">
-            <tr>
-              <th className="text-start">🆔 Order #</th>
-              <th className="text-start">👤 User</th>
-              <th className="text-end">💵 Total</th>
-              <th className="text-center">🔁 Status</th>
-              <th className="text-center">📅 Created</th>
-              <th className="text-center">🔍 Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td className="text-start">#{order.orderNumber}</td>
-                <td className="text-start">{order.shippingAddress.fullName}</td>
-                <td className="text-end">{order.totalPrice.toLocaleString()}đ</td>
-                
-                <td className="text-center">
-                  <span
-                    className={`badge rounded-pill px-3 py-2 fw-semibold ${getStatusBadgeClass(order.status)}`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
-
-                <td className="text-center">{formatDateTime(order.createdAt)}</td>
-                <td className="text-center">
-                  <Link
-                    to={`${order.orderNumber}`}
-                    className="btn btn-outline-primary btn-sm rounded-pill px-3"
-                  >
-                    Details
-                  </Link>
-                </td>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ 
+            width: "100%", 
+            borderCollapse: "collapse", 
+            minWidth: 800, 
+            fontSize: 14 
+          }}>
+            <thead>
+              <tr style={{ background: "#f3f6fa" }}>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, fontSize: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <FaBox size={14} />
+                    Mã đơn
+                  </div>
+                </th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, fontSize: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <FaUser size={14} />
+                    Khách hàng
+                  </div>
+                </th>
+                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, fontSize: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
+                    <FaMoneyBillWave size={14} />
+                    Tổng tiền
+                  </div>
+                </th>
+                <th style={{ padding: "12px 16px", textAlign: "center", fontWeight: 600, fontSize: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                    <FaCog size={14} />
+                    Trạng thái
+                  </div>
+                </th>
+                <th style={{ padding: "12px 16px", textAlign: "center", fontWeight: 600, fontSize: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                    <FaClock size={14} />
+                    Ngày tạo
+                  </div>
+                </th>
+                <th style={{ padding: "12px 16px", textAlign: "center", fontWeight: 600, fontSize: 14 }}>
+                  Thao tác
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id} style={{
+                  borderBottom: "1px solid #eee",
+                  transition: "background 0.2s",
+                  cursor: "pointer"
+                }}
+                  onMouseOver={e => e.currentTarget.style.background = "#f6f8fa"}
+                  onMouseOut={e => e.currentTarget.style.background = ""}
+                >
+                  <td style={{ padding: "12px 16px", fontWeight: 600, color: "#3b82f6" }}>
+                    #{order.orderNumber}
+                  </td>
+                  <td style={{ padding: "12px 16px", fontWeight: 500 }}>
+                    {order.shippingAddress?.fullName || "N/A"}
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#10b981" }}>
+                    {order.totalPrice?.toLocaleString()}₫
+                  </td>
+                  
+                  <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                    <span
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 20,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        display: "inline-block",
+                        minWidth: 80,
+                        ...getStatusBadgeStyle(order.status)
+                      }}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+
+                  <td style={{ padding: "12px 16px", textAlign: "center", color: "#6b7280" }}>
+                    {formatDateTime(order.createdAt)}
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                    <Link
+                      to={`${order.orderNumber}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 16px",
+                        background: "#3b82f6",
+                        color: "#fff",
+                        textDecoration: "none",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        transition: "all 0.2s",
+                        border: "none",
+                        cursor: "pointer"
+                      }}
+                      onMouseOver={e => e.target.style.background = "#2563eb"}
+                      onMouseOut={e => e.target.style.background = "#3b82f6"}
+                    >
+                      <FaEye size={12} />
+                      Chi tiết
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

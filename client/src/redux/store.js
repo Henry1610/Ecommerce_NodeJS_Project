@@ -11,6 +11,7 @@ import userShippingAddressReducer from './user/shippingAddressSlice';
 import userOrderReducer from './user/orderSlice'
 import userUserReducer from './user/userSlice'
 import userReviewReducer from './user/reviewSlice'
+import userProfileReducer from './user/userSlice';
 //---------------------public-------------------------
 import productsReducer from './public/productsSlice'
 import shippingZonesReducer from './public/shippingZoneSlice'
@@ -43,6 +44,7 @@ const userReducer = combineReducers({
   userOrder:userOrderReducer,
   userUser:userUserReducer,
   userReview:userReviewReducer,
+  userProfile: userProfileReducer,
 });
 const adminReducer = combineReducers({
   adminProduct: adminProductReducer,

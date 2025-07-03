@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMyOrders } from '../../../../redux/user/orderSlice';
+import { fetchMyOrders } from '../../../redux/user/orderSlice';
 import { Link } from 'react-router-dom';
-import formatDateTime from '../../../../untils/dateUtils';
+import formatDateTime from '../../../untils/dateUtils';
 
 const formatVND = (price) => {
   return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || '0 ₫';
 };
 
-const OrderHistory = () => {
+const OrderHistoryTab = () => {
   const dispatch = useDispatch();
   const { orders, loading, error } = useSelector((state) => state.user.userOrder);
 
@@ -191,4 +191,4 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory;
+export default OrderHistoryTab; 

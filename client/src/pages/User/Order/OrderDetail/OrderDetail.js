@@ -997,6 +997,10 @@ const OrderDetail = () => {
                   <span className="fw-bold text-dark">{orderDetail.shippingAddress.address}</span>
                 </div>
                 <div className="p-3 rounded-3 bg-light">
+                  <label className="text-muted small fw-medium mb-1 d-block">Thành phố</label>
+                  <span className="fw-bold text-dark">{orderDetail.shippingAddress.city}</span>
+                </div>
+                <div className="p-3 rounded-3 bg-light">
                   <label className="text-muted small fw-medium mb-1 d-block">Điện thoại</label>
                   <span className="fw-bold text-dark">{orderDetail.shippingAddress.phoneNumber}</span>
                 </div>

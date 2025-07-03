@@ -1,116 +1,280 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaBell, FaUserCircle, FaFlagUsa, FaSearch, FaSignOutAlt, FaCog, FaUser, FaBars, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import './Header.css';
-import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../../redux/auth/authSlice';
+import Swal from 'sweetalert2';
+
+const getAdminInfo = () => {
+  // Simulate getting admin info from localStorage
+  try {
+    const admin = JSON.parse(localStorage.getItem('admin'));
+    return admin || { name: 'Admin', avatar: '' };
+  } catch {
+    return { name: 'Admin', avatar: '' };
+  }
+};
 
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+  const admin = getAdminInfo();
+  const dispatch = useDispatch();
 
   const toggleDropdown = (type) => {
     setActiveDropdown(prev => (prev === type ? null : type));
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) {
+      // You can implement real search logic here
+      console.log('Searching:', search);
+    }
+  };
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: 'Đăng xuất',
+      text: 'Bạn có chắc chắn muốn đăng xuất?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f43f5e',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Đăng xuất',
+      cancelButtonText: 'Huỷ'
+    });
+    if (result.isConfirmed) {
+      dispatch(logout());
+      navigate('/login');
+    }
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-      <div className="container-fluid">
-        <h2 className="accordion-header" id="headingProduct">
-          <Link
-            to="/admin/dashboard"
-            className="accordion-button collapsed bg-light text-decoration-none"
-          >
-            <i className="fa-brands fa-unity me-2"></i> Dashboard
-          </Link>
-        </h2>
+    <nav
+      className="admin-header-nav"
+      style={{
+        background: '#fff',
+        boxShadow: '0 2px 12px rgba(59,130,246,0.08)',
+        padding: '0 32px',
+        minHeight: 64,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}
+    >
+      {/* Logo & Dashboard */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <Link to="/admin/dashboard" style={{
+          display: 'flex',
+          alignItems: 'center',
+          fontWeight: 700,
+          fontSize: 22,
+          color: '#3b82f6',
+          textDecoration: 'none',
+          letterSpacing: 1
+        }}>
+          <FaBars style={{ marginRight: 10, fontSize: 22 }} />
+          Dashboard
+        </Link>
+      </div>
 
+      {/* Search */}
+      <form
+        onSubmit={handleSearch}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: '#f3f6fa',
+          borderRadius: 8,
+          padding: '4px 12px',
+          minWidth: 260,
+          boxShadow: '0 1px 4px rgba(59,130,246,0.04)'
+        }}
+      >
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Tìm kiếm..."
+          style={{
+            border: 'none',
+            outline: 'none',
+            background: 'transparent',
+            fontSize: 15,
+            flex: 1,
+            color: '#222'
+          }}
+        />
         <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
+          type="submit"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#3b82f6',
+            fontSize: 18,
+            cursor: 'pointer',
+            padding: 0
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          <FaSearch />
         </button>
+      </form>
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <form className="d-flex ms-auto me-3">
-            <input className="form-control me-2" type="search" placeholder="Search Here ..." />
-            <button className="btn btn-outline-success" type="submit">
-              <i className="fas fa-search"></i>
-            </button>
-          </form>
+      {/* Right section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        {/* Language dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => toggleDropdown('lang')}
+            className={`admin-header-btn${activeDropdown === 'lang' ? ' active' : ''}`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8 }}
+            aria-label="Language"
+          >
+            <FaFlagUsa size={20} />
+            {activeDropdown === 'lang' ? <FaChevronUp size={12} style={{ marginLeft: 4 }} /> : <FaChevronDown size={12} style={{ marginLeft: 4 }} />}
+          </button>
+          {activeDropdown === 'lang' && (
+            <ul className="admin-header-dropdown" style={{ minWidth: 140 }}>
+              <li><span><FaFlagUsa className="me-2" />English</span></li>
+              <li><span role="img" aria-label="fr">🇫🇷</span> French</li>
+              <li><span role="img" aria-label="es">🇪🇸</span> Spanish</li>
+              <li><span role="img" aria-label="de">🇩🇪</span> German</li>
+            </ul>
+          )}
+        </div>
 
-          <ul className="navbar-nav align-items-center">
-            {/* Language dropdown */}
-            <li className={`nav-item dropdown ms-3 ${activeDropdown === "lang" ? "show" : ""}`}>
-              <button
-                onClick={() => toggleDropdown("lang")}
-                className="nav-link dropdown-toggle btn btn-link"
-                aria-expanded={activeDropdown === "lang"}
-              >
-                <i className="fas fa-flag-usa"></i>
-              </button>
-              <ul className={`dropdown-menu dropdown-menu-start${activeDropdown === "lang" ? " show" : ""}`}>
-                <li><a className="dropdown-item" href="#"><i className="fas fa-flag-usa me-2"></i>English</a></li>
-                <li><a className="dropdown-item" href="#"><i className="fas fa-flag me-2"></i>French</a></li>
-                <li><a className="dropdown-item" href="#"><i className="fas fa-flag me-2"></i>Spanish</a></li>
-                <li><a className="dropdown-item" href="#"><i className="fas fa-flag me-2"></i>German</a></li>
-              </ul>
-            </li>
+        {/* Notifications dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => toggleDropdown('notif')}
+            className={`admin-header-btn${activeDropdown === 'notif' ? ' active' : ''}`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, position: 'relative' }}
+            aria-label="Notifications"
+          >
+            <FaBell size={20} />
+            <span style={{
+              position: 'absolute',
+              top: 2,
+              right: 2,
+              background: '#f43f5e',
+              color: '#fff',
+              borderRadius: '50%',
+              fontSize: 11,
+              minWidth: 18,
+              height: 18,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700
+            }}>4</span>
+            {activeDropdown === 'notif' ? <FaChevronUp size={12} style={{ marginLeft: 4 }} /> : <FaChevronDown size={12} style={{ marginLeft: 4 }} />}
+          </button>
+          {activeDropdown === 'notif' && (
+            <ul className="admin-header-dropdown" style={{ minWidth: 320, maxHeight: 400, overflowY: 'auto' }}>
+              <li className="notif-item">
+                <FaUserCircle className="me-2 text-primary" size={28} />
+                <div><strong>John Doe</strong> added new task <br /><small className="text-muted">4 mins ago</small></div>
+              </li>
+              <li className="notif-item">
+                <FaUserCircle className="me-2 text-secondary" size={28} />
+                <div><strong>Tarah Shropshire</strong> changed the task name <br /><small className="text-muted">6 mins ago</small></div>
+              </li>
+              <li><hr className="dropdown-divider" /></li>
+              <li style={{ textAlign: 'center', padding: 8, color: '#3b82f6', cursor: 'pointer' }}>View all Notifications</li>
+            </ul>
+          )}
+        </div>
 
-            {/* Notifications dropdown */}
-            <li className={`nav-item dropdown ms-3 ${activeDropdown === "notif" ? "show" : ""}`}>
-              <button
-                onClick={() => toggleDropdown("notif")}
-                className="nav-link position-relative btn btn-link"
-                aria-expanded={activeDropdown === "notif"}
-              >
-                <i className="fas fa-bell"></i>
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">4</span>
-              </button>
-              <ul
-                className={`dropdown-menu dropdown-menu-start p-3${activeDropdown === "notif" ? " show" : ""}`}
-                style={{ width: 350, maxHeight: 400, overflowY: 'auto' }}
-              >
-                <li className="mb-2 d-flex align-items-center">
-                  <i className="fas fa-user-circle fa-2x me-2 text-primary"></i>
-                  <div><strong>John Doe</strong> added new task <br /><small className="text-muted">4 mins ago</small></div>
-                </li>
-                <li className="mb-2 d-flex align-items-center">
-                  <i className="fas fa-user-circle fa-2x me-2 text-secondary"></i>
-                  <div><strong>Tarah Shropshire</strong> changed the task name <br /><small className="text-muted">6 mins ago</small></div>
-                </li>
-                <li><hr className="dropdown-divider" /></li>
-                <li><a href="activities.html" className="dropdown-item text-center">View all Notifications</a></li>
-              </ul>
-            </li>
-
-            {/* User dropdown */}
-            <li className={`nav-item dropdown ms-3 ${activeDropdown === "user" ? "show" : ""}`}>
-              <button
-                onClick={() => toggleDropdown("user")}
-                className="nav-link dropdown-toggle d-flex align-items-center btn btn-link"
-                aria-expanded={activeDropdown === "user"}
-              >
-                <i className="fas fa-user-circle fa-lg"></i>
-                <span
-                  className="status online ms-2"
-                  style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: '#28a745', display: 'inline-block' }}
-                ></span>
-              </button>
-              <ul className={`dropdown-menu dropdown-menu-start${activeDropdown === "user" ? " show" : ""}`}>
-                <li className="px-3 py-2 d-flex align-items-center">
-                  <i className="fas fa-user-circle fa-2x me-2 text-dark"></i>
-                  <div><h6 className="mb-0">John Doe</h6><small className="text-muted">Admin</small></div>
-                </li>
-                <li><hr className="dropdown-divider" /></li>
-                <li><a className="dropdown-item" href="profile.html"><i className="fas fa-user me-2"></i> My Profile</a></li>
-                <li><a className="dropdown-item" href="generalsettings.html"><i className="fas fa-cog me-2"></i> Settings</a></li>
-                <li><hr className="dropdown-divider" /></li>
-                <li><a className="dropdown-item" href="signin.html"><i className="fas fa-sign-out-alt me-2"></i> Logout</a></li>
-              </ul>
-            </li>
-          </ul>
+        {/* User dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => toggleDropdown('user')}
+            className={`admin-header-btn${activeDropdown === 'user' ? ' active' : ''}`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center' }}
+            aria-label="User menu"
+          >
+            {admin.avatar ? (
+              <img src={admin.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+            ) : (
+              <FaUserCircle size={28} style={{ marginRight: 8, color: '#3b82f6' }} />
+            )}
+            <span style={{ fontWeight: 600, color: '#222', fontSize: 15 }}>{admin.name}</span>
+            {activeDropdown === 'user' ? <FaChevronUp size={12} style={{ marginLeft: 6 }} /> : <FaChevronDown size={12} style={{ marginLeft: 6 }} />}
+          </button>
+          {activeDropdown === 'user' && (
+            <ul className="admin-header-dropdown" style={{ minWidth: 180 }}>
+              <li className="px-3 py-2 d-flex align-items-center">
+                {admin.avatar ? (
+                  <img src={admin.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+                ) : (
+                  <FaUserCircle size={32} style={{ marginRight: 10, color: '#3b82f6' }} />
+                )}
+                <div><h6 className="mb-0">{admin.name}</h6><small className="text-muted">Admin</small></div>
+              </li>
+              <li><hr className="dropdown-divider" /></li>
+              <li><Link className="dropdown-item" to="/admin/profile"><FaUser className="me-2" /> My Profile</Link></li>
+              <li><Link className="dropdown-item" to="/admin/settings"><FaCog className="me-2" /> Settings</Link></li>
+              <li><hr className="dropdown-divider" /></li>
+              <li><button className="dropdown-item" onClick={handleLogout} style={{ color: '#fff', background: '#f43f5e', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '10px 18px', border: 'none', margin: 8, boxShadow: '0 2px 8px rgba(244,63,94,0.08)', transition: 'background 0.15s' }} onMouseOver={e => e.target.style.background = '#dc2626'} onMouseOut={e => e.target.style.background = '#f43f5e'}><FaSignOutAlt /> Đăng xuất</button></li>
+            </ul>
+          )}
         </div>
       </div>
+
+      {/* Custom styles for dropdown */}
+      <style>{`
+        .admin-header-btn:hover, .admin-header-btn.active {
+          background: #f3f6fa;
+        }
+        .admin-header-dropdown {
+          position: absolute;
+          top: 110%;
+          right: 0;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 4px 24px rgba(59,130,246,0.10);
+          padding: 8px 0;
+          z-index: 1000;
+          min-width: 140px;
+          animation: fadeIn 0.18s;
+        }
+        .admin-header-dropdown li {
+          padding: 8px 18px;
+          cursor: pointer;
+          font-size: 15px;
+          transition: background 0.15s;
+        }
+        .admin-header-dropdown li:hover {
+          background: #f3f6fa;
+        }
+        .notif-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 10px 18px;
+        }
+        @media (max-width: 700px) {
+          nav.admin-header-nav {
+            flex-direction: column;
+            padding: 0 8px;
+            min-height: unset;
+          }
+          .admin-header-dropdown {
+            right: unset;
+            left: 0;
+          }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: none; }
+        }
+      `}</style>
     </nav>
   );
 };

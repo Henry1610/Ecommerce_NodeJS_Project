@@ -1,111 +1,170 @@
-import { Link } from 'react-router-dom';
-import React, { useState,useEffect  } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { register } from '../../../redux/auth/authSlice';
+import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
 
 function Register() {
-
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState(''); // Thêm confirmPassword
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { token, loading, error } = useSelector((state) => state.auth);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleRegister = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Lỗi!',
-            text: 'Mật khẩu xác nhận không khớp',
-            confirmButtonText: 'Thử lại'
-          });
-          return;
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Mật khẩu xác nhận không khớp',
+            });
+            return;
         }
         try {
-            const result = await dispatch(register({ username, email, password })).unwrap();
+            const result = await dispatch(register({ email, password, username })).unwrap();
             if (result) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Đăng ký thành công!',
-                    
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        navigate('/login');
-                    }
                 });
+                navigate('/login');
             }
         } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Lỗi!',
                 text: error || 'Đăng ký thất bại',
-                confirmButtonText: 'Thử lại'
             });
         }
     };
-      
-        return (
-            <div>
-                <div class="breadcrumb-area">
-                    <div className="container ">
-                        <div class="breadcrumb-content">
-                            <ul>
-                                <li><a href="index.html">Home</a></li>
-                                <li class="active"> Register</li>
-                            </ul>
+
+    return (
+        <div className="register-bg" style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="register-card" style={{
+                background: '#fff',
+                borderRadius: 18,
+                boxShadow: '0 4px 32px rgba(59,130,246,0.10)',
+                padding: '40px 32px',
+                maxWidth: 400,
+                width: '100%',
+                margin: '32px 0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
+                <h2 style={{ fontWeight: 700, color: '#3b82f6', marginBottom: 18, fontSize: 28 }}>Đăng ký</h2>
+                <form onSubmit={handleRegister} style={{ width: '100%' }}>
+                    <div className="mb-4" style={{ position: 'relative' }}>
+                        <label htmlFor="username" className="form-label" style={{ fontWeight: 500 }}>Họ và tên</label>
+                        <div style={{ position: 'relative' }}>
+                            <FaUser style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="username"
+                                placeholder="Nhập họ và tên"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                style={{
+                                    paddingLeft: 38,
+                                    height: 44,
+                                    borderRadius: 10,
+                                    fontSize: 16,
+                                    border: '1px solid #e5e7eb',
+                                    background: '#f9fafb'
+                                }}
+                            />
                         </div>
                     </div>
-
-
-                </div>
-                <div class="page-section mb-60">
-                    <div class="container">
-                        <div class="row">
-
-                            <div class="col-sm-12 col-md-12 col-lg-6 col-xs-12">
-                                <form onSubmit={handleRegister}>
-                                    <div class="login-form">
-                                        <h4 class="login-title">Register</h4>
-                                        <div class="row">
-                                            <div class="col-md-6 col-12 mb-20">
-                                                <label>Your Name</label>
-                                                <input class="mb-0" type="text" placeholder="Your Name" value={username} onChange={(e)=>setUsername(e.target.value)}/>
-                                            </div>
-
-                                            <div class="col-md-12 mb-20">
-                                                <label>Email Address*</label>
-                                                <input class="mb-0" type="email" placeholder="Email Address" value={email} onChange={(e)=>setEmail(e.target.value)}/>
-                                            </div>
-                                            <div class="col-md-6 mb-20">
-                                                <label>Password</label>
-                                                <input class="mb-0" type="password" placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)}/>
-                                            </div>
-                                            <div class="col-md-6 mb-20">
-                                                <label>Confirm Password</label>
-                                                <input className="mb-0" type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />                                            </div>
-                                            <div className="d-flex justify-content-between w-100">
-                                                <div className="d-flex justify-content-start">
-                                                    <button className="register-button mt-0">Register</button>
-                                                </div>
-                                                <div className="d-flex justify-content-end">
-                                                    <p>Already have an account? <Link to="/login">Log in here</Link></p>
-                                                </div>
-                                            </div>
-
-
-
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                    <div className="mb-4" style={{ position: 'relative' }}>
+                        <label htmlFor="email" className="form-label" style={{ fontWeight: 500 }}>Email</label>
+                        <div style={{ position: 'relative' }}>
+                            <FaEnvelope style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+                            <input
+                                type="email"
+                                className="form-control"
+                                id="email"
+                                placeholder="Nhập email của bạn"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                style={{
+                                    paddingLeft: 38,
+                                    height: 44,
+                                    borderRadius: 10,
+                                    fontSize: 16,
+                                    border: '1px solid #e5e7eb',
+                                    background: '#f9fafb'
+                                }}
+                            />
                         </div>
                     </div>
+                    <div className="mb-4" style={{ position: 'relative' }}>
+                        <label htmlFor="password" className="form-label" style={{ fontWeight: 500 }}>Mật khẩu</label>
+                        <div style={{ position: 'relative' }}>
+                            <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="password"
+                                placeholder="Nhập mật khẩu"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                style={{
+                                    paddingLeft: 38,
+                                    height: 44,
+                                    borderRadius: 10,
+                                    fontSize: 16,
+                                    border: '1px solid #e5e7eb',
+                                    background: '#f9fafb'
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className="mb-4" style={{ position: 'relative' }}>
+                        <label htmlFor="confirmPassword" className="form-label" style={{ fontWeight: 500 }}>Xác nhận mật khẩu</label>
+                        <div style={{ position: 'relative' }}>
+                            <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="confirmPassword"
+                                placeholder="Nhập lại mật khẩu"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                                style={{
+                                    paddingLeft: 38,
+                                    height: 44,
+                                    borderRadius: 10,
+                                    fontSize: 16,
+                                    border: '1px solid #e5e7eb',
+                                    background: '#f9fafb'
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100 fw-bold" style={{
+                        background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',
+                        border: 'none',
+                        borderRadius: 10,
+                        height: 44,
+                        fontSize: 17,
+                        marginBottom: 8
+                    }}>Đăng ký</button>
+                </form>
+                <div className="mt-3 text-center">
+                    <span style={{ color: '#6b7280', fontSize: 15 }}>Đã có tài khoản? </span>
+                    <Link to="/login" style={{ color: '#3b82f6', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Đăng nhập</Link>
                 </div>
-            </div>)
-    }
-    export default Register
+            </div>
+        </div>
+    );
+}
+
+export default Register;

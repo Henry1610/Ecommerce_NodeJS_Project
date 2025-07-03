@@ -1,77 +1,142 @@
-import ShippingZone from '../../models/shippingZone.js';
+import ShippingZone from '../../models/ShippingZone.js';
+import { calculateShippingFee, getAllAvailableCities } from '../../utils/calculateShippingFee.js';
 
-// Lấy tất cả shipping zones
+// Get all shipping zones
 export const getShippingZones = async (req, res) => {
   try {
-    const zones = await ShippingZone.find();
-    res.status(200).json(zones);
+    const shippingZones = await ShippingZone.find().sort({ city: 1 });
+    res.json(shippingZones);
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi khi lấy danh sách vùng vận chuyển', error: error.message });
+    res.status(500).json({ message: 'Failed to fetch shipping zones', error: error.message });
   }
 };
 
-// Lấy chi tiết một shipping zone theo ID
+// Get shipping zone by ID
 export const getShippingZoneById = async (req, res) => {
   try {
-    const zone = await ShippingZone.findById(req.params.id);
-    if (!zone) {
-      return res.status(404).json({ message: 'Không tìm thấy vùng vận chuyển' });
+    const shippingZone = await ShippingZone.findById(req.params.id);
+    if (!shippingZone) {
+      return res.status(404).json({ message: 'Shipping zone not found' });
     }
-    res.status(200).json(zone);
+    res.json(shippingZone);
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi server', error: error.message });
+    res.status(500).json({ message: 'Failed to fetch shipping zone', error: error.message });
   }
 };
 
-// Tạo một shipping zone mới
+// Create new shipping zone
 export const createShippingZone = async (req, res) => {
   try {
     const { city, fee } = req.body;
-
-    const existingZone = await ShippingZone.findOne({ city });
-    if (existingZone) {
-      return res.status(400).json({ message: 'Vùng vận chuyển đã tồn tại' });
+    
+    if (!city || fee === undefined) {
+      return res.status(400).json({ message: 'City and fee are required' });
     }
 
-    const newZone = new ShippingZone({ city, fee });
-    await newZone.save();
+    // Check if city already exists
+    const existingZone = await ShippingZone.findOne({ city });
+    if (existingZone) {
+      return res.status(400).json({ message: 'Shipping zone for this city already exists' });
+    }
 
-    res.status(201).json({ message: 'Tạo vùng vận chuyển thành công', zone: newZone });
+    const shippingZone = new ShippingZone({ city, fee });
+    const savedZone = await shippingZone.save();
+    
+    res.status(201).json(savedZone);
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi server', error: error.message });
+    res.status(500).json({ message: 'Failed to create shipping zone', error: error.message });
   }
 };
 
-// Cập nhật một shipping zone
+// Update shipping zone
 export const updateShippingZone = async (req, res) => {
   try {
     const { city, fee } = req.body;
-    const zone = await ShippingZone.findById(req.params.id);
-
-    if (!zone) {
-      return res.status(404).json({ message: 'Không tìm thấy vùng vận chuyển' });
+    
+    if (!city || fee === undefined) {
+      return res.status(400).json({ message: 'City and fee are required' });
     }
 
-    zone.city = city || zone.city;
-    zone.fee = fee !== undefined ? fee : zone.fee;
+    // Check if city already exists in another zone
+    const existingZone = await ShippingZone.findOne({ 
+      city, 
+      _id: { $ne: req.params.id } 
+    });
+    if (existingZone) {
+      return res.status(400).json({ message: 'Shipping zone for this city already exists' });
+    }
 
-    await zone.save();
-    res.status(200).json({ message: 'Cập nhật vùng vận chuyển thành công', zone });
+    const updatedZone = await ShippingZone.findByIdAndUpdate(
+      req.params.id,
+      { city, fee },
+      { new: true }
+    );
+
+    if (!updatedZone) {
+      return res.status(404).json({ message: 'Shipping zone not found' });
+    }
+
+    res.json(updatedZone);
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi server', error: error.message });
+    res.status(500).json({ message: 'Failed to update shipping zone', error: error.message });
   }
 };
 
-// Xoá một shipping zone
+// Delete shipping zone
 export const deleteShippingZone = async (req, res) => {
   try {
-    const zone = await ShippingZone.findByIdAndDelete(req.params.id);
-    if (!zone) {
-      return res.status(404).json({ message: 'Không tìm thấy vùng vận chuyển' });
+    const deletedZone = await ShippingZone.findByIdAndDelete(req.params.id);
+    
+    if (!deletedZone) {
+      return res.status(404).json({ message: 'Shipping zone not found' });
     }
 
-    res.status(200).json({ message: 'Xoá vùng vận chuyển thành công' });
+    res.json({ message: 'Shipping zone deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi server', error: error.message });
+    res.status(500).json({ message: 'Failed to delete shipping zone', error: error.message });
+  }
+};
+
+// Calculate shipping fee for a city (for admin use)
+export const calculateShippingFeeForCity = async (req, res) => {
+  try {
+    const { cityName } = req.params;
+    
+    if (!cityName) {
+      return res.status(400).json({ message: 'City name is required' });
+    }
+
+    const { fee, zone } = await calculateShippingFee(cityName);
+    
+    res.json({
+      cityName,
+      shippingFee: fee,
+      zone: {
+        _id: zone._id,
+        city: zone.city,
+        fee: zone.fee
+      }
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      message: error.message || 'Failed to calculate shipping fee', 
+      error: error.message 
+    });
+  }
+};
+
+// Get all available cities (for debugging)
+export const getAvailableCities = async (req, res) => {
+  try {
+    const cities = await getAllAvailableCities();
+    res.json({
+      cities,
+      count: cities.length
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Failed to get available cities', 
+      error: error.message 
+    });
   }
 };

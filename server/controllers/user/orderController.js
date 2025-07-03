@@ -5,14 +5,8 @@ export const getMyOrders = async (req, res) => {
     const userId = req.user.id;
 
     const orders = await Order.find({ user: userId })
-  .populate({
-    path: 'shippingAddress',
-    populate: {
-      path: 'city',  
-      model: 'ShippingZone'
-    }
-  })
-  .sort({ createdAt: -1 });
+      .populate('shippingAddress.cityId') // Only populate cityId reference if needed
+      .sort({ createdAt: -1 });
 
 
     res.status(200).json({
@@ -33,7 +27,7 @@ export const getOrderByOrderNumber = async (req, res) => {
 
     const order = await Order.findOne({ orderNumber, user: userId })
       .populate('appliedDiscount')
-      .populate('shippingAddress')
+      .populate('shippingAddress.cityId') // Only populate cityId reference if needed
       .populate('payment')
       .populate('items.product');
 
