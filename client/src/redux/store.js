@@ -28,7 +28,7 @@ import adminShippingZoneReducer from './admin/shippingZoneSlice';
 import adminProductReducer from './admin/productsSlice'
 import adminOrderReducer from './admin/orderSlice'
 import adminPaymentReducer from './admin/paymentSlice'
-
+import adminAdminReducer from './admin/adminSlice'
 const publicReducer = combineReducers({
   publicShippingZones: shippingZonesReducer,
   publicProduct: productsReducer,
@@ -54,8 +54,8 @@ const adminReducer = combineReducers({
   adminShippingZone: adminShippingZoneReducer,
   adminUser: adminUserReducer,
   adminOrder:adminOrderReducer,
-  adminPayment:adminPaymentReducer
-
+  adminPayment:adminPaymentReducer,
+  adminAdmin:adminAdminReducer
 });
 const store = configureStore({
   reducer: {

@@ -20,17 +20,17 @@ function Footer() {
             {[
               "Trung Tâm Trợ Giúp Shopee", "Shopee Blog", "Shopee Mall",
               "Hướng Dẫn Mua Hàng/Đặt Hàng", "Hướng Dẫn Bán Hàng", "Ví ShopeePay",
-              "Shopee Xu", "Đơn Hàng", "Trả Hàng/Hoàn Tiền", "Liên Hệ Shopee", "Chính Sách Bảo Hành"
+              "Shopee Xu", "Đơn Hàng", "Trả Hàng/Hoàn Tiền", "Liên Hệ PRO", "Chính Sách Bảo Hành"
             ].map((item, idx) => <li key={idx} className="mb-2">{item}</li>)}
           </ul>
         </div>
 
         <div className="col-12 col-md-2 text-start mb-4">
-          <h6 className="fw-bold">SHOPEE VIỆT NAM</h6>
+          <h6 className="fw-bold">PRO VIỆT NAM</h6>
           <ul className="list-unstyled">
             {[
               "Về Shopee", "Tuyển Dụng", "Điều Khoản Shopee", "Chính Sách Bảo Mật",
-              "Shopee Mall", "Kênh Người Bán", "Flash Sale", "Tiếp Thị Liên Kết", "Liên Hệ Truyền Thông"
+              "PRO Mall", "Kênh Người Bán", "Flash Sale", "Tiếp Thị Liên Kết", "Liên Hệ Truyền Thông"
             ].map((item, idx) => <li key={idx} className="mb-2">{item}</li>)}
           </ul>
         </div>
@@ -55,7 +55,7 @@ function Footer() {
         </div>
 
         <div className="col-12 col-md-2 text-start mb-4">
-          <h6 className="fw-bold">THEO DÕI SHOPEE</h6>
+          <h6 className="fw-bold">THEO DÕI PRO</h6>
           <ul className="list-unstyled">
             {[
               { name: "Facebook", icon: "2277b37437aa470fd1c71127c6ff8eb5" },
@@ -73,7 +73,7 @@ function Footer() {
         </div>
 
         <div className="col-12 col-md-2 text-start mb-4">
-          <h6 className="fw-bold">TẢI ỨNG DỤNG SHOPEE</h6>
+          <h6 className="fw-bold">TẢI ỨNG DỤNG PRO</h6>
           <div className="d-flex">
             <img src="https://down-vn.img.susercontent.com/file/a5e589e8e118e937dc660f224b9a1472" alt="" width="80" />
             <div className="ms-2">

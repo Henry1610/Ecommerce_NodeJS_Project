@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { fetchProducts, resetSuggestions } from '../../../../redux/public/productsSlice';
 import { getProductSuggestions } from '../../../../redux/public/productsSlice';
 import useDebounce from '../../../../hooks/useDebounce';
+import logo from '../../../../assets/logo/Logo.png'
 function Header() {
     const token = useSelector((state) => state.auth.token);
     const dispatch = useDispatch();
@@ -56,12 +57,12 @@ function Header() {
         navigate('/login');
     };
     useEffect(() => {
-        dispatch(fetchCart())
-
-            .unwrap()
-
-            .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
-    }, [dispatch]);
+        if (isAuthenticated && authUser?.role === 'user') {
+            dispatch(fetchCart())
+                .unwrap()
+                .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
+        }
+    }, [dispatch, isAuthenticated, authUser]);
 
     return (
         <>
@@ -101,7 +102,8 @@ function Header() {
             <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
                 <div className="d-flex align-items-center gap-4">
                     <Link to='/' className="text-primary fw-bold" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
-                        pro
+                    <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
+                    pro
                     </Link>
                     <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
                         <i className="fas fa-bars fs-4"></i>

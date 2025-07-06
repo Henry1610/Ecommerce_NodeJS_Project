@@ -26,7 +26,6 @@ const productSchema = new mongoose.Schema(
         images: {
             type: [ String ],
             validate: [arr => arr.length <= 10, 'Chỉ cho phép tối đa 3 ảnh'],
-            required: true,
 
         },
 

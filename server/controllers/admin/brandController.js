@@ -1,4 +1,3 @@
-
 import Brand from '../../models/Brand.js';
 import Product from '../../models/Product.js';
 import path from 'path';
@@ -6,6 +5,7 @@ import fs from 'fs';
 import { getPublicIdFromUrl } from '../../utils/getPublicIdFromUrl.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { deleteCloudinaryFolder } from '../../utils/deleteCloudinaryFolder.js';
+
 export const createBrand = async (req, res) => {
     try {
         const { name } = req.body;
@@ -53,7 +53,7 @@ export const getBrandById = async (req, res) => {
 export const updateBrand = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, removeLogo } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: 'Tên brand không được để trống' });
@@ -67,6 +67,15 @@ export const updateBrand = async (req, res) => {
     console.log('🔥 Brand cũ:', brand); // ✅ Kiểm tra dữ liệu brand cũ
 
     let logo = brand.logo;
+
+    // Xử lý xóa logo nếu có cờ removeLogo
+    if (removeLogo === 'true' && brand.logo) {
+      const publicId = getPublicIdFromUrl(brand.logo);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+      logo = null;
+    }
 
     if (req.file) {
       console.log('🆕 Có file logo mới:', req.file.path);

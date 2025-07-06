@@ -3,9 +3,11 @@ import './AddBrand.css';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { addBrand } from '../../../../redux/admin/brandSlice';
+import { useNavigate } from 'react-router-dom';
 
 const AddBrand = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -25,6 +27,8 @@ const AddBrand = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('form',formData);
+        
         if (!formData.name) {
             toast.error('Tên brand không được để trống!');
             return;
@@ -48,6 +52,7 @@ const AddBrand = () => {
             if (fileInputRef.current) {
                 fileInputRef.current.value = null;
             }
+            navigate('/admin/brand');
         } catch (error) {
             toast.error('Thêm brand thất bại: ' + error.message);
         }

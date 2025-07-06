@@ -10,8 +10,12 @@ function Login() {
     const navigate = useNavigate();
 
     const { token } = useSelector((state) => state.auth);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    // Lấy email và password đã nhớ (nếu có)
+    const rememberedEmail = localStorage.getItem('rememberedEmail') || '';
+    const rememberedPassword = localStorage.getItem('rememberedPassword') || '';
+    const [email, setEmail] = useState(rememberedEmail);
+    const [password, setPassword] = useState(rememberedPassword);
+    const [rememberMe, setRememberMe] = useState(!!rememberedPassword);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -19,6 +23,13 @@ function Login() {
             const result = await dispatch(login({ email, password })).unwrap();
             if (result) {
                 const user = JSON.parse(localStorage.getItem("user"));
+                // Nếu tick ghi nhớ thì lưu cả email và password, không thì chỉ lưu email
+                localStorage.setItem('rememberedEmail', email);
+                if (rememberMe) {
+                    localStorage.setItem('rememberedPassword', password);
+                } else {
+                    localStorage.removeItem('rememberedPassword');
+                }
                 Swal.fire({
                     icon: 'success',
                     title: 'Đăng nhập thành công!',
@@ -109,10 +120,10 @@ function Login() {
                     </div>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <div className="form-check">
-                            <input type="checkbox" className="form-check-input" id="remember_me" />
+                            <input type="checkbox" className="form-check-input" id="remember_me" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
                             <label className="form-check-label" htmlFor="remember_me">Ghi nhớ đăng nhập</label>
                         </div>
-                        <a href="#" style={{ color: '#3b82f6', fontWeight: 500, fontSize: 15 }}>Quên mật khẩu?</a>
+                        <Link to="/reset-password" style={{ color: '#3b82f6', fontWeight: 500, fontSize: 15 }}>Quên mật khẩu?</Link>
                     </div>
                     <button type="submit" className="btn btn-primary w-100 fw-bold" style={{
                         background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',

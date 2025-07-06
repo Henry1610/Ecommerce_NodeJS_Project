@@ -2,7 +2,7 @@ import Discount from '../../models/Discount.js';  // Import Discount model
 
 export const createDiscount = async (req, res) => {
     try {
-        const { code, description, discountPercent, validFrom, validTo, isActive } = req.body;
+        const { code, description, discountPercent, validFrom, validTo, isActive, quantity } = req.body;
 
         const existingDiscount = await Discount.findOne({ code });
         if (existingDiscount) {
@@ -16,6 +16,7 @@ export const createDiscount = async (req, res) => {
             validFrom,
             validTo,
             isActive,
+            quantity,
         });
 
         await newDiscount.save();

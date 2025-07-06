@@ -15,10 +15,10 @@ const Profile = () => {
         // Example: fetch('/api/users/me').then(...)
         // For now, just set dummy data
         setFormData({
-            username: 'williamc',
-            email: 'william@example.com',
+            username: '',
+            email: '',
             password: '',
-            avatar: 'assets/img/customer/customer5.jpg',
+            avatar: '',
         });
     }, []);
 

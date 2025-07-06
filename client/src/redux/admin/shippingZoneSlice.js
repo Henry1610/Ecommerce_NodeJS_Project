@@ -12,64 +12,35 @@ export const fetchShippingZones = createAsyncThunk(
         },
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi lấy danh sách vùng vận chuyển');
-      }
+      if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
     }
   }
 );
+
+// Fetch by ID
 export const fetchShippingZoneById = createAsyncThunk(
-    'shippingZones/fetchById',
-    async (id, thunkAPI) => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        const data = await res.json();
-  
-        if (!res.ok) {
-          return thunkAPI.rejectWithValue(data.message || 'Lỗi khi lấy vùng vận chuyển');
-        }
-        return data.zone;
-      } catch (error) {
-        return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
-      }
+  'shippingZones/fetchById',
+  async (id, thunkAPI) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) return thunkAPI.rejectWithValue(data.message);
+      return data; // 
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
     }
-  );
-  export const updateShippingZone = createAsyncThunk(
-    'shippingZones/update',
-    async ({ id, updatedData }, thunkAPI) => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify(updatedData),
-        });
-  
-        const data = await res.json();
-  
-        if (!res.ok) {
-          return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật vùng vận chuyển');
-        }
-  
-        return data.zone;
-      } catch (error) {
-        return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
-      }
-    }
-  );
-    
-// Create a shipping zone
+  }
+);
+
+// Create
 export const createShippingZone = createAsyncThunk(
   'shippingZones/create',
   async (zoneData, thunkAPI) => {
@@ -83,18 +54,39 @@ export const createShippingZone = createAsyncThunk(
         body: JSON.stringify(zoneData),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tạo vùng vận chuyển');
-      }
-      return data.zone;
+      if (!res.ok) return thunkAPI.rejectWithValue(data.message);
+      return data; //
     } catch (error) {
       return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
     }
   }
 );
 
-// Delete a shipping zone
+// Update
+export const updateShippingZone = createAsyncThunk(
+  'shippingZones/update',
+  async ({ id, city, fee }, thunkAPI) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/shipping-zones/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ city, fee }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật vùng vận chuyển');
+      }
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+    }
+  }
+);
+
+// Delete
 export const deleteShippingZone = createAsyncThunk(
   'shippingZones/delete',
   async (id, thunkAPI) => {
@@ -106,10 +98,7 @@ export const deleteShippingZone = createAsyncThunk(
         },
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xoá vùng vận chuyển');
-      }
+      if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return id;
     } catch (error) {
       return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
@@ -117,18 +106,19 @@ export const deleteShippingZone = createAsyncThunk(
   }
 );
 
-// Slice definition
+// SLICE
 const shippingZoneSlice = createSlice({
   name: 'shippingZones',
   initialState: {
     zones: [],
+    currentZone: null,
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch
+      // Fetch all
       .addCase(fetchShippingZones.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -141,6 +131,22 @@ const shippingZoneSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // Fetch by ID
+      .addCase(fetchShippingZoneById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.currentZone = null;
+      })
+      .addCase(fetchShippingZoneById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentZone = action.payload;
+      })
+      .addCase(fetchShippingZoneById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // Create
       .addCase(createShippingZone.pending, (state) => {
         state.loading = true;
@@ -148,12 +154,30 @@ const shippingZoneSlice = createSlice({
       })
       .addCase(createShippingZone.fulfilled, (state, action) => {
         state.loading = false;
-        state.zones.push(action.payload);
+        state.zones.push(action.payload); 
       })
       .addCase(createShippingZone.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
+      // Update
+      .addCase(updateShippingZone.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateShippingZone.fulfilled, (state, action) => {
+        state.loading = false;
+        state.zones = state.zones.map(zone =>
+          zone._id === action.payload._id ? action.payload : zone
+        );
+        state.currentZone = action.payload;
+      })
+      .addCase(updateShippingZone.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // Delete
       .addCase(deleteShippingZone.pending, (state) => {
         state.loading = true;
@@ -166,39 +190,7 @@ const shippingZoneSlice = createSlice({
       .addCase(deleteShippingZone.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      // Fetch by ID
-.addCase(fetchShippingZoneById.pending, (state) => {
-    state.loading = true;
-    state.error = null;
-    state.currentZone = null;
-  })
-  .addCase(fetchShippingZoneById.fulfilled, (state, action) => {
-    state.loading = false;
-    state.currentZone = action.payload;
-  })
-  .addCase(fetchShippingZoneById.rejected, (state, action) => {
-    state.loading = false;
-    state.error = action.payload;
-  })
-  
-  // Update
-  .addCase(updateShippingZone.pending, (state) => {
-    state.loading = true;
-    state.error = null;
-  })
-  .addCase(updateShippingZone.fulfilled, (state, action) => {
-    state.loading = false;
-    state.zones = state.zones.map(zone =>
-      zone._id === action.payload._id ? action.payload : zone
-    );
-    state.currentZone = action.payload;
-  })
-  .addCase(updateShippingZone.rejected, (state, action) => {
-    state.loading = false;
-    state.error = action.payload;
-  })
-  
+      });
   },
 });
 

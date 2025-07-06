@@ -172,268 +172,99 @@ const AddProduct = () => {
 
     return (
         <div className="container-fluid py-4">
-            <div className="row">
-                <div className="col-12">
+            <div className="row justify-content-center">
+                <div className="col-12 col-lg-10 col-xl-9">
                     <div className="mb-4">
-                        <h4 className="fw-bold">Product Add</h4>
-                        <h6 className="text-muted">Create new product</h6>
+                        <h4 className="fw-bold mb-1" style={{ fontSize: 24 }}>Thêm sản phẩm mới</h4>
+                        <h6 className="text-muted mb-0">Tạo sản phẩm cho cửa hàng</h6>
                     </div>
-
-                    <div className="card shadow-sm">
-                        <div className="card-body">
-                            <div className="row g-3">
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Product Name</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                        />
+                    <div className="card shadow-sm border-0">
+                        <div className="card-body p-4">
+                            <form onSubmit={handleSubmit}>
+                                <div className="row g-2">
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Tên sản phẩm</label>
+                                        <input type="text" className="form-control form-control-sm rounded-3" name="name" value={formData.name} onChange={handleInputChange} />
                                     </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Category</label>
-                                        <select
-                                            className="form-select"
-                                            name="category"
-                                            value={formData.category}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>-- Select Category --</option>
-                                            {
-                                                categories.map(category => {
-                                                    return (<option key={category._id} value={category._id}>{category.name}</option>)
-                                                })
-                                            }
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Danh mục</label>
+                                        <select className="form-select form-select-sm rounded-3" name="category" value={formData.category} onChange={handleInputChange}>
+                                            <option value="">-- Chọn danh mục --</option>
+                                            {categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}
                                         </select>
                                     </div>
-                                </div>
-
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Brand</label>
-                                        <select
-                                            className="form-select"
-                                            name="brand"
-                                            value={formData.brand}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option>-- Select Brand --</option>
-                                            {
-                                                brands.map(brand => {
-                                                    return (<option key={brand._id} value={brand._id}>{brand.name}</option>)
-                                                })
-                                            }
-
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Thương hiệu</label>
+                                        <select className="form-select form-select-sm rounded-3" name="brand" value={formData.brand} onChange={handleInputChange}>
+                                            <option value="">-- Chọn thương hiệu --</option>
+                                            {brands.map(brand => <option key={brand._id} value={brand._id}>{brand.name}</option>)}
                                         </select>
                                     </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Color</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="color"
-                                            value={formData.color}
-                                            onChange={handleInputChange}
-                                        />
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Màu sắc</label>
+                                        <input type="text" className="form-control form-control-sm rounded-3" name="color" value={formData.color} onChange={handleInputChange} />
                                     </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Stock</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            name="stock"
-                                            value={formData.stock}
-                                            onChange={handleInputChange}
-                                        />
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Tồn kho</label>
+                                        <input type="number" className="form-control form-control-sm rounded-3" name="stock" value={formData.stock} onChange={handleInputChange} />
                                     </div>
-                                </div>
-
-                                <div className="col-lg-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Description</label>
-                                        <textarea
-                                            className="form-control"
-                                            name="description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
-                                        ></textarea>
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Giá bán (VNĐ)</label>
+                                        <input type="number" className="form-control form-control-sm rounded-3" name="price" value={formData.price} onChange={handleInputChange} />
                                     </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">discountPercent</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            name="discountPercent"
-                                            value={formData.discountPercent}
-                                            onChange={handleInputChange}
-                                        />
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Giảm giá (%)</label>
+                                        <input type="number" className="form-control form-control-sm rounded-3" name="discountPercent" value={formData.discountPercent} onChange={handleInputChange} />
                                     </div>
-                                </div>
-
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Price</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            name="price"
-                                            value={formData.price}
-                                            onChange={handleInputChange}
-                                        />
+                                    <div className="col-md-6 col-lg-4">
+                                        <label className="form-label mb-1 small">Trạng thái</label>
+                                        <select className="form-select form-select-sm rounded-3" name="statusCurrent" value={formData.statusCurrent} onChange={handleInputChange}>
+                                            <option value="">-- Chọn trạng thái --</option>
+                                            {status.map((sts, idx) => <option key={idx} value={sts}>{sts.charAt(0).toUpperCase() + sts.slice(1)}</option>)}
+                                        </select>
                                     </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Status</label>
-                                        <select
-                                            className="form-select"
-                                            name="statusCurrent"
-                                            value={formData.statusCurrent}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option value="">-- Select Status --</option>
-                                            {status.map((sts, index) => (
-                                                <option key={index} value={sts}>
-                                                    {sts.charAt(0).toUpperCase() + sts.slice(1)}
-                                                </option>
+                                    <div className="col-12">
+                                        <label className="form-label mb-1 small">Mô tả sản phẩm</label>
+                                        <textarea className="form-control form-control-sm rounded-3" name="description" rows={2} value={formData.description} onChange={handleInputChange} />
+                                    </div>
+                                    <div className="col-12">
+                                        <label className="form-label mb-1 small">Ảnh sản phẩm</label>
+                                        <div className="image-upload border rounded-3 p-2 bg-light d-flex align-items-center gap-3 flex-wrap">
+                                            <input multiple type="file" accept="image/*" onChange={handleFileChange} style={{ width: 120 }} />
+                                            {previewImages.length > 0 && (
+                                                <div className="d-flex flex-wrap gap-2">
+                                                    {previewImages.map((src, index) => (
+                                                        <div key={index} className="position-relative" style={{ width: 72, height: 72 }}>
+                                                            <img src={src} alt={`Preview ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }} />
+                                                            <button type="button" className="btn btn-sm btn-danger position-absolute top-0 end-0" style={{ transform: 'translate(50%, -50%)', borderRadius: '50%', padding: '2px 6px', fontSize: '12px', lineHeight: '1' }} onClick={() => handleRemoveImage(index)}>
+                                                                <span className='fw-bold'>×</span>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <label className="form-label mb-1 small">Thuộc tính sản phẩm</label>
+                                        <div className="bg-light p-2 rounded-3">
+                                            {attributesList.map(([key, value], index) => (
+                                                <div key={index} className="d-flex align-items-center gap-2 mb-2">
+                                                    <input type="text" className="form-control form-control-sm w-25 rounded-3" value={key} onChange={e => handleAttributeChange(index, 'key', e.target.value)} placeholder="Tên thuộc tính" />
+                                                    <span>:</span>
+                                                    <input type="text" className="form-control form-control-sm w-50 rounded-3" value={value} onChange={e => handleAttributeChange(index, 'value', e.target.value)} placeholder="Giá trị" />
+                                                    <button type="button" onClick={() => handleRemoveAttribute(index)} className="btn btn-sm btn-outline-danger px-2 py-0 ms-1" style={{ fontSize: 16, lineHeight: 1 }} title="Xoá"><i className="fas fa-times"></i></button>
+                                                </div>
                                             ))}
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div className="col-lg-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Product Image</label>
-                                        <div className="image-upload">
-                                            <input
-                                                multiple
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
-                                            <div className="image-uploads">
-                                                <img src="assets/img/icons/upload.svg" alt="upload" />
-                                                <h4>Drag and drop a file to upload</h4>
-                                            </div>
+                                            <button type="button" className="btn btn-sm btn-outline-primary mt-1" onClick={handleAddAttribute}><i className="fas fa-plus me-1"></i>Thêm thuộc tính</button>
                                         </div>
                                     </div>
-                                </div>
-                                {previewImages.length > 0 && (
-                                    <div className="preview-images d-flex flex-wrap gap-2 mt-2">
-                                        {previewImages.map((src, index) => (
-                                            <div
-                                                key={index}
-                                                className="position-relative"
-                                                style={{ width: '100px', height: '100px' }}
-                                            >
-                                                <img
-                                                    src={src}
-                                                    alt={`Preview ${index}`}
-                                                    style={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        objectFit: 'cover',
-                                                        borderRadius: '8px',
-                                                    }}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                    style={{
-                                                        transform: 'translate(50%, -50%)',
-                                                        borderRadius: '50%',
-                                                        padding: '4 6px',
-                                                        fontSize: '12px',
-                                                        lineHeight: '1',
-                                                    }}
-                                                    onClick={() => handleRemoveImage(index)}
-                                                >
-                                                    <div className='fw-bold'>
-                                                        X
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                )}
-
-                                <div className="col-lg-12">
-                                    <div className="form-group">
-                                        <label className="form-label">Thông tin sản phẩm</label>
-                                        <div className="bg-light p-3 rounded">
-                                            <ul className="list-unstyled text-secondary mb-0 small">
-                                                {attributesList.map(([key, value], index) => (
-                                                    <li key={index} className="d-flex align-items-center gap-2 mb-2">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm w-25"
-                                                            value={key}
-                                                            onChange={(e) => handleAttributeChange(index, "key", e.target.value)}
-                                                            placeholder="Tên thuộc tính"
-                                                        />
-                                                        <span>:</span>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm w-50"
-                                                            value={value}
-                                                            onChange={(e) => handleAttributeChange(index, "value", e.target.value)}
-                                                            placeholder="Giá trị"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveAttribute(index)}
-                                                            className="btn p-0 border-0 bg-transparent text-dark"
-                                                            style={{
-                                                                fontSize: '1.2rem',
-                                                                lineHeight: 1,
-                                                                cursor: 'pointer',
-                                                                width: '24px',
-                                                                height: '24px',
-                                                            }}
-                                                            aria-label="Xoá thuộc tính"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm mt-2 border-0 border-top d-flex align-items-center gap-1 bg-transparent"
-                                                onClick={handleAddAttribute}
-                                            >
-                                                <span style={{ fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>+</span>
-                                                Thêm thuộc tính
-                                            </button>
-                                        </div>
+                                    <div className="col-12 d-flex justify-content-end gap-2 mt-3">
+                                        <button type="submit" className="btn btn-primary px-4">Thêm sản phẩm</button>
+                                        <Link to="/admin/product" className="btn btn-secondary px-4">Huỷ</Link>
                                     </div>
                                 </div>
-
-                                <div className="col-lg-12 d-flex gap-2">
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={handleSubmit}
-                                    >
-                                        Submit
-                                    </button>
-                                    <Link to="/admin/product" className="btn btn-warning">
-                                        Cancel
-                                    </Link>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>

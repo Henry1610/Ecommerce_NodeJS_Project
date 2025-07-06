@@ -3,7 +3,16 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <div className="mt-3" id="sidebar-wrapper">
+    <div className="mt-3" id="sidebar-wrapper" style={{
+      background: '#f8fafc',
+      borderRadius: 18,
+      boxShadow: '0 4px 24px rgba(59,130,246,0.08)',
+      padding: '18px 0',
+      minHeight: '92vh',
+      maxWidth: 270,
+      marginLeft: 12,
+      marginRight: 12
+    }}>
       <div className="accordion" id="sidebarAccordion">
         
         {/* PRODUCT */}
@@ -233,15 +242,63 @@ const Sidebar = () => {
                 <Link to="/admin/shipping-zones" className="list-group-item list-group-item-action ps-5 py-3">
                 <i className="fa-solid fa-user me-2"></i>  Zone List
                 </Link>
-                <Link to="/admin/shipping-zones/create" className="list-group-item list-group-item-action ps-5 py-3">
-                <i className="fa-solid fa-circle-plus me-2"></i> Create Zone
-                </Link>
+              
               </div>
             </div>
           </div>
         </div>
 
       </div>
+      <style>{`
+        #sidebar-wrapper .accordion-item {
+          border: none;
+          background: transparent;
+          margin-bottom: 8px;
+        }
+        #sidebar-wrapper .accordion-button {
+          border-radius: 12px !important;
+          font-weight: 600;
+          font-size: 17px;
+          color: #2563eb;
+          background: #f3f6fa !important;
+          box-shadow: none;
+          transition: background 0.18s, color 0.18s;
+          padding: 14px 22px;
+        }
+        #sidebar-wrapper .accordion-button:hover, #sidebar-wrapper .accordion-button:not(.collapsed) {
+          background: #e0e7ef !important;
+          color: #1d4ed8;
+        }
+        #sidebar-wrapper .list-group-item {
+          border: none;
+          background: transparent;
+          font-size: 15px;
+          color: #222;
+          font-weight: 500;
+          border-radius: 8px;
+          margin: 2px 0;
+          padding: 10px 28px !important;
+          transition: background 0.15s, color 0.15s;
+          display: flex;
+          align-items: center;
+        }
+        #sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active {
+          background: #e0e7ef;
+          color: #2563eb;
+        }
+        #sidebar-wrapper i {
+          font-size: 19px;
+          margin-right: 10px;
+          min-width: 22px;
+          text-align: center;
+        }
+        @media (max-width: 900px) {
+          #sidebar-wrapper {
+            max-width: 100vw;
+            padding: 8px 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };

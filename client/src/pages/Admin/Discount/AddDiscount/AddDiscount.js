@@ -15,6 +15,7 @@ const AddDiscount = () => {
         validFrom: '',
         validTo: '',
         isActive: true,
+        quantity: 1,
     });
 
     const handleChange = (e) => {
@@ -95,6 +96,18 @@ const AddDiscount = () => {
                                 name="validTo"
                                 value={formData.validTo}
                                 onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Số lượng</label>
+                            <input
+                                type="number"
+                                className="form-control"
+                                name="quantity"
+                                value={formData.quantity}
+                                onChange={handleChange}
+                                min={1}
                                 required
                             />
                         </div>

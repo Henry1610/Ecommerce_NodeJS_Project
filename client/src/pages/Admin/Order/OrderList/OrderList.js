@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './OrderList.css';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../../../redux/admin/orderSlice';
@@ -8,6 +8,8 @@ import { FaEye, FaBox, FaUser, FaMoneyBillWave, FaClock, FaCog } from 'react-ico
 
 const OrderList = () => {
   const dispatch = useDispatch()
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
@@ -33,6 +35,11 @@ const OrderList = () => {
         return { background: '#f9fafb', color: '#374151' }; // Trạng thái không xác định
     }
   };
+
+  const filteredOrders = orders.filter(order =>
+    (order.orderNumber + '').toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+    (order.shippingAddress?.fullName || '').toLowerCase().includes(searchTerm.trim().toLowerCase())
+  );
 
   return (
     <div style={{
@@ -62,6 +69,22 @@ const OrderList = () => {
           <FaBox size={28} />
           Danh sách đơn hàng
         </h2>
+        <div className="row mb-3">
+          <div className="col-lg-4 col-md-6 col-12">
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm kiếm theo mã đơn hoặc tên khách..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-searchset btn-primary" type="button">
+                <i className="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div style={{ overflowX: "auto" }}>
           <table style={{ 
@@ -108,7 +131,7 @@ const OrderList = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id} style={{
                   borderBottom: "1px solid #eee",
                   transition: "background 0.2s",

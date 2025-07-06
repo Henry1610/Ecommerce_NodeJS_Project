@@ -17,6 +17,7 @@ import { FaBoxOpen, FaTags, FaThLarge, FaUserFriends, FaExclamationTriangle } fr
 import { fetchUsers } from "../../../redux/admin/userSlice";
 import { fetchBrands } from "../../../redux/admin/brandSlice";
 import { fetchCategories } from "../../../redux/admin/categoriesSlice";
+import LoadingCard from "../../../components/LoadingCard";
 
 Chart.register(LineElement, PointElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -34,11 +35,10 @@ const Dashboard = () => {
   }, [dispatch]);
 
   const { orders } = useSelector((state) => state.admin.adminOrder);
-  const { products } = useSelector((state) => state.admin.adminProduct);
+  const { products, loading } = useSelector((state) => state.admin.adminProduct);
   const { brands } = useSelector((state) => state.admin.adminBrand);
   const { categories } = useSelector((state) => state.admin.adminCategory);
   const { users } = useSelector((state) => state.admin.adminUser);
-  console.log(products, orders, categories, brands)
   const revenueByDate = {};
   (orders || []).forEach(order => {
     if (!order.createdAt) return;
@@ -93,13 +93,10 @@ const Dashboard = () => {
     }
   });
 
-  const productsThisMonth = (products || []).map(p => ({
-    ...p,
-    soldThisMonth: soldByProductThisMonth[p._id] || 0,
-  }));
+
 
   // Top 5 sản phẩm bán chạy toàn thời gian
-  const topProductsAll = [...(products || [])]
+  const topProductsAll = [...(Array.isArray(products) ? products : [])]
     .sort((a, b) => (b.sold || 0) - (a.sold || 0))
     .slice(0, 5);
 
@@ -117,40 +114,12 @@ const Dashboard = () => {
   };
 
   const pieDataAll = createPieData(topProductsAll, "sold");
-  const pieChartStyle = {
-    width: 220,
-    height: 220,
-    margin: "0 auto",
-  };
-
-  const renderProductStats = (products, total, key, colors) => (
-    <div>
-      {products.map((p, idx) => (
-        <div key={p._id || idx} style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-          <span
-            style={{
-              display: "inline-block",
-              width: 12,
-              height: 12,
-              borderRadius: "50%",
-              background: colors[idx],
-              marginRight: 8,
-            }}
-          />
-          <span style={{ flex: 1 }}>{p.name}</span>
-          <span style={{ width: 50, textAlign: "right" }}>{p[key] || 0}</span>
-          <span style={{ width: 50, textAlign: "right", color: "#888" }}>
-            {total ? ((p[key] || 0) * 100 / total).toFixed(1) : 0}%
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+  
 
   const totalSoldAll = topProductsAll.reduce((sum, p) => sum + (p.sold || 0), 0);
 
   // Thống kê 5 sản phẩm còn số lượng ít nhất
-  const minStockProducts = [...(products || [])]
+  const minStockProducts = [...(Array.isArray(products) ? products : [])]
     .filter(p => typeof p.stock === 'number')
     .sort((a, b) => a.stock - b.stock)
     .slice(0, 5);
@@ -166,7 +135,7 @@ const Dashboard = () => {
     if (!order.items) return;
     order.items.forEach(item => {
       const productId = typeof item.product === 'object' ? item.product._id : item.product;
-      const product = (products || []).find(p => p._id === productId);
+      const product = (Array.isArray(products) ? products : []).find(p => p._id === productId);
       if (product && product.category) {
         const catId = typeof product.category === 'object' ? product.category._id : product.category;
         soldByCategory[catId] = (soldByCategory[catId] || 0) + (item.quantity || 0);
@@ -198,7 +167,7 @@ const Dashboard = () => {
     if (!order.items) return;
     order.items.forEach(item => {
       const productId = typeof item.product === 'object' ? item.product._id : item.product;
-      const product = (products || []).find(p => p._id === productId);
+      const product = (Array.isArray(products) ? products : []).find(p => p._id === productId);
       if (product && product.brand) {
         const brandId = typeof product.brand === 'object' ? product.brand._id : product.brand;
         soldByBrand[brandId] = (soldByBrand[brandId] || 0) + (item.quantity || 0);
@@ -225,6 +194,10 @@ const Dashboard = () => {
   const totalSoldBrand = topBrands.reduce((sum, b) => sum + b.sold, 0);
 
   const [pieTab, setPieTab] = useState("product");
+
+  if (loading) {
+    return <LoadingCard />;
+  }
 
   return (
     <div style={{

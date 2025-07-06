@@ -14,6 +14,7 @@ const CategoryList = () => {
 
     const [selectAll, setSelectAll] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         dispatch(fetchCategories());
@@ -53,6 +54,11 @@ const CategoryList = () => {
         }
       };
       
+    // Lọc categories theo searchTerm
+    const filteredCategories = categories.filter(category =>
+      category.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+    );
+
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -66,6 +72,22 @@ const CategoryList = () => {
                             <i className="fas fa-plus me-2"></i>Add Category
                         </Link>
                     </div>
+                    <div className="row mb-3">
+                        <div className="col-lg-4 col-md-6 col-12">
+                            <div className="input-group">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Tìm kiếm danh mục..."
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
+                                <button className="btn btn-searchset btn-primary" type="button">
+                                    <i className="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <div className="card shadow-sm">
                         <div className="card-body">
@@ -74,48 +96,45 @@ const CategoryList = () => {
 
                             {!loading && !error && (
                                 <div className="table-responsive">
-                                    <table className="table table-striped table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <label className="checkboxs">
-                                                        <input
-                                                            type="checkbox"
-                                                            id="select-all"
-                                                            checked={selectAll}
-                                                            onChange={handleSelectAll}
-                                                        />
-                                                        <span className="checkmarks"></span>
-                                                    </label>
+                                    <table className="table align-middle table-hover shadow-sm" style={{ background: '#fff', borderRadius: 16, overflow: 'hidden' }}>
+                                        <thead style={{ background: '#f3f6fa', borderBottom: '2px solid #e0e7ef' }}>
+                                            <tr style={{ fontSize: 17, fontWeight: 700, color: '#2563eb' }}>
+                                                <th style={{ width: 40, border: 'none' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="select-all"
+                                                        checked={selectAll}
+                                                        onChange={handleSelectAll}
+                                                        style={{ cursor: 'pointer' }}
+                                                    />
                                                 </th>
-                                                <th>Category Name</th>
-                                                <th>Description</th>
-                                                <th>Action</th>
-
+                                                <th style={{ border: 'none' }}>Tên danh mục</th>
+                                                <th style={{ border: 'none' }}>Mô tả</th>
+                                                <th style={{ width: 120, border: 'none' }}>Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {categories.map(category => (
-                                                <tr key={category.id}>
-                                                    <td>
-                                                        <label className="checkboxs">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={selectedCategories.includes(category.id)}
-                                                                onChange={() => handleSelectCategory(category.id)}
-                                                            />
-                                                            <span className="checkmarks"></span>
-                                                        </label>
+                                            {filteredCategories.map(category => (
+                                                <tr key={category._id} className="align-middle" style={{ transition: 'box-shadow 0.2s, background 0.2s', border: 'none', borderRadius: 12, boxShadow: '0 1px 8px rgba(59,130,246,0.06)', marginBottom: 8, background: '#fff' }}>
+                                                    <td style={{ border: 'none' }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedCategories.includes(category._id)}
+                                                            onChange={() => handleSelectCategory(category._id)}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
                                                     </td>
-                                                    <td>{category.name}</td>
-                                                    <td>{category.description}</td>
-                                                    <td className="action-icons">
-                                                        <Link to={`edit/${category._id}`} className="me-2" title="Edit">
-                                                            <i className="fas fa-edit"></i>
-                                                        </Link>
-                                                        <button href="#" className="confirm-text" title="Delete" onClick={(e) => handleDelete(e, category._id)}>
-                                                            <i className="fas fa-trash"></i>
-                                                        </button>
+                                                    <td style={{ fontWeight: 600, fontSize: 16, border: 'none' }}>{category.name}</td>
+                                                    <td style={{ color: '#555', fontSize: 15, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: 'none' }}>{category.description || 'Không có mô tả'}</td>
+                                                    <td style={{ border: 'none' }}>
+                                                        <div className="d-flex gap-2 justify-content-center">
+                                                            <Link to={`edit/${category._id}`} className="btn btn-sm" style={{ background: '#f3f6fa', color: '#2563eb', borderRadius: 8, border: 'none', boxShadow: '0 1px 4px rgba(59,130,246,0.06)' }} title="Sửa">
+                                                                <i className="fas fa-edit"></i>
+                                                            </Link>
+                                                            <button className="btn btn-sm" style={{ background: '#fef2f2', color: '#dc2626', borderRadius: 8, border: 'none', boxShadow: '0 1px 4px rgba(245,62,94,0.06)' }} title="Xoá" onClick={(e) => handleDelete(e, category._id)}>
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

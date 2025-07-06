@@ -31,7 +31,7 @@ function App() {
               key={index}
               path={route.path}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute role="user">
                   <UserLayout><Page /></UserLayout>
                 </ProtectedRoute>
               }

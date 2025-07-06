@@ -218,8 +218,11 @@ const Header = () => {
                 <div><h6 className="mb-0">{admin.name}</h6><small className="text-muted">Admin</small></div>
               </li>
               <li><hr className="dropdown-divider" /></li>
-              <li><Link className="dropdown-item" to="/admin/profile"><FaUser className="me-2" /> My Profile</Link></li>
-              <li><Link className="dropdown-item" to="/admin/settings"><FaCog className="me-2" /> Settings</Link></li>
+              <li>
+  <Link className="dropdown-item" to="/admin/profile">
+    <FaUser className="me-2" /> My Profile
+  </Link>
+</li>              <li><Link className="dropdown-item" to="/admin/settings"><FaCog className="me-2" /> Settings</Link></li>
               <li><hr className="dropdown-divider" /></li>
               <li><button className="dropdown-item" onClick={handleLogout} style={{ color: '#fff', background: '#f43f5e', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '10px 18px', border: 'none', margin: 8, boxShadow: '0 2px 8px rgba(244,63,94,0.08)', transition: 'background 0.15s' }} onMouseOver={e => e.target.style.background = '#dc2626'} onMouseOut={e => e.target.style.background = '#f43f5e'}><FaSignOutAlt /> Đăng xuất</button></li>
             </ul>

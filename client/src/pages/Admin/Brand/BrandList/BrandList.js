@@ -23,6 +23,7 @@ const BrandList = () => {
 
     const [selectAll, setSelectAll] = useState(false);
     const [selectedBrands, setSelectedBrands] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
    
     const handleRemove = (e, brandId) => {
@@ -60,6 +61,11 @@ const BrandList = () => {
             prev.includes(id) ? prev.filter(bid => bid !== id) : [...prev, id]
         );
     };
+
+    // Lọc brands theo searchTerm
+    const filteredBrands = brands.filter(brand =>
+      brand.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+    );
 
     if (loading) {
         return (
@@ -143,7 +149,13 @@ const BrandList = () => {
                                         <i className="fas fa-filter"></i>
                                     </button>
                                     <div className="input-group" style={{ maxWidth: '300px' }}>
-                                        <input type="text" className="form-control" placeholder="Search..." />
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Tìm kiếm thương hiệu..."
+                                            value={searchTerm}
+                                            onChange={e => setSearchTerm(e.target.value)}
+                                        />
                                         <button className="btn btn-searchset btn-primary" type="button">
                                             <i className="fas fa-search"></i>
                                         </button>
@@ -197,58 +209,59 @@ const BrandList = () => {
                             </div>
 
                             <div className="table-responsive">
-                                <table className="table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <label className="checkboxs">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="select-all"
-                                                        checked={selectAll}
-                                                        onChange={handleSelectAll}
-                                                    />
-                                                    <span className="checkmarks"></span>
-                                                </label>
+                                <table className="table align-middle table-hover shadow-sm" style={{ background: '#fff', borderRadius: 16, overflow: 'hidden' }}>
+                                    <thead style={{ background: '#f3f6fa', borderBottom: '2px solid #e0e7ef' }}>
+                                        <tr style={{ fontSize: 17, fontWeight: 700, color: '#2563eb' }}>
+                                            <th style={{ width: 40, border: 'none' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    id="select-all"
+                                                    checked={selectAll}
+                                                    onChange={handleSelectAll}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
                                             </th>
-                                            <th>Image</th>
-                                            <th>Brand Name</th>
-                                            <th>Brand Description</th>
-                                            <th>Action</th>
+                                            <th style={{ width: 90, border: 'none' }}>Logo</th>
+                                            <th style={{ border: 'none' }}>Tên thương hiệu</th>
+                                            <th style={{ border: 'none' }}>Mô tả</th>
+                                            <th style={{ width: 120, border: 'none' }}>Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {brands.map(brand => (
-                                            <tr key={brand._id}>
-                                                <td>
-                                                    <label className="checkboxs">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedBrands.includes(brand._id)}
-                                                            onChange={() => handleSelectBrand(brand._id)}
-                                                        />
-                                                        <span className="checkmarks"></span>
-                                                    </label>
+                                        {filteredBrands.map(brand => (
+                                            <tr key={brand._id} className="align-middle" style={{ transition: 'box-shadow 0.2s, background 0.2s', border: 'none', borderRadius: 12, boxShadow: '0 1px 8px rgba(59,130,246,0.06)', marginBottom: 8, background: '#fff' }}>
+                                                <td style={{ border: 'none' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedBrands.includes(brand._id)}
+                                                        onChange={() => handleSelectBrand(brand._id)}
+                                                        style={{ cursor: 'pointer' }}
+                                                    />
                                                 </td>
-                                                <td>
-                                                    <div className="product-img">
-                                                        <img
-                                                            src={`http://localhost:5000/uploads/brands/${brand.logo}`}
-                                                            alt={brand.name}
-                                                            className="img-fluid"
-                                                            style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
-                                                        />
+                                                <td style={{ border: 'none' }}>
+                                                    <div style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
+                                                        {brand.logo ? (
+                                                            <img
+                                                                src={brand.logo.startsWith('http') ? brand.logo : `http://localhost:5000/${brand.logo}`}
+                                                                alt={brand.name}
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                            />
+                                                        ) : (
+                                                            <i className="fas fa-image text-muted" style={{ fontSize: 28 }} title="No logo" />
+                                                        )}
                                                     </div>
                                                 </td>
-                                                <td>{brand.name}</td>
-                                                <td>{brand.description || 'Không có mô tả'}</td>
-                                                <td className="action-icons">
-                                                    <Link to={`/admin/brand/edit/${brand._id}`} className="me-2" title="Edit">
-                                                        <i className="fas fa-edit"></i>
-                                                    </Link>
-                                                    <button href="#" className="confirm-text" title="Delete" onClick={(e) => handleRemove(e, brand._id)}>
-                                                        <i className="fas fa-trash"></i>
-                                                    </button>
+                                                <td style={{ fontWeight: 600, fontSize: 16, border: 'none' }}>{brand.name}</td>
+                                                <td style={{ color: '#555', fontSize: 15, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: 'none' }}>{brand.description || 'Không có mô tả'}</td>
+                                                <td style={{ border: 'none' }}>
+                                                    <div className="d-flex gap-2 justify-content-center">
+                                                        <Link to={`/admin/brand/edit/${brand._id}`} className="btn btn-sm" style={{ background: '#f3f6fa', color: '#2563eb', borderRadius: 8, border: 'none', boxShadow: '0 1px 4px rgba(59,130,246,0.06)' }} title="Sửa">
+                                                            <i className="fas fa-edit"></i>
+                                                        </Link>
+                                                        <button className="btn btn-sm" style={{ background: '#fef2f2', color: '#dc2626', borderRadius: 8, border: 'none', boxShadow: '0 1px 4px rgba(245,62,94,0.06)' }} title="Xoá" onClick={(e) => handleRemove(e, brand._id)}>
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}

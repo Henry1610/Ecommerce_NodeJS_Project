@@ -18,9 +18,10 @@ export const register = createAsyncThunk(
 
             }
             localStorage.setItem('token', data.token);
-            localStorage.setItem('user',  JSON.stringify(data.user));
+            const { _id: regId, ...regUserWithRole } = data.user || {};
+            localStorage.setItem('user',  JSON.stringify(regUserWithRole));
 
-            return {token:data.token,user:data.user};
+            return {token:data.token,user:regUserWithRole};
         }
         catch (error) {
             return thunkAPI.rejectWithValue('Lỗi kết nối server'); 
@@ -45,9 +46,10 @@ export const login = createAsyncThunk(
                 return thunkAPI.rejectWithValue(data.message || 'Đăng nhập thất bại');
             }
             localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            const { _id, ...userWithRole } = data.user || {};
+            localStorage.setItem('user', JSON.stringify(userWithRole));
 
-            return {token:data.token,user:data.user};
+            return {token:data.token,user:userWithRole};
 
 
         } catch (error) {
@@ -56,14 +58,54 @@ export const login = createAsyncThunk(
 
     })
 
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ email }, thunkAPI) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Gửi email thất bại');
+      }
+      return data.message;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
+    }
+  }
+);
+
+export const resetPasswordConfirm = createAsyncThunk(
+  'auth/resetPasswordConfirm',
+  async ({ token, newPassword }, thunkAPI) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Đặt lại mật khẩu thất bại');
+      }
+      return data.message;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
+    }
+  }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
         token: localStorage.getItem('token') || null,
         loading: false,
-        error: null
-
+        error: null,
+        resetSuccess: false,
     },
     reducers: {
         logout: (state) => {
@@ -72,7 +114,11 @@ const authSlice = createSlice({
             localStorage.removeItem('token')
             localStorage.removeItem('user')
 
-        }
+        },
+        clearResetState: (state) => {
+            state.resetSuccess = false;
+            state.error = null;
+        },
     }
     , extraReducers: (builder) => {
         builder
@@ -102,6 +148,34 @@ const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(resetPassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.resetSuccess = false;
+            })
+            .addCase(resetPassword.fulfilled, (state, action) => {
+                state.loading = false;
+                state.resetSuccess = true;
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.resetSuccess = false;
+            })
+            .addCase(resetPasswordConfirm.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.resetSuccess = false;
+            })
+            .addCase(resetPasswordConfirm.fulfilled, (state, action) => {
+                state.loading = false;
+                state.resetSuccess = true;
+            })
+            .addCase(resetPasswordConfirm.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.resetSuccess = false;
             });
     }
 }
@@ -109,5 +183,5 @@ const authSlice = createSlice({
 
 
 )
-export const { logout } = authSlice.actions;
+export const { logout, clearResetState } = authSlice.actions;
 export default authSlice.reducer;

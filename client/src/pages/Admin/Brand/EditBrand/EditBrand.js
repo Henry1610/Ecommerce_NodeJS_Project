@@ -14,6 +14,7 @@ const EditBrand = () => {
     const [name, setName] = useState('');
     const [logoFile, setLogoFile] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [removeLogo, setRemoveLogo] = useState(false);
 
 
     useEffect(() => {
@@ -34,8 +35,7 @@ const EditBrand = () => {
     useEffect(() => {
         if (brand) {
             setName(brand.name || '');
-            setPreview(`http://localhost:5000/uploads/brands/${brand.logo}`);
-
+            setPreview(brand.logo || null);
         }
     }, [brand]);
 
@@ -43,9 +43,8 @@ const EditBrand = () => {
         const file = e.target.files[0];
         if (file) {
             setLogoFile(file);
-
-            // Tạo ảnh preview từ file tạm (blob URL)
             setPreview(URL.createObjectURL(file));
+            setRemoveLogo(false);
         }
     }
     const handleSubmit = async (e) => {
@@ -55,6 +54,9 @@ const EditBrand = () => {
         brandData.append('name', name);
         if (logoFile) {
             brandData.append('logo', logoFile);
+        }
+        if (removeLogo) {
+            brandData.append('removeLogo', 'true');
         }
 
         try {
@@ -93,7 +95,7 @@ const EditBrand = () => {
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label className="form-label">Brand Logo</label>
-                                        {(preview) ? (
+                                        {preview ? (
                                             <div className="position-relative d-inline-block border rounded" style={{ width: '100%' }}>
                                                 <img
                                                     src={preview}
@@ -104,7 +106,7 @@ const EditBrand = () => {
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded"
-                                                    onClick={() => setPreview(null)}
+                                                    onClick={() => { setPreview(null); setLogoFile(null); setRemoveLogo(true); }}
                                                     style={{ lineHeight: '01', padding: '0 0.45rem', fontSize: '30px' }}
                                                 >
                                                     &times;
@@ -141,9 +143,13 @@ const EditBrand = () => {
                                     >
                                         Submit
                                     </button>
-                                    <a href="brandlist.html" className="btn btn-cancel">
+                                    <button
+                                        type="button"
+                                        className="btn btn-cancel"
+                                        onClick={() => navigate('/admin/brand')}
+                                    >
                                         Cancel
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>

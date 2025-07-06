@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 
 const ShippingZoneList = () => {
   const dispatch = useDispatch();
-  const { zones, loading, error } = useSelector((state) => state.admin.adminshippingZone);
+  const { zones = [], loading = false, error = null } = useSelector((state) => state.admin.adminShippingZone || {});
   const [selectedZones, setSelectedZones] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -83,8 +83,16 @@ const ShippingZoneList = () => {
   };
 
   const handleSaveEdit = async () => {
+    const feeNumber = Number(editedZone.fee);
+    if (!editedZone.city || isNaN(feeNumber) || feeNumber <= 0) {
+      return Swal.fire('Thiếu thông tin', 'Vui lòng nhập tên thành phố hợp lệ và phí > 0.', 'warning');
+    }
     try {
-      await dispatch(updateShippingZone({ id: editingZoneId, ...editedZone })).unwrap();
+      await dispatch(updateShippingZone({
+        id: editingZoneId,
+        city: editedZone.city,
+        fee: feeNumber
+      })).unwrap();
       Swal.fire('Thành công!', 'Đã cập nhật vùng vận chuyển.', 'success');
       setEditingZoneId(null);
       setEditedZone({ city: '', fee: '' });
@@ -92,7 +100,7 @@ const ShippingZoneList = () => {
       Swal.fire('Lỗi!', err?.message || 'Không thể cập nhật vùng.', 'error');
     }
   };
-
+  
   return (
     <div className="container-fluid py-4">
       <div className="row">
@@ -102,9 +110,7 @@ const ShippingZoneList = () => {
               <h4 className="fw-bold">Shipping Zones</h4>
               <h6 className="text-muted">Manage your Shipping Areas</h6>
             </div>
-            <Link to="/admin/shippingzones/add" className="btn btn-primary">
-              <i className="fas fa-plus me-2"></i> Add Zone
-            </Link>
+           
           </div>
 
           <div className="card shadow-sm">

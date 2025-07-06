@@ -5,6 +5,9 @@ import Product from "../pages/User/Product"
 import Register from "../pages/Auth/Register/Register"
 import Home from "../pages/User/Home/Home"
 import ProductDetail from "../pages/User/ProductDetail/ProductDetail"
+import ResetPassword from '../pages/Auth/ResetPassword'
+import NewPassword from '../pages/Auth/ResetPassword/NewPassword'
+
 const publicRoutes = [
     { path: "/about-us", component: AboutUs },
     { path: "/product", component: Product },
@@ -14,6 +17,8 @@ const publicRoutes = [
     { path: "/", component: Home },
     { path: "/login", component: Login },
     { path: "/register", component: Register },
+    { path: "/reset-password", component: ResetPassword },
+    { path: "/reset-password/:token", component: NewPassword },
     
  
  

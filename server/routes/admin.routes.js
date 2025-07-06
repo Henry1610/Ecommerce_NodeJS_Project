@@ -11,7 +11,7 @@ import userRoutes from './admin/admin.user.routes.js';
 import discountRoutes from './admin/admin.discount.routes.js';
 import ShippingZoneRoutes from './admin/admin.shippingZone.routes.js';
 import paymentRoutes from './admin/admin.payment.routes.js';
-
+import adminRoutes from './admin/admin.admin.routes.js'
 const router = express.Router();
 
 // Các route cho admin
@@ -27,6 +27,7 @@ router.use('/orders', orderRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/products', productRoutes);
 router.use('/users', userRoutes);
+router.use('/', adminRoutes);
 
 export default router;
 
