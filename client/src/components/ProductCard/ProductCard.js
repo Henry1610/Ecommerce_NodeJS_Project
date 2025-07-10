@@ -133,17 +133,24 @@ function ProductCard({ product }) {
                 {/* Product Image */}
                 <div 
                     className="position-relative overflow-hidden"
-                    style={{ height: '200px', cursor: 'pointer' }}
+                    style={{ aspectRatio: '1/1', height: 'auto', minHeight: 0, background: '#fff', borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     onClick={() => handleShowDetail(product.slug)}
                 >
                     <img
-                        src={product.image || "https://storage.googleapis.com/a1aa/image/821514f3-0a04-418f-30e9-be563b4f05cb.jpg"}
-                        className="w-100 h-100"
+                        src={product.images && product.images.length > 0 ? product.images[0] : "https://storage.googleapis.com/a1aa/image/821514f3-0a04-418f-30e9-be563b4f05cb.jpg"}
                         alt={product.name}
                         style={{
-                            objectFit: 'cover',
+                            width: '100%',
+                            height: '100%',
+                            maxWidth: 200,
+                            maxHeight: 200,
+                            objectFit: 'contain',
+                            background: '#fff',
+                            borderRadius: 12,
                             transition: 'transform 0.3s ease',
                             transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                            display: 'block',
+                            margin: '0 auto'
                         }}
                     />
                     

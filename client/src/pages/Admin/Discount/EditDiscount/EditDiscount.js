@@ -14,6 +14,7 @@ const EditDiscount = () => {
         code: '',
         description: '',
         discountPercent: 0,
+        maxDiscount: 0,
         validFrom: '',
         validTo: '',
         isActive: true,
@@ -33,6 +34,7 @@ const EditDiscount = () => {
                 code: discount.code || '',
                 description: discount.description || '',
                 discountPercent: discount.discountPercent || 0,
+                maxDiscount: discount.maxDiscount || 0,
                 validFrom: discount.validFrom?.substring(0, 10) || '',
                 validTo: discount.validTo?.substring(0, 10) || '',
                 isActive: discount.isActive ?? true,
@@ -103,6 +105,18 @@ const EditDiscount = () => {
                                 name="discountPercent"
                                 value={formData.discountPercent}
                                 onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Giá trị giảm tối đa (VNĐ)</label>
+                            <input
+                                type="number"
+                                className="form-control"
+                                name="maxDiscount"
+                                value={formData.maxDiscount}
+                                onChange={handleChange}
+                                min={0}
                                 required
                             />
                         </div>

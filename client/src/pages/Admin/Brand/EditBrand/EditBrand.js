@@ -124,7 +124,7 @@ const EditBrand = () => {
                                         <div className="image-upload">
                                             <input
                                                 type="file"
-                                                accept="image/*"
+                                                accept="image/*,.svg"
                                                 onChange={handleFileChange}
                                             />
 

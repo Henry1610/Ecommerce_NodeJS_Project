@@ -23,7 +23,7 @@ export const uploadBrandImageForCreate = () =>
 
         return {
           folder: `brands/${slug}`,
-          allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'svg'],
           public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
         };
       },
@@ -79,7 +79,7 @@ export const uploadBrandImageWithSlug = () =>
 
         return {
           folder: `brands/${slug}`,
-          allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'svg'],
           public_id: file.originalname.split('.')[0], // tên file không có đuôi
         };
       },

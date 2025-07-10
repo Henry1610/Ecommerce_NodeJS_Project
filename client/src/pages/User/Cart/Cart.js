@@ -393,7 +393,7 @@ function Cart() {
                                 <div className="card-body">
                                     <div className="d-flex justify-content-between">
                                         <div className="d-flex">
-                                            <img src={image} alt={name} width="60" height="40" className="me-3 rounded" />
+                                            <img src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : '/default-product.jpg'} alt={name} width="60" height="40" className="me-3 rounded" />
                                             <div>
                                                 <h6 className="mb-1 fw-semibold">{name}</h6>
                                                 <p className="small text-muted mb-0">{description}</p>

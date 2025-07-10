@@ -403,34 +403,45 @@ const OrderDetail = () => {
       <div className="card shadow-sm mb-4 border-0 rounded-3">
   <div className="card-body">
     <div className="table-responsive">
-      <table className="table align-middle table-hover">
+      <table className="table align-middle table-hover border rounded-4 overflow-hidden">
         <thead className="table-light">
-          <tr>
-            <th scope="col">Product</th>
-            <th scope="col">Name</th>
-            <th scope="col" className="text-center">Quantity</th>
-            <th scope="col" className="text-end">Price</th>
-            <th scope="col" className="text-end">Original</th>
-            <th scope="col" className="text-end">Total</th>
+          <tr style={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+            <th scope="col">#</th>
+            <th scope="col">Sản phẩm</th>
+            <th scope="col">Tên</th>
+            <th scope="col" className="text-center">SL</th>
+            <th scope="col" className="text-end">Giá bán</th>
+            <th scope="col" className="text-end">Giá gốc</th>
+            <th scope="col" className="text-end">Tổng</th>
           </tr>
         </thead>
         <tbody>
           {
             selectedOrder?.items.map((item, index) => (
-              <tr key={index}>
+              <tr key={index} className="align-middle" style={{ transition: 'background 0.2s' }}>
+                <td className="text-muted small text-center" style={{ width: 36 }}>{index + 1}</td>
                 <td>
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="img-fluid rounded border"
-                    style={{ width: "60px", height: "60px", objectFit: "cover" }}
-                  />
+                  <div style={{ width: 60, height: 60, borderRadius: 10, overflow: 'hidden', border: '1px solid #eee', transition: 'box-shadow 0.2s' }}
+                    className="bg-light position-relative hover-zoom">
+                    <img
+                      src={
+                        item.images && item.images.length > 0
+                          ? item.images[0]
+                          : item.image
+                            ? item.image
+                            : '/default-product.jpg'
+                      }
+                      alt={item.name}
+                      className="img-fluid"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10, transition: 'transform 0.2s' }}
+                    />
+                  </div>
                 </td>
-                <td className="fw-semibold">{item.name}</td>
-                <td className="text-center">{item.quantity}</td>
-                <td className="text-end text-success fw-semibold">{item.price.toLocaleString()}đ</td>
-                <td className="text-end text-muted text-decoration-line-through">{item.originalPrice.toLocaleString()}đ</td>
-                <td className="text-end fw-bold text-dark">{(item.price * item.quantity).toLocaleString()}đ</td>
+                <td className="fw-semibold" style={{ minWidth: 160, maxWidth: 260, whiteSpace: 'normal', wordBreak: 'break-word' }}>{item.name}</td>
+                <td className="text-center fw-bold" style={{ fontSize: 15 }}>{item.quantity}</td>
+                <td className="text-end text-success fw-bold" style={{ fontSize: 16 }}>{item.price.toLocaleString()}đ</td>
+                <td className="text-end text-muted text-decoration-line-through" style={{ fontSize: 14 }}>{item.originalPrice.toLocaleString()}đ</td>
+                <td className="text-end fw-bold text-dark" style={{ fontSize: 16 }}>{(item.price * item.quantity).toLocaleString()}đ</td>
               </tr>
             ))
           }

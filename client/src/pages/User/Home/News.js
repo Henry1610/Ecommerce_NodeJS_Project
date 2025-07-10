@@ -4,35 +4,31 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
-import img1 from '../../../assets/news/281e9e10-13be-45c3-0300-6b3b765570d2.jpg'
-import img2 from '../../../assets/news/2d178fd8-2731-4dd5-6d42-17e996639d7c.jpg'
-import img3 from '../../../assets/news/6ad92b02-1cd3-4e9d-0a4d-7b5b1768bac3.jpg'
-import img4 from '../../../assets/news/6fee00d4-32b9-4d6d-bb54-a784aaf2b765.jpg'
-import img5 from '../../../assets/news/f2f0a71d-8fcb-4a0c-af13-672e49ce0cc9.jpg'
+
 function News() {
     const articles = [
         {
-            img: "https://storage.googleapis.com/a1aa/image/281e9e10-13be-45c3-0300-6b3b765570d2.jpg",
+            img: "https://m.media-amazon.com/images/I/71-2ed893ZL._AC_SY879_.jpg",
             title: "Lenovo trình làng loạt laptop Xiaoxin 2024 Ryzen Edition tại Trung Quốc, giá ...",
             author: "Nguyễn Công Minh",
         },
         {
-            img: "https://storage.googleapis.com/a1aa/image/6ad92b02-1cd3-4e9d-0a4d-7b5b1768bac3.jpg",
+            img: "https://m.media-amazon.com/images/I/811mbFDXx7L._AC_SL1500_.jpg",
             title: "Laptop ThinkPad là gì? Tất tần tật về dòng Lenovo ThinkPad",
             author: "Phạm Quốc Toàn",
         },
         {
-            img: "https://storage.googleapis.com/a1aa/image/2d178fd8-2731-4dd5-6d42-17e996639d7c.jpg",
+            img: "https://m.media-amazon.com/images/I/71wva-X3xZL._AC_SX679_.jpg",
             title: "Đánh giá chi tiết Dell Precision 7550: Không dành cho số đông",
             author: "Lương Mạnh Hà",
         },
         {
-            img: "https://storage.googleapis.com/a1aa/image/6fee00d4-32b9-4d6d-bb54-a784aaf2b765.jpg",
+            img: "https://m.media-amazon.com/images/I/71NeIm6iWHL._AC_SX679_.jpg",
             title: "Lenovo ThinkPad T14 – Lá cờ đầu của ThinkPad T-series chuẩn bị cập bến...",
             author: "Thu Hồng",
         },
         {
-            img: "https://storage.googleapis.com/a1aa/image/47de56e7-1ee1-4f6c-9b20-8f6e045753ea.jpg",
+            img: "https://m.media-amazon.com/images/I/71Or+U1uzYL._AC_SL1500_.jpg",
             title: "Review Lenovo Yoga: mỏng nhẹ linh động, cấu hình đáp ứng tốt mọi nhu cà...",
             author: "Lương Mạnh Hà",
         },
@@ -48,7 +44,7 @@ function News() {
             title: "Lenovo ra mắt Xiaoxin Pro AI 2024: Chạy chip Core Ultra siêu khỏe",
             author: "Nguyễn Công Minh",
             date: "26/05/2025",
-            image: img1,
+            image: 'https://m.media-amazon.com/images/I/81r8immmQfL._AC_SL1500_.jpg',
             description: "Với sức mạnh mới cùng sự trợ giúp từ AI, con chip mới của đội Xanh hứa hẹn sẽ giúp sản phẩm này có được hiệu năng ấn tượng và thời lượng pin dài lên đến 12 giờ sử dụng liên tục. Xiaoxin Pro AI 2024 không chỉ mang đến trải nghiệm làm việc mượt mà mà còn tích hợp nhiều tính năng AI thông minh giúp tối ưu hóa hiệu suất và tiết kiệm năng lượng. Thiết kế premium với khung nhôm nguyên khối và màn hình 2.5K sắc nét sẽ làm hài lòng cả những người dùng khó tính nhất.",
             backgroundColor: "#E5D7FF",
             watermark: "HOT NEWS"
@@ -58,7 +54,7 @@ function News() {
             title: "Apple MacBook Air M3 2024: Hiệu năng vượt trội với chip M3 mới nhất",
             author: "Trần Văn A",
             date: "25/05/2025",
-            image: img2,
+            image: 'https://m.media-amazon.com/images/I/71Z-hOiOHoL._AC_SL1500_.jpg',
             description: "MacBook Air M3 2024 mang đến hiệu năng vượt trội với chip M3 mới nhất của Apple, cùng thiết kế mỏng nhẹ và thời lượng pin ấn tượng lên đến 18 giờ. Với CPU 8 nhân và GPU 10 nhân, M3 chip mang lại hiệu suất tăng 20% so với thế hệ trước, đặc biệt xuất sắc trong các tác vụ đồ họa và xử lý video 4K. Màn hình Liquid Retina 13.6 inch với độ sáng 500 nits và hỗ trợ 1 tỷ màu mang đến trải nghiệm hình ảnh sống động như thật.",
             backgroundColor: "#FFE5E5",
             watermark: "NEWS"
@@ -68,7 +64,7 @@ function News() {
             title: "Đánh giá chi tiết Dell XPS 15: Laptop cao cấp cho dân sáng tạo",
             author: "Phạm Quốc Toàn",
             date: "24/05/2025",
-            image: img3,
+            image: 'https://m.media-amazon.com/images/I/71BdMWKqMAL._AC_SL1500_.jpg',
             description: "Dell XPS 15 là lựa chọn hoàn hảo cho những người làm công việc sáng tạo với màn hình 4K OLED 15.6 inch tuyệt đẹp và hiệu năng mạnh mẽ từ chip Intel Core i7 thế hệ 13. Card đồ họa RTX 4060 đảm bảo xử lý mượt mà các phần mềm thiết kế nặng như Adobe Premiere Pro, Photoshop hay Blender. Bàn phím có đèn nền với hành trình phím 1.3mm mang lại cảm giác gõ thoải mái, cùng với trackpad lớn hỗ trợ đa cử chỉ Windows Precision.",
             backgroundColor: "#E5F7FF",
             watermark: "REVIEW"
@@ -78,7 +74,7 @@ function News() {
             title: "Nên chọn laptop nào cho sinh viên năm 2024? Top 5 gợi ý tốt nhất",
             author: "Lương Mạnh Hà",
             date: "23/05/2025",
-            image: img4,
+            image: 'https://m.media-amazon.com/images/I/71gbrvRJI-L._AC_SX679_.jpg',
             description: "Hướng dẫn chi tiết cách chọn laptop phù hợp cho sinh viên với ngân sách từ 10-20 triệu đồng, đáp ứng nhu cầu học tập và giải trí đa dạng. Trong bài viết này, chúng tôi sẽ phân tích từng tiêu chí quan trọng như hiệu năng xử lý, dung lượng RAM, ổ cứng SSD, chất lượng màn hình, thời lượng pin và độ bền. Đặc biệt, chúng tôi cũng đưa ra những gợi ý cụ thể cho từng ngành học khác nhau như Công nghệ thông tin, Thiết kế đồ họa, Kinh tế hay Luật.",
             backgroundColor: "#FFF5E5",
             watermark: "GUIDE"
@@ -88,7 +84,7 @@ function News() {
             title: "10 thủ thuật tăng tốc Windows 11 mà bạn nên biết",
             author: "Thu Hồng",
             date: "22/05/2025",
-            image: img5,
+            image: 'https://m.media-amazon.com/images/I/51B6AYSgQEL._AC_SX679_.jpg',
             description: "Những mẹo và thủ thuật đơn giản nhưng hiệu quả giúp tăng tốc độ và tối ưu hóa hiệu năng Windows 11 trên laptop của bạn một cách đáng kể. Từ việc tắt các ứng dụng khởi động không cần thiết, dọn dẹp file rác, tối ưu hóa Registry, đến cách sử dụng tính năng Storage Sense và Game Mode. Chúng tôi cũng hướng dẫn cách cập nhật driver, điều chỉnh hiệu ứng hình ảnh và quản lý bộ nhớ ảo để có được hiệu suất tối ưu nhất cho máy tính của bạn.",
             backgroundColor: "#E5FFE5",
             watermark: "TIPS"
@@ -137,14 +133,14 @@ function News() {
                                 <span className="mx-2">/</span>
                                 <time dateTime={currentContent.date}>{currentContent.date}</time>
                             </div>
-                            <div style={{ height: '379px', overflow: 'hidden' }}>
-                                <img
-                                    src={currentContent.image}
-                                    alt={currentContent.title}
-                                    className="img-fluid rounded mb-3"
-                                    style={{ objectFit: 'cover', height: '100%', width: '100%' }}
-                                />
-                            </div>
+                            <div style={{ height: '379px', overflow: 'hidden', background: '#f8f9fa' }}>
+  <img
+    src={currentContent.image}
+    alt={currentContent.title}
+    className="img-fluid rounded mb-3"
+    style={{ objectFit: 'contain', height: '100%', width: '100%', background: '#f8f9fa' }}
+  />
+</div>
 
                             <p className="text-muted small mt-2">
                                 {currentContent.description}

@@ -128,7 +128,7 @@ const ProductList = () => {
                         </td>
                         <td className="d-flex align-items-center" style={{ border: 'none' }}>
                           <a href="#" className="product-img">
-                            <img src={product.img} alt="sản phẩm" className="product-img" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8, marginRight: 8 }} />
+                            <img src={product.images && product.images.length > 0 ? product.images[0] : '/default-product.jpg'} alt="sản phẩm" className="product-img" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8, marginRight: 8 }} />
                           </a>
                           <span style={{ fontWeight: 600, fontSize: 16 }}>{product.name}</span>
                         </td>

@@ -6,6 +6,8 @@ import adminRoutes from './routes/AdminRoutes';
 import UserLayout from './Layout/UserLayout';
 import AdminLayout from './Layout/AdminLayout';
 import ProtectedRoute from './routes/components/ProtectedRoute';
+import ErrorPage from './components/ErrorPage';
+import ForbiddenPage from './components/ForbiddenPage';
 
 function App() {
   return (
@@ -67,7 +69,10 @@ function App() {
         </Route>
 
         {/* Route bắt lỗi 404 */}
-        <Route path="*" element={<UserLayout><div>Không tìm thấy trang</div></UserLayout>} />
+        <Route path="*" element={<UserLayout><ErrorPage/></UserLayout>} />
+
+        {/* Route cấm truy cập 403 */}
+        <Route path="/forbidden" element={<UserLayout><ForbiddenPage/></UserLayout>} />
       </Routes>
     </Router>
   );

@@ -12,6 +12,7 @@ const AddDiscount = () => {
         code: '',
         description: '',
         discountPercent: 0,
+        maxDiscount: 0,
         validFrom: '',
         validTo: '',
         isActive: true,
@@ -74,6 +75,18 @@ const AddDiscount = () => {
                                 name="discountPercent"
                                 value={formData.discountPercent}
                                 onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Giá trị giảm tối đa (VNĐ)</label>
+                            <input
+                                type="number"
+                                className="form-control"
+                                name="maxDiscount"
+                                value={formData.maxDiscount}
+                                onChange={handleChange}
+                                min={0}
                                 required
                             />
                         </div>

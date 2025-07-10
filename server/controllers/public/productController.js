@@ -120,7 +120,7 @@ export const getPublicProductBySlug = async (req, res) => {
             slug,
         })
             .populate('category', 'name slug')
-            .populate('brand', 'name slug');
+            .populate('brand', 'name logo slug');
 
         if (!product) {
             return res.status(404).json({

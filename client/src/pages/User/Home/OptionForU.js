@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import ProductCard from '../../../components/ProductCard/ProductCard';
 import { fetchProducts } from '../../../redux/public/productsSlice';
 import { fetchCategories } from '../../../redux/public/categorySlice';
+import { fetchBrands } from '../../../redux/public/brandSlice';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -18,14 +19,40 @@ const SWIPER_CONFIG = {
 const INITIAL_DISPLAY_COUNT = 4;
 const LOAD_MORE_COUNT = 4;
 
+function BrandTabSwiper({ brands, activeBrand, onBrandChange, loading }) {
+    return (
+        <div className="tab-swiper-container text-center d-flex justify-content-center m-3">
+            <Swiper
+                {...SWIPER_CONFIG}
+                className="tab-swiper bg-light rounded-pill p-2"
+            >
+                {brands.map((brand) => (
+                    <SwiperSlide key={brand._id} className="w-auto">
+                        <button
+                            type="button"
+                            className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeBrand === brand._id ? 'active' : ''}`}
+                            onClick={() => onBrandChange(brand._id)}
+                            disabled={loading}
+                        >
+                            {brand.name}
+                        </button>
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+        </div>
+    );
+}
+
 function OptionForU() {
     const dispatch = useDispatch();
 
     // Redux selectors
     const { products, loading: productsLoading } = useSelector((state) => state.public.publicProduct);
     const { categories, loading: categoriesLoading } = useSelector((state) => state.public.publicCategory);
+    const { brands, loading: brandsLoading } = useSelector((state) => state.public.publicBrand || { brands: [], loading: false });
 
     const [activeTabCategories, setActiveTabCategories] = useState(null);
+    const [activeTabBrands, setActiveTabBrands] = useState(null);
     const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
 
     // Memoized values
@@ -33,6 +60,7 @@ function OptionForU() {
     const hasProducts = useMemo(() => products?.length > 0, [products]);
     const displayedProducts = useMemo(() => products?.slice(0, displayCount) || [], [products, displayCount]);
     const hasMoreProducts = useMemo(() => products?.length > displayCount, [products, displayCount]);
+    const hasBrands = useMemo(() => brands?.length > 0, [brands]);
 
     // Fetch products when category changes
     useEffect(() => {
@@ -46,12 +74,31 @@ function OptionForU() {
         dispatch(fetchCategories());
     }, [dispatch]);
 
+    // Fetch brands on component mount
+    useEffect(() => {
+        dispatch(fetchBrands());
+    }, [dispatch]);
+
     // Set default category when categories are loaded
     useEffect(() => {
         if (hasCategories && !activeTabCategories) {
             setActiveTabCategories(categories[0]._id);
         }
     }, [categories, activeTabCategories, hasCategories]);
+
+    // Set default brand when brands are loaded
+    useEffect(() => {
+        if (hasBrands && !activeTabBrands) {
+            setActiveTabBrands(brands[0]._id);
+        }
+    }, [brands, activeTabBrands, hasBrands]);
+
+    // Fetch products when brand changes
+    useEffect(() => {
+        if (activeTabBrands) {
+            dispatch(fetchProducts({ brand: activeTabBrands }));
+        }
+    }, [dispatch, activeTabBrands]);
 
     // Reset display count when category changes
     useEffect(() => {
@@ -161,6 +208,22 @@ function OptionForU() {
         );
     }
 
+    // Show loading state for brands
+    if (brandsLoading || !hasBrands) {
+        return (
+            <div className="py-3">
+                <h1 className="text-center fw-bold mb-4 d-flex align-items-center justify-content-center gap-2">
+                    Gợi ý cho bạn
+                </h1>
+                <div className="text-center py-4">
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Đang tải thương hiệu...</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="py-3">
             <h1 className="text-center fw-bold mb-4 d-flex align-items-center justify-content-center gap-2">
@@ -168,6 +231,7 @@ function OptionForU() {
             </h1>
 
             {renderCategoryTabs()}
+            <BrandTabSwiper brands={brands} activeBrand={activeTabBrands} onBrandChange={setActiveTabBrands} loading={brandsLoading} />
 
             <div className="row g-3">
                 {renderProductGrid()}

@@ -239,12 +239,12 @@ const BrandList = () => {
                                                     />
                                                 </td>
                                                 <td style={{ border: 'none' }}>
-                                                    <div style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
+                                                    <div style={{ width: 100, height: 60, borderRadius: '12px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
                                                         {brand.logo ? (
                                                             <img
                                                                 src={brand.logo.startsWith('http') ? brand.logo : `http://localhost:5000/${brand.logo}`}
                                                                 alt={brand.name}
-                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }}
                                                             />
                                                         ) : (
                                                             <i className="fas fa-image text-muted" style={{ fontSize: 28 }} title="No logo" />

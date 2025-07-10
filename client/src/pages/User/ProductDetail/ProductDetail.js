@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Thumbs } from 'swiper/modules';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from "react-redux"
@@ -13,6 +14,9 @@ import { addToCart } from '../../../redux/user/cartSlice';
 import { toast } from 'react-toastify';
 import { fetchReviewStats } from '../../../redux/public/reviewSlice';
 import "./ProductDetail.css";
+import axios from 'axios';
+import ProductCard from '../../../components/ProductCard/ProductCard';
+import RelatedProductItem from '../../../components/RelatedProductItem';
 
 // Constants
 const SERVICES = [
@@ -20,14 +24,6 @@ const SERVICES = [
     { icon: <i className="fa-solid fa-folder-closed"></i>, text: "Trải nghiệm tận tay" },
     { icon: <i className="fa-solid fa-folder-closed"></i>, text: "Tư vấn tận tâm" },
     { icon: <i className="fa-solid fa-folder-closed"></i>, text: "Trung tâm khác" },
-];
-
-const THUMBNAIL_IDS = [
-    "538bbcd9-818b-409e-8e16-d05c4a791404",
-    "c344cbc7-b03f-4bdb-8b00-86f59755ab25",
-    "4fb746a2-b4bd-4779-8648-ea08e1bc58c2",
-    "e24b0897-0754-47ba-9f93-209861f42b37",
-    "b3411b75-6987-4cac-8629-f96415e10504",
 ];
 
 function ProductDetail() {
@@ -38,7 +34,7 @@ function ProductDetail() {
     // Hooks
     const dispatch = useDispatch();
     const { slug } = useParams();
-    
+
     // Selectors
     const { reviews, product, loading, error } = useSelector((state) => state.public.publicProduct);
     const { stats, total } = useSelector(state => state.public.publicReview);
@@ -48,7 +44,6 @@ function ProductDetail() {
     const originalPrice = product?.price ?? 0;
     const discountPercent = product?.discountPercent ?? 0;
     const discountPrice = originalPrice - (originalPrice * discountPercent) / 100;
-    const doubled = [...SERVICES, ...SERVICES];
 
     // Effects
     useEffect(() => {
@@ -89,7 +84,7 @@ function ProductDetail() {
     };
 
     const handleAddToCart = () => {
-        
+
         if (product && quantity > 0) {
             dispatch(addToCart({ productId: product._id, quantity }))
                 .unwrap()
@@ -135,7 +130,7 @@ function ProductDetail() {
         <div className="container py-5">
             <div className="row">
                 <ProductImages />
-                <ProductInfo 
+                <ProductInfo
                     product={product}
                     quantity={quantity}
                     originalPrice={originalPrice}
@@ -146,15 +141,15 @@ function ProductDetail() {
                     onAddToCart={handleAddToCart}
                 />
             </div>
-            
-            <ProductReviews 
+
+            <ProductReviews
                 reviews={reviews}
                 averageRating={averageRating}
                 stats={stats}
                 selectedRating={selectedRating}
                 onRatingFilter={handleRatingFilter}
             />
-            
+
             <FloatingChatButton />
         </div>
     );
@@ -162,50 +157,57 @@ function ProductDetail() {
 
 // Sub-components
 function ProductImages() {
-    const doubled = [...SERVICES, ...SERVICES];
-
+    const { product } = useSelector((state) => state.public.publicProduct);
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const images = product?.images && product.images.length > 0 ? product.images : [
+        '/default-product.jpg'
+    ];
     return (
         <div className="col-lg-7">
-            <MainImageSection />
-            <ThumbnailSection />
-            <ServiceSlider doubled={doubled} />
+            <Swiper
+                style={{ width: 540, height: 440, borderRadius: 16, marginBottom: 16, background: '#f8f9fa', maxWidth: '100%' }}
+                modules={[Navigation, Thumbs]}
+                navigation
+                thumbs={{ swiper: thumbsSwiper }}
+                spaceBetween={10}
+                slidesPerView={1}
+            >
+                {images.map((img, idx) => (
+                    <SwiperSlide key={idx}>
+                        <img
+                            src={img}
+                            alt={`Ảnh sản phẩm ${idx + 1}`}
+                            className="img-fluid"
+                            style={{ width: '100%', height: 440, objectFit: 'contain', background: '#f8f9fa', borderRadius: 16, maxWidth: 540, maxHeight: 440 }}
+                        />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+            <Swiper
+                onSwiper={setThumbsSwiper}
+                modules={[Thumbs]}
+                spaceBetween={4}
+                slidesPerView={Math.min(images.length, 7)}
+                style={{ marginTop: 4, maxWidth: 360 }}
+            >
+                {images.map((img, idx) => (
+                    <SwiperSlide key={idx} style={{ width: 48, height: 48, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img
+                            src={img}
+                            alt={`Thumbnail ${idx + 1}`}
+                            className="img-thumbnail"
+                            style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, padding: 0, background: '#fff' }}
+                        />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+            <ServiceSlider doubled={[...SERVICES, ...SERVICES]} />
             <CommitmentSection />
             <AttributesSection />
         </div>
     );
 }
 
-function MainImageSection() {
-    return (
-        <div className="position-relative border rounded overflow-hidden">
-            <img
-                src="https://storage.googleapis.com/a1aa/image/419b4c2d-8f17-4dbe-447a-8fe49a18e6ae.jpg"
-                alt="Lenovo ThinkBook 14 G6+ laptop front view"
-                className="img-fluid"
-                style={{ width: '100%', maxWidth: '700px', height: '500px' }}
-            />
-            <button className="btn btn-dark position-absolute top-50 start-0 translate-middle-y" />
-            <button className="btn btn-dark position-absolute top-50 end-0 translate-middle-y" />
-        </div>
-    );
-}
-
-function ThumbnailSection() {
-    return (
-        <div className="d-flex flex-wrap gap-3 justify-content-center mt-4">
-            {THUMBNAIL_IDS.map((imgId, idx) => (
-                <div key={idx} className="border p-1 rounded cursor-pointer">
-                    <img
-                        src={`https://storage.googleapis.com/a1aa/image/${imgId}.jpg`}
-                        alt={`Thumbnail ${idx}`}
-                        className="img-thumbnail"
-                        style={{ width: 100, height: 100, objectFit: 'cover' }}
-                    />
-                </div>
-            ))}
-        </div>
-    );
-}
 
 function ServiceSlider({ doubled }) {
     return (
@@ -265,7 +267,18 @@ function CommitmentSection() {
 
 function AttributesSection() {
     const { product } = useSelector((state) => state.public.publicProduct);
-
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    useEffect(() => {
+        if (product?.category?._id) {
+            axios.get(`http://localhost:5000/api/products/filter?category=${product.category._id}&limit=8`)
+                .then(res => {
+                    // Loại bỏ sản phẩm hiện tại khỏi danh sách
+                    const filtered = res.data.products.filter(p => p._id !== product._id);
+                    setRelatedProducts(filtered);
+                })
+                .catch(() => setRelatedProducts([]));
+        }
+    }, [product]);
     return (
         <div className="my-5">
             <h2 className="fw-bold mb-4">Cấu hình & đặc điểm</h2>
@@ -275,8 +288,8 @@ function AttributesSection() {
                         {product?.attributes ? (
                             Object.entries(product.attributes).map(([key, value], index) => (
                                 <tr key={index} className={index % 2 === 1 ? 'bg-light' : ''}>
-                                    <th className="w-50 text-start pe-4">{key}</th>
-                                    <td className="text-start ps-4">{value}</td>
+                                    <td className="w-50 text-start pe-4 fw-light text-muted">{key}</td>
+                                    <td className="text-muted fw-lighter text-start">{value}</td>
                                 </tr>
                             ))
                         ) : (
@@ -289,36 +302,58 @@ function AttributesSection() {
                     </tbody>
                 </table>
             </div>
+           
         </div>
     );
 }
 
-function ProductInfo({ 
-    product, 
-    quantity, 
-    originalPrice, 
-    discountPrice, 
-    onIncreaseQuantity, 
-    onDecreaseQuantity, 
-    onQuantityChange, 
-    onAddToCart 
+function ProductInfo({
+    product,
+    quantity,
+    originalPrice,
+    discountPrice,
+    onIncreaseQuantity,
+    onDecreaseQuantity,
+    onQuantityChange,
+    onAddToCart
 }) {
+    // Lấy sản phẩm cùng danh mục
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    useEffect(() => {
+        if (product?.category?._id) {
+            axios.get(`http://localhost:5000/api/products/filter?category=${product.category._id}&limit=8`)
+                .then(res => {
+                    const filtered = res.data.products.filter(p => p._id !== product._id);
+                    setRelatedProducts(filtered);
+                })
+                .catch(() => setRelatedProducts([]));
+        }
+    }, [product]);
     return (
         <div className="col-lg-4 mx-5">
             <ProductHeader product={product} />
             <ProductOptions />
-            <QuantitySelector 
+            <QuantitySelector
                 quantity={quantity}
                 onIncrease={onIncreaseQuantity}
                 onDecrease={onDecreaseQuantity}
                 onChange={onQuantityChange}
             />
-            <PurchaseBox 
+            <PurchaseBox
                 originalPrice={originalPrice}
                 discountPrice={discountPrice}
                 discountPercent={product.discountPercent}
                 onAddToCart={onAddToCart}
             />
+            {/* Sản phẩm cùng danh mục */}
+            {relatedProducts.length > 0 && (
+                <div className="mt-5">
+                    <h3 className="fw-bold mb-3">Sản phẩm cùng danh mục</h3>
+                    {relatedProducts.map(product => (
+                        <RelatedProductItem product={product} key={product._id} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
@@ -326,7 +361,18 @@ function ProductInfo({
 function ProductHeader({ product }) {
     return (
         <>
-            <h1 className="fw-bold fs-4 mb-1">{product.name}</h1>
+            <div className="d-flex align-items-center gap-3 mb-2">
+                {product.brand && product.brand.logo && (
+                    <div style={{ width: 95, height: 59, borderRadius: '12px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
+                        <img
+                            src={product.brand.logo.startsWith('http') ? product.brand.logo : `http://localhost:5000/${product.brand.logo}`}
+                            alt={product.brand.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }}
+                        />
+                    </div>
+                )}
+                <h1 className="fw-bold fs-4 mb-1 mb-0" style={{ marginBottom: 0 }}>{product.name}</h1>
+            </div>
             <span className='fw-bold text-muted m-1' style={{ opacity: 0.7 }}>
                 {product.description}
             </span>
@@ -369,68 +415,71 @@ function ProductOptions() {
 
 function QuantitySelector({ quantity, onIncrease, onDecrease, onChange }) {
     return (
-        <>
-            <p className="fw-semibold">Số lượng</p>
-            <div className="input-group m-2">
-                <button
-                    className="btn bg-info fw-bold fs-5"
-                    type="button"
-                    onClick={onDecrease}
-                >
-                    -
-                </button>
-                <input
-                    type="number"
-                    className="form-control text-center border-info"
-                    value={quantity}
-                    min="1"
-                    onChange={onChange}
-                />
-                <button
-                    className="btn bg-info fw-bold fs-5"
-                    type="button"
-                    onClick={onIncrease}
-                >
-                    +
-                </button>
-            </div>
-        </>
+        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e7ef', borderRadius: 20, background: '#fff', height: 36, width: 120, overflow: 'hidden' }}>
+            <button
+                className="btn btn-outline-info rounded-0 border-0 p-0 d-flex align-items-center justify-content-center"
+                type="button"
+                style={{ width: 36, height: 36, fontSize: 18, borderRadius: 0, background: 'transparent', transition: 'background 0.2s' }}
+                onClick={onDecrease}
+                onMouseEnter={e => e.currentTarget.style.background = '#e0f7fa'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+                <i className="fas fa-minus"></i>
+            </button>
+            <input
+                type="number"
+                className="form-control text-center border-0"
+                value={quantity}
+                min="1"
+                onChange={onChange}
+                style={{ width: 48, height: 36, fontSize: 16, padding: 0, border: 'none', boxShadow: 'none', outline: 'none' }}
+            />
+            <button
+                className="btn btn-outline-info rounded-0 border-0 p-0 d-flex align-items-center justify-content-center"
+                type="button"
+                style={{ width: 36, height: 36, fontSize: 18, borderRadius: 0, background: 'transparent', transition: 'background 0.2s' }}
+                onClick={onIncrease}
+                onMouseEnter={e => e.currentTarget.style.background = '#e0f7fa'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+                <i className="fas fa-plus"></i>
+            </button>
+        </div>
     );
 }
 
 function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCart }) {
     return (
-        <div className="d-flex flex-column flex-md-row shadow rounded-4 overflow-hidden p-4 align-items-center" 
-             style={{ maxWidth: '520px', backgroundColor: '#fff' }}>
-            <div className="flex-grow-1 w-100">
-                <p className="fw-bold fs-5 mb-1">Mua ngay</p>
-                <p className="text-muted small mb-3">Trả hết một giá</p>
-                <div className="d-flex align-items-center gap-3 mb-3">
-                    <span className="fw-bold fs-4" style={{ color: '#e91e63' }}>
+        <div className="d-flex flex-column align-items-center shadow rounded-4 overflow-hidden p-2"
+            style={{ maxWidth: '320px', backgroundColor: '#fff', marginTop: 16 }}>
+            <div className="flex-grow-1 w-100 text-center">
+                <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span className="fw-bold fs-3" style={{ color: '#e91e63' }}>
                         {discountPrice?.toLocaleString('vi-VN')}đ
                     </span>
-                    <span className="text-muted text-decoration-line-through small">
-                        {originalPrice?.toLocaleString('vi-VN')}đ
-                    </span>
-                    <span className="badge rounded-pill text-white px-2 py-1" 
-                          style={{ backgroundColor: '#e91e63' }}>
-                        -{discountPercent}%
-                    </span>
+                    {discountPercent > 0 && (
+                        <span className="text-muted text-decoration-line-through small" style={{ fontSize: '1rem' }}>
+                            {originalPrice?.toLocaleString('vi-VN')}đ
+                        </span>
+                    )}
+                    {discountPercent > 0 && (
+                        <span className="badge rounded-pill text-white px-2 py-1"
+                            style={{ backgroundColor: '#e91e63', fontSize: 12 }}>
+                            -{discountPercent}%
+                        </span>
+                    )}
                 </div>
-                <div className="d-flex gap-3">
-                    <button className="btn fw-bold text-white px-4 py-2" 
-                            style={{ backgroundColor: '#00e5ff', borderRadius: '999px' }}>
-                        Mua ngay
-                    </button>
-                    <button 
-                        className="btn fw-bold text-white px-4 py-2 d-flex align-items-center gap-2" 
-                        style={{ backgroundColor: '#000', borderRadius: '999px' }} 
-                        onClick={onAddToCart}
-                    >
-                        <i className="fas fa-shopping-bag"></i>
-                        Thêm vào giỏ
-                    </button>
-                </div>
+                <button
+                    className="btn fw-bold text-white d-flex align-items-center justify-content-center gap-2"
+                    style={{ background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)', borderRadius: '22px', minWidth: 90, height: 44, fontSize: 15, boxShadow: '0 2px 8px rgba(0,229,255,0.10)', transition: 'all 0.2s', margin: '0 auto', padding: '0 10px' }}
+                    onClick={onAddToCart}
+                    title="Thêm vào giỏ"
+                    onMouseEnter={e => e.target.style.filter = 'brightness(1.08)'}
+                    onMouseLeave={e => e.target.style.filter = 'none'}
+                >
+                    <i className="fas fa-shopping-bag"></i>
+                    Thêm vào giỏ
+                </button>
             </div>
         </div>
     );
@@ -440,7 +489,7 @@ function ProductReviews({ reviews, averageRating, stats, selectedRating, onRatin
     return (
         <div className="py-4">
             <h2 className="fw-bold mb-4">Đánh giá sản phẩm</h2>
-            <ReviewStats 
+            <ReviewStats
                 averageRating={averageRating}
                 stats={stats}
                 selectedRating={selectedRating}
@@ -464,10 +513,10 @@ function ReviewStats({ averageRating, stats, selectedRating, onRatingFilter }) {
                         <i
                             key={i}
                             className={`fas ${i <= Math.floor(averageRating)
-                                    ? 'fa-star'
-                                    : i - averageRating <= 0.5
-                                        ? 'fa-star-half-alt'
-                                        : 'fa-star text-muted'
+                                ? 'fa-star'
+                                : i - averageRating <= 0.5
+                                    ? 'fa-star-half-alt'
+                                    : 'fa-star text-muted'
                                 } text-warning`}
                         ></i>
                     ))}
@@ -562,7 +611,7 @@ function FloatingChatButton() {
             className="btn btn-info text-white rounded-circle shadow position-fixed"
             style={{ bottom: '24px', right: '24px', width: '56px', height: '56px' }}
             aria-label="Chat support"
-        />
+        ><i class="fa-solid fa-phone"></i></button>
     );
 }
 
