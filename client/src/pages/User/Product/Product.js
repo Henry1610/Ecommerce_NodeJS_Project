@@ -5,14 +5,14 @@ import { fetchProducts } from '../../../redux/public/productsSlice';
 import { fetchCategories } from '../../../redux/public/categorySlice';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 import Select from 'react-select';
-
+import { Link } from 'react-router-dom';
 function Product() {
   const dispatch = useDispatch();
   const { products, loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
-  
+
   const { categories } = useSelector((state) => state.public.publicCategory || { categories: [] });
   const { brands } = useSelector((state) => state.public.publicBrand || { brands: [] });
-  
+
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     category: '',
@@ -21,7 +21,7 @@ function Product() {
     maxPrice: '',
     sortBy: '',
   });
-  
+
   const limit = 4;
 
   const { category, brand, minPrice, maxPrice, sortBy } = filters;
@@ -83,24 +83,41 @@ function Product() {
 
   return (
     <div className="container-fluid py-3">
+      <ol className="breadcrumb">
+        <li className="breadcrumb-item">
+          <Link to="/" className="text-decoration-none">Trang chủ</Link>
+        </li>
+        <li className="breadcrumb-item active" aria-current="page">Sản phẩm</li>
+      </ol>
       <div className="row">
+        {/* Banner */}
+        <div class=" mb-5">
+          <div class="row">
+            <div class="col-md-6 mb-3 rounded-4">
+              <img src="https://imagor.owtg.one/unsafe/fit-in/1000x334/https://d28jzcg6y4v9j1.cloudfront.net/banners/bao-hanh-chinh-hang-phu-kien-6ww.jpg" alt="Bảo hành chính hãng" class="img-fluid rounded" />
+            </div>
+            <div class="col-md-6 mb-3 rounded-4">
+              <img src="https://imagor.owtg.one/unsafe/fit-in/1000x334/https://d28jzcg6y4v9j1.cloudfront.net/banners/back-to-school-2025-snp.jpg" alt="Back to school 2025" class="img-fluid rounded" />
+            </div>
+          </div>
+        </div>
+
         {/* Sidebar Filters */}
         <div className="col-md-3 col-lg-2">
           <div className="card shadow border-0 rounded-4 sticky-top" style={{ top: '20px', background: '#fff' }}>
-            <div className="card-header bg-primary text-white rounded-top-4">
+            <div className="card-header bg-info text-white rounded-top-4">
               <h6 className="mb-0 d-flex align-items-center justify-content-between">
                 <span>
                   <i className="bi bi-funnel me-2"></i>
                   <span style={{ letterSpacing: 1 }}>BỘ LỌC</span>
                 </span>
-                <button 
-                  className="btn btn-sm btn-light border-0 rounded-circle d-flex align-items-center justify-content-center" 
+                <button
+                  className="btn btn-sm btn-light border-0 rounded-circle d-flex align-items-center justify-content-center "
                   onClick={clearFilters}
                   title="Xóa tất cả bộ lọc"
                   style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
                 >
-                  <i className="bi bi-x-lg text-danger"></i>
-                </button>
+                  <i class="fa-solid fa-delete-left"></i>                </button>
               </h6>
             </div>
             <div className="card-body p-3">
@@ -229,9 +246,9 @@ function Product() {
                     )}
                     {(minPrice || maxPrice) && (
                       <span className="badge bg-secondary d-flex align-items-center gap-1">
-                        {minPrice && maxPrice ? `${minPrice}đ - ${maxPrice}đ` 
-                         : minPrice ? `Từ ${minPrice}đ` 
-                         : `Đến ${maxPrice}đ`}
+                        {minPrice && maxPrice ? `${minPrice}đ - ${maxPrice}đ`
+                          : minPrice ? `Từ ${minPrice}đ`
+                            : `Đến ${maxPrice}đ`}
                         <button type="button" className="btn btn-sm btn-link p-0 ms-1 text-white" style={{ lineHeight: 1 }} onClick={() => setFilters(f => ({ ...f, minPrice: '', maxPrice: '' }))}>
                           <i className="bi bi-x-circle"></i>
                         </button>
@@ -289,9 +306,9 @@ function Product() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center align-items-center gap-3 mt-4 py-3">
-                  <button 
-                    className="btn btn-outline-primary btn-sm d-flex align-items-center" 
-                    onClick={handlePrev} 
+                  <button
+                    className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                    onClick={handlePrev}
                     disabled={page <= 1}
                   >
                     <i className="bi bi-chevron-left me-1"></i>
@@ -304,9 +321,9 @@ function Product() {
                     </span>
                   </div>
 
-                  <button 
-                    className="btn btn-outline-primary btn-sm d-flex align-items-center" 
-                    onClick={handleNext} 
+                  <button
+                    className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                    onClick={handleNext}
                     disabled={page >= totalPages}
                   >
                     Trang sau

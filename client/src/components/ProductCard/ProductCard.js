@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux"
 import { addToCart } from "../../redux/user/cartSlice";
+import { addToWishlist, removeFromWishlist } from "../../redux/user/wishlistSlice";
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetchCart } from '../../redux/user/cartSlice';
@@ -12,6 +13,8 @@ function ProductCard({ product }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const totalPrice = useSelector(selectCartTotalPrice);
+    const { wishlist } = useSelector(state => state.user.userWishlist);
+    const { token } = useSelector(state => state.auth);
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -51,6 +54,35 @@ function ProductCard({ product }) {
         setTimeout(() => {
             navigate('/cart');
         }, 1000);
+    };
+
+    const handleWishlistToggle = () => {
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để sử dụng tính năng này');
+            return;
+        }
+
+        const isInWishlist = wishlist.some(item => item._id === product._id);
+        
+        if (isInWishlist) {
+            dispatch(removeFromWishlist(product._id))
+                .unwrap()
+                .then(() => {
+                    toast.success('Đã xóa khỏi danh sách yêu thích');
+                })
+                .catch(error => {
+                    toast.error(`Lỗi khi xóa khỏi danh sách yêu thích: ${error}`);
+                });
+        } else {
+            dispatch(addToWishlist(product._id))
+                .unwrap()
+                .then(() => {
+                    toast.success('Đã thêm vào danh sách yêu thích');
+                })
+                .catch(error => {
+                    toast.error(`Lỗi khi thêm vào danh sách yêu thích: ${error}`);
+                });
+        }
     };
 
     return (
@@ -107,7 +139,7 @@ function ProductCard({ product }) {
                     style={{ zIndex: 2 }}
                 >
                     <button
-                        className="btn btn-sm border-0 bg-white rounded-circle"
+                        className={`btn btn-sm border-0 rounded-circle ${wishlist.some(item => item._id === product._id) ? 'bg-danger text-white' : 'bg-white'}`}
                         style={{
                             width: '32px',
                             height: '32px',
@@ -117,13 +149,18 @@ function ProductCard({ product }) {
                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                             transition: 'all 0.2s ease',
                         }}
+                        onClick={handleWishlistToggle}
                         onMouseEnter={(e) => {
                             e.target.style.transform = 'scale(1.1)';
-                            e.target.style.color = '#ff6b6b';
+                            if (!wishlist.some(item => item._id === product._id)) {
+                                e.target.style.color = '#ff6b6b';
+                            }
                         }}
                         onMouseLeave={(e) => {
                             e.target.style.transform = 'scale(1)';
-                            e.target.style.color = '#6c757d';
+                            if (!wishlist.some(item => item._id === product._id)) {
+                                e.target.style.color = '#6c757d';
+                            }
                         }}
                     >
                         <i className="fas fa-heart" style={{ fontSize: '0.8rem' }}></i>

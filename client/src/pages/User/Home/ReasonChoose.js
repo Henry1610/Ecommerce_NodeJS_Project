@@ -40,7 +40,7 @@ function ReasonChoose() {
     return (
         <div className="py-5">
             <h1 className="text-center mb-5 fw-bold">
-                Chọn ThinkPro - Chọn sự yên tâm
+                Chọn Pro - Chọn sự yên tâm
             </h1>
 
             <div className="card shadow border-0 rounded-4 overflow-hidden">
@@ -56,7 +56,7 @@ function ReasonChoose() {
                                     style={{ transition: "all 0.3s ease" }}
                                 >
                                     <i className={`${item.icon} fs-5`}></i>
-                                    <span className="fs-6 text-start">{item.title}</span>
+                                    <span className="fs-6 text-start fw-bold">{item.title}</span>
                                 </button>
                             ))}
                         </div>

@@ -11,11 +11,11 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/thumbs';
 import { addToCart } from '../../../redux/user/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../../../redux/user/wishlistSlice';
 import { toast } from 'react-toastify';
 import { fetchReviewStats } from '../../../redux/public/reviewSlice';
 import "./ProductDetail.css";
 import axios from 'axios';
-import ProductCard from '../../../components/ProductCard/ProductCard';
 import RelatedProductItem from '../../../components/RelatedProductItem';
 
 // Constants
@@ -38,6 +38,8 @@ function ProductDetail() {
     // Selectors
     const { reviews, product, loading, error } = useSelector((state) => state.public.publicProduct);
     const { stats, total } = useSelector(state => state.public.publicReview);
+    const { wishlist } = useSelector(state => state.user.userWishlist);
+    const { token } = useSelector(state => state.auth);
 
     // Computed values
     const averageRating = (product?.ratings || 0).toFixed(1);
@@ -97,6 +99,35 @@ function ProductDetail() {
         }
     };
 
+    const handleWishlistToggle = () => {
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để sử dụng tính năng này');
+            return;
+        }
+
+        const isInWishlist = wishlist.some(item => item._id === product._id);
+        
+        if (isInWishlist) {
+            dispatch(removeFromWishlist(product._id))
+                .unwrap()
+                .then(() => {
+                    toast.success('Đã xóa khỏi danh sách yêu thích');
+                })
+                .catch(error => {
+                    toast.error(`Lỗi khi xóa khỏi danh sách yêu thích: ${error}`);
+                });
+        } else {
+            dispatch(addToWishlist(product._id))
+                .unwrap()
+                .then(() => {
+                    toast.success('Đã thêm vào danh sách yêu thích');
+                })
+                .catch(error => {
+                    toast.error(`Lỗi khi thêm vào danh sách yêu thích: ${error}`);
+                });
+        }
+    };
+
     const handleRatingFilter = (rating) => {
         setSelectedRating(rating);
     };
@@ -139,6 +170,8 @@ function ProductDetail() {
                     onDecreaseQuantity={decreaseQuantity}
                     onQuantityChange={handleQuantityChange}
                     onAddToCart={handleAddToCart}
+                    onWishlistToggle={handleWishlistToggle}
+                    isInWishlist={wishlist.some(item => item._id === product._id)}
                 />
             </div>
 
@@ -315,7 +348,9 @@ function ProductInfo({
     onIncreaseQuantity,
     onDecreaseQuantity,
     onQuantityChange,
-    onAddToCart
+    onAddToCart,
+    onWishlistToggle,
+    isInWishlist
 }) {
     // Lấy sản phẩm cùng danh mục
     const [relatedProducts, setRelatedProducts] = useState([]);
@@ -344,6 +379,8 @@ function ProductInfo({
                 discountPrice={discountPrice}
                 discountPercent={product.discountPercent}
                 onAddToCart={onAddToCart}
+                onWishlistToggle={onWishlistToggle}
+                isInWishlist={isInWishlist}
             />
             {/* Sản phẩm cùng danh mục */}
             {relatedProducts.length > 0 && (
@@ -448,7 +485,7 @@ function QuantitySelector({ quantity, onIncrease, onDecrease, onChange }) {
     );
 }
 
-function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCart }) {
+function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCart, onWishlistToggle, isInWishlist }) {
     return (
         <div className="d-flex flex-column align-items-center shadow rounded-4 overflow-hidden p-2"
             style={{ maxWidth: '320px', backgroundColor: '#fff', marginTop: 16 }}>
@@ -469,17 +506,27 @@ function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCar
                         </span>
                     )}
                 </div>
-                <button
-                    className="btn fw-bold text-white d-flex align-items-center justify-content-center gap-2"
-                    style={{ background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)', borderRadius: '22px', minWidth: 90, height: 44, fontSize: 15, boxShadow: '0 2px 8px rgba(0,229,255,0.10)', transition: 'all 0.2s', margin: '0 auto', padding: '0 10px' }}
-                    onClick={onAddToCart}
-                    title="Thêm vào giỏ"
-                    onMouseEnter={e => e.target.style.filter = 'brightness(1.08)'}
-                    onMouseLeave={e => e.target.style.filter = 'none'}
-                >
-                    <i className="fas fa-shopping-bag"></i>
-                    Thêm vào giỏ
-                </button>
+                <div className="d-flex gap-2 justify-content-center">
+                    <button
+                        className="btn fw-bold text-white d-flex align-items-center justify-content-center gap-2"
+                        style={{ background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)', borderRadius: '22px', minWidth: 90, height: 44, fontSize: 15, boxShadow: '0 2px 8px rgba(0,229,255,0.10)', transition: 'all 0.2s', padding: '0 10px' }}
+                        onClick={onAddToCart}
+                        title="Thêm vào giỏ"
+                        onMouseEnter={e => e.target.style.filter = 'brightness(1.08)'}
+                        onMouseLeave={e => e.target.style.filter = 'none'}
+                    >
+                        <i className="fas fa-shopping-bag"></i>
+                        Thêm vào giỏ
+                    </button>
+                    <button
+                        className={`btn d-flex align-items-center justify-content-center ${isInWishlist ? 'btn-danger' : 'btn-outline-danger'}`}
+                        style={{ borderRadius: '22px', width: 44, height: 44, fontSize: 15, transition: 'all 0.2s' }}
+                        onClick={onWishlistToggle}
+                        title={isInWishlist ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+                    >
+                        <i className={`fas fa-heart ${isInWishlist ? 'text-white' : ''}`}></i>
+                    </button>
+                </div>
             </div>
         </div>
     );

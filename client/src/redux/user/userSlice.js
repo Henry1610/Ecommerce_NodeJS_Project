@@ -13,7 +13,8 @@ export const fetchUserProfile = createAsyncThunk(
       });
 
       const data = await res.json();
-
+      console.log('data:',data);
+      
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Failed to fetch user info');
       }
@@ -99,6 +100,7 @@ const userProfileSlice = createSlice({
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.profile = action.payload;
+        
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

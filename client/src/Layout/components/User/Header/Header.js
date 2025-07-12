@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { fetchProducts, resetSuggestions } from '../../../../redux/public/productsSlice';
 import { getProductSuggestions } from '../../../../redux/public/productsSlice';
 import useDebounce from '../../../../hooks/useDebounce';
-import logo from '../../../../assets/logo/Logo.png'
+import { fetchUserProfile } from '../../../../redux/user/userSlice';
 function Header() {
     const token = useSelector((state) => state.auth.token);
     const dispatch = useDispatch();
@@ -20,11 +20,13 @@ function Header() {
     const [keyword, setKeyword] = useState('');
     const debouncedKeyword = useDebounce(keyword, 500);
 
-    const userProfile = useSelector(state => state.user.userProfile.profile);
+    const { profile } = useSelector(state => state.user.userProfile);
     const authUser = useSelector(state => state.auth.user);
-    const username = userProfile?.user?.username || authUser?.username || 'Tài khoản';
-    const avatar = userProfile?.user?.avatar || authUser?.avatar || '';
-
+    const username = profile?.user?.username || authUser?.username || 'Tài khoản';
+    const avatar = profile?.user?.avatar || authUser?.avatar || '';
+    useEffect(() => {
+        dispatch(fetchUserProfile());
+    }, [dispatch]);
     const handleSearch = (e) => {
         e.preventDefault();
 
@@ -85,7 +87,7 @@ function Header() {
                         style={{ color: '#6c757d', fontWeight: 500, fontSize: "0.9rem" }} // nhỏ chữ + giảm đậm
                     >
                         <i className="fas fa-store-alt small"></i>
-                        <span>Địa chỉ cửa hàng</span>
+                        <Link to='/store-address' className="text-decoration-none">Địa chỉ cửa hàng</Link>
                     </button>
                     <button
                         className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
@@ -102,8 +104,8 @@ function Header() {
             <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
                 <div className="d-flex align-items-center gap-4">
                     <Link to='/' className="text-primary fw-bold" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
-                    <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
-                    pro
+                        <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
+                        pro
                     </Link>
                     <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
                         <i className="fas fa-bars fs-4"></i>
@@ -180,7 +182,7 @@ function Header() {
                                     <span className="fw-bold fs-6">{username}</span>
                                 </span>
                             </Link>
-                            
+
 
                             <button
                                 className="btn btn-info text-black fw-bold d-flex align-items-center gap-1 rounded-pill position-relative"
@@ -205,10 +207,18 @@ function Header() {
                             <button
                                 className="btn btn-info text-black fw-bold d-flex align-items-center p-2 rounded-pill"
                                 type="button"
-                                aria-label="Shopping cart"
+                                aria-label="Wish list"
+                                onClick={() => { navigate('/wishlist') }}
+                            >
+                                <i className="fas fa-heart fs-4"></i>
+                            </button>
+                            <button
+                                className="btn btn-info text-black fw-bold d-flex align-items-center p-2 rounded-pill"
+                                type="button"
+                                aria-label="Order history"
                                 onClick={() => { navigate('/order-history') }}
                             >
-                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <i className="fa-solid fa-clock-rotate-left"></i>
                             </button>
                             <button
                                 className="btn btn-logout  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"

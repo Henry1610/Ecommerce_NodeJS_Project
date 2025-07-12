@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {
