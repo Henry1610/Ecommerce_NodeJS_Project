@@ -8,8 +8,9 @@ import { toast } from 'react-toastify';
 import { fetchCart } from '../../redux/user/cartSlice';
 import { MAX_STRIPE_AMOUNT } from '../../config/constants';
 import { selectCartTotalPrice } from '../../redux/user/cartSlice';
+import { addToCompare, removeFromCompare } from '../../redux/public/compareSlice';
 
-function ProductCard({ product }) {
+function ProductCard({ product, compareEnabled }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const totalPrice = useSelector(selectCartTotalPrice);
@@ -17,6 +18,7 @@ function ProductCard({ product }) {
     const { token } = useSelector(state => state.auth);
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const compareList = useSelector(state => state.public.compare.compareList);
 
     useEffect(() => {
         dispatch(fetchCart());
@@ -307,6 +309,22 @@ function ProductCard({ product }) {
                         </div>
                     </div>
 
+                    {/* Nút +So sánh */}
+                    {compareEnabled && (
+                        <button
+                            className={`btn btn-outline-info btn-sm w-100 mb-2 ${compareList.length >= 2 && !compareList.find(p => p._id === product._id) ? 'disabled' : ''}`}
+                            disabled={compareList.length >= 2 && !compareList.find(p => p._id === product._id)}
+                            onClick={() => {
+                                if (compareList.find(p => p._id === product._id)) {
+                                    dispatch(removeFromCompare(product._id));
+                                } else {
+                                    dispatch(addToCompare(product));
+                                }
+                            }}
+                        >
+                            {compareList.find(p => p._id === product._id) ? 'Bỏ so sánh' : '+ So sánh'}
+                        </button>
+                    )}
                     {/* Action Buttons */}
                     <div className="d-flex gap-2">
                         <button 

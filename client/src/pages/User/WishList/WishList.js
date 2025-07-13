@@ -81,18 +81,15 @@ function WishList() {
             <div className="row mb-5">
                 <div className="col-12">
                     <div className="d-flex align-items-center justify-content-between">
-        <div>
-                            <h2 className="fw-bold text-dark mb-2">
-                                <i className="fas fa-heart text-danger me-3"></i>
-                                Danh sách yêu thích
-                            </h2>
-                            <p className="text-muted mb-0">
+                        <div className="d-flex align-items-center gap-2 mb-3">
+                            <p className="mb-0 fw-semibold text-secondary fs-5">
                                 {wishlist?.length || 0} sản phẩm trong danh sách yêu thích
                             </p>
                         </div>
+
                         {wishlist && wishlist.length > 0 && (
                             <div className="text-end">
-                                <span className="badge bg-info fs-6 px-3 py-2">
+                                <span className="badge bg-info fs-6 px-3 ">
                                     {wishlist.length} sản phẩm
                                 </span>
                             </div>
@@ -100,7 +97,7 @@ function WishList() {
                     </div>
                 </div>
             </div>
-           
+
             {/* Wishlist Content */}
             {wishlist && wishlist.length > 0 ? (
                 <div className="row">
@@ -167,8 +164,8 @@ function WishList() {
                                                                                     width: '100%',
                                                                                     height: '100%',
                                                                                     objectFit: 'contain',
-                                                                                    backgroundColor: '#f8f9fa', 
-                                                                                    padding: '4px', 
+                                                                                    backgroundColor: '#f8f9fa',
+                                                                                    padding: '4px',
                                                                                     border: '1px solid #dee2e6'
                                                                                 }}
                                                                             />
@@ -275,7 +272,7 @@ function WishList() {
                                                         </div>
                                                     </td>
 
-                                            </tr>
+                                                </tr>
                                             ))}
                                         </tbody>
                                     </table>
@@ -301,9 +298,9 @@ function WishList() {
                                 <i className="fas fa-shopping-bag me-2"></i>
                                 Mua sắm ngay
                             </Link>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
         </div>
     );

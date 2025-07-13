@@ -27,33 +27,51 @@ const ReviewTab = () => {
     <div className="container py-3">
       <h4 className="fw-bold mb-4">Đánh giá & nhận xét của bạn</h4>
       <div className="row g-3">
-        {myReviews.map((review) => (
-          <div className="col-12 col-md-6 col-lg-4" key={review._id}>
-            <div className="card shadow-sm rounded-4 h-100">
-              <div className="card-body">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <img src={review.product?.images?.[0] || '/default-product.png'} alt="product" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} />
-                  <div>
-                    <div className="fw-bold text-dark">{review.product?.name || 'Sản phẩm'}</div>
-                    <div className="small text-muted">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</div>
-                  </div>
-                </div>
-                <div className="mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <i
-                      key={i}
-                      className={`fas fa-star${i < review.rating ? ' text-warning' : ' text-muted'}`}
-                      style={{ fontSize: 15 }}
-                    ></i>
-                  ))}
-                </div>
-                <div className="mb-2 text-secondary" style={{ fontSize: 15 }}>
-                  {review.comment}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      {myReviews.map((review) => (
+  <div className="col-12 mb-3" key={review._id}>
+    <div className="card shadow-sm rounded-4 d-flex flex-row align-items-start p-3 gap-3">
+      {/* Hình ảnh sản phẩm */}
+      <img
+        src={review.product.images?.[0] || '/default-product.png'}
+        alt={review.product.name}
+        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }}
+      />
+
+      {/* Nội dung đánh giá */}
+      <div className="flex-grow-1">
+        <div className="d-flex justify-content-between align-items-center">
+          <strong className="text-dark">{review.product.name}</strong>
+          <small className="text-muted">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</small>
+        </div>
+
+        {/* Sao đánh giá */}
+        <div className="mb-1">
+          {[...Array(5)].map((_, i) => (
+            <i
+              key={i}
+              className={`fas fa-star${i < review.rating ? ' text-warning' : ' text-muted'}`}
+              style={{ fontSize: 14 }}
+            ></i>
+          ))}
+        </div>
+
+        {/* Nội dung bình luận */}
+        <div className="text-muted small">{review.comment}</div>
+
+        {/* Ảnh review nếu có */}
+        {review.images && (
+          <img
+            src={review.images}
+            alt="Ảnh đánh giá"
+            className="mt-2"
+            style={{ maxWidth: 100, borderRadius: 6 }}
+          />
+        )}
+      </div>
+    </div>
+  </div>
+))}
+
       </div>
     </div>
   );

@@ -83,7 +83,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="px-2 px-md-4 py-4">
+    <div className="px-2 px-md-4 py-4 ">
       <h2 className="fw-bold mb-4" style={{ fontSize: 28 }}>Thông tin tài khoản</h2>
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
       {error && <div className="alert alert-danger">{error}</div>}

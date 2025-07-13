@@ -8,6 +8,7 @@ import ProductDetail from "../pages/User/ProductDetail/ProductDetail"
 import ResetPassword from '../pages/Auth/ResetPassword'
 import NewPassword from '../pages/Auth/ResetPassword/NewPassword'
 import AddressStore from '../pages/User/AddressStore';
+import ComparePage from '../pages/User/ComparePage';
 
 const publicRoutes = [
     { path: "/about-us", component: AboutUs },
@@ -20,5 +21,6 @@ const publicRoutes = [
     { path: "/register", component: Register },
     { path: "/reset-password", component: ResetPassword },
     { path: "/reset-password/:token", component: NewPassword },
+    { path: "/compare", component: ComparePage },
 ]
 export default publicRoutes

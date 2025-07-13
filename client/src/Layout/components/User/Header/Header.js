@@ -17,6 +17,7 @@ function Header() {
     const { productSuggestions } = useSelector(state => state.public.publicProduct);
 
     const { cart, error, loading } = useSelector(state => state.user.userCart);
+    const { compareList } = useSelector(state => state.public.compare);
     const [keyword, setKeyword] = useState('');
     const debouncedKeyword = useDebounce(keyword, 500);
 
@@ -65,6 +66,8 @@ function Header() {
                 .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
         }
     }, [dispatch, isAuthenticated, authUser]);
+
+    const wishlistCount = useSelector(state => state.user.userWishlist.wishlist.length);
 
     return (
         <>
@@ -168,58 +171,100 @@ function Header() {
                 <div className="d-flex align-items-center gap-3 text-secondary fw-semibold user-select-none">
                     {isAuthenticated ? (
                         <>
+                            <div className="bg-info d-flex align-items-center gap-4 px-3 py-2 rounded-4 shadow">
+                                <button
+                                    className="btn p-0 border-0 bg-transparent position-relative"
+                                    type="button"
+                                    aria-label="Shopping cart"
+                                    onClick={() => { navigate('/cart') }}
+                                    style={{ color: '#fff' }}
+                                >
+                                    <i className="fas fa-shopping-bag fs-4"></i>
+                                    {cart?.items?.length > 0 && (
+                                        <span
+                                            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                            style={{
+                                                transform: 'translate(-50%, -30%)',
+                                                padding: '4px 6px',
+                                                fontSize: '0.75rem',
+                                                minWidth: '20px',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {cart?.items?.length}
+                                        </span>
+                                    )}
+                                </button>
+                                <button
+                                    className="btn p-0 border-0 bg-transparent position-relative"
+                                    type="button"
+                                    aria-label="Wish list"
+                                    onClick={() => { navigate('/wishlist') }}
+                                    style={{ color: '#fff' }}
+                                >
+                                    <i className="fas fa-heart fs-4"></i>
+                                    {wishlistCount > 0 && (
+                                        <span
+                                            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                            style={{
+                                                transform: 'translate(-50%, -30%)',
+                                                padding: '4px 6px',
+                                                fontSize: '0.75rem',
+                                                minWidth: '20px',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {wishlistCount}
+                                        </span>
+                                    )}
+                                </button>
+                                <button
+                                    className="btn p-0 border-0 bg-transparent position-relative"
+                                    type="button"
+                                    aria-label="Compare products"
+                                    onClick={() => { navigate('/compare') }}
+                                    style={{ color: '#fff' }}
+                                >
+                                    <i className="fas fa-exchange-alt fs-4"></i>
+                                    {compareList.length > 0 && (
+                                        <span
+                                            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                                            style={{
+                                                transform: 'translate(-50%, -30%)',
+                                                padding: '4px 6px',
+                                                fontSize: '0.75rem',
+                                                minWidth: '20px',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {compareList.length}
+                                        </span>
+                                    )}
+                                </button>
+                                <button
+                                    className="btn p-0 border-0 bg-transparent"
+                                    type="button"
+                                    aria-label="Order history"
+                                    onClick={() => { navigate('/order-history') }}
+                                    style={{ color: '#fff' }}
+                                >
+                                    <i className="fa-solid fa-clock-rotate-left fs-4"></i>
+                                </button>
+                            </div>
                             <Link to='/profile'>
                                 <span className="d-flex align-items-center gap-2">
                                     {avatar ? (
                                         <img
                                             src={avatar}
                                             alt="avatar"
-                                            style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
+                                            style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }}
                                         />
                                     ) : (
                                         <i className="far fa-user-circle fs-4"></i>
                                     )}
-                                    <span className="fw-bold fs-6">{username}</span>
+                                    <span className="fw-bold fs-5">{username}</span>
                                 </span>
                             </Link>
-
-
-                            <button
-                                className="btn btn-info text-black fw-bold d-flex align-items-center gap-1 rounded-pill position-relative"
-                                type="button"
-                                aria-label="Shopping cart"
-                                onClick={() => { navigate('/cart') }}
-                            >
-                                <i className="fas fa-shopping-bag fs-4"></i>
-                                <span
-                                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                    style={{
-                                        transform: 'translate(-50%, -30%)',
-                                        padding: '4px 6px',
-                                        fontSize: '0.75rem',
-                                        minWidth: '20px',
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    {cart?.items?.length}
-                                </span>
-                            </button>
-                            <button
-                                className="btn btn-info text-black fw-bold d-flex align-items-center p-2 rounded-pill"
-                                type="button"
-                                aria-label="Wish list"
-                                onClick={() => { navigate('/wishlist') }}
-                            >
-                                <i className="fas fa-heart fs-4"></i>
-                            </button>
-                            <button
-                                className="btn btn-info text-black fw-bold d-flex align-items-center p-2 rounded-pill"
-                                type="button"
-                                aria-label="Order history"
-                                onClick={() => { navigate('/order-history') }}
-                            >
-                                <i className="fa-solid fa-clock-rotate-left"></i>
-                            </button>
                             <button
                                 className="btn btn-logout  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
                                 type="button"
@@ -227,19 +272,16 @@ function Header() {
                             >
                                 <i class="fa-solid fa-right-from-bracket"></i>  <span className="fw-semibold">Đăng xuất</span>
                             </button>
-
                         </>
                     ) : (
                         <Link to='/login'>
                             <button
                                 className="btn btn-login  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
                                 type="button"
-
                             >
                                 <i class="fa-solid fa-right-to-bracket"></i>  <span className="fw-semibold">Đăng nhập</span>
                             </button>
                         </Link>
-
                     )}
                 </div>
 

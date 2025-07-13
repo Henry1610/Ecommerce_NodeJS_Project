@@ -6,12 +6,15 @@ import { fetchCategories } from '../../../redux/public/categorySlice';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
+import { toggleCompare } from '../../../redux/public/compareSlice';
+import CompareBar from '../../../components/CompareBar/CompareBar';
 function Product() {
   const dispatch = useDispatch();
   const { products, loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
 
   const { categories } = useSelector((state) => state.public.publicCategory || { categories: [] });
   const { brands } = useSelector((state) => state.public.publicBrand || { brands: [] });
+  const compareEnabled = useSelector(state => state.public.compare.enabled);
 
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -89,6 +92,7 @@ function Product() {
         </li>
         <li className="breadcrumb-item active" aria-current="page">Sản phẩm</li>
       </ol>
+
       <div className="row">
         {/* Banner */}
         <div class=" mb-5">
@@ -121,6 +125,37 @@ function Product() {
               </h6>
             </div>
             <div className="card-body p-3">
+              {/* Icon toggle so sánh */}
+              <div className="mb-3 d-flex justify-content-center">
+                <button
+                  className={`btn btn-light border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm`}
+                  onClick={() => dispatch(toggleCompare())}
+                  style={{
+                    width: '45px',
+                    height: '45px',
+                    transition: 'all 0.3s ease',
+                    background: compareEnabled ? '#28a745' : '#f8f9fa',
+                    color: compareEnabled ? 'white' : '#6c757d',
+                    border: compareEnabled ? 'none' : '1px solid #dee2e6'
+                  }}
+                  title={compareEnabled ? 'Tắt chế độ so sánh' : 'Bật chế độ so sánh'}
+                >
+                  <i 
+                    className={`fas fa-exchange-alt ${compareEnabled ? 'text-white' : 'text-muted'}`}
+                    style={{
+                      transform: compareEnabled ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.3s ease',
+                      fontSize: '14px'
+                    }}
+                  ></i>
+                </button>
+              </div>
+              <div className="text-center mb-3">
+                <small className={`text-muted ${compareEnabled ? 'text-success fw-semibold' : ''}`}>
+                  {compareEnabled ? 'Chế độ so sánh đang bật' : 'Bật chế độ so sánh'}
+                </small>
+              </div>
+              <hr className="my-2 opacity-25" />
               {/* Sort Filter */}
               <div className="filter-group mb-4">
                 <label className="form-label fw-semibold text-uppercase small text-muted mb-1">
@@ -298,7 +333,7 @@ function Product() {
               <div className="row g-3">
                 {products.map(product => (
                   <div className="col-6 col-lg-4 col-xl-3" key={product._id}>
-                    <ProductCard product={product} />
+                    <ProductCard product={product} compareEnabled={compareEnabled} />
                   </div>
                 ))}
               </div>
@@ -307,7 +342,7 @@ function Product() {
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center align-items-center gap-3 mt-4 py-3">
                   <button
-                    className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                    className="btn btn-outline-info btn-sm d-flex align-items-center"
                     onClick={handlePrev}
                     disabled={page <= 1}
                   >
@@ -316,13 +351,13 @@ function Product() {
                   </button>
 
                   <div className="pagination-info px-3">
-                    <span className="badge bg-primary">
+                    <span className="badge bg-info">
                       {currentPage} / {totalPages}
                     </span>
                   </div>
 
                   <button
-                    className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                    className="btn btn-outline-info btn-sm d-flex align-items-center"
                     onClick={handleNext}
                     disabled={page >= totalPages}
                   >
@@ -335,6 +370,7 @@ function Product() {
           )}
         </div>
       </div>
+      <CompareBar />
     </div>
   );
 }

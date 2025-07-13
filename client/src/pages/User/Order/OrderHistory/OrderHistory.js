@@ -64,13 +64,17 @@ const OrderHistory = () => {
   if (error) return <p className="text-danger text-center">Lỗi: {error}</p>;
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 border-top">
       <div className="row">
         <div className="col-12">
           {/* Header */}
-          <div className="mb-4">
-            <h2 className="fw-bold">Lịch Sử Đơn Hàng</h2>
-            <p className="text-muted">Theo dõi tất cả đơn hàng của bạn tại đây</p>
+          <div className="mb-4 ">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/" className="text-decoration-none">Trang chủ</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Lịch sử đơn hàng</li>
+            </ol>
           </div>
 
           {orders.length === 0 ? (
@@ -123,8 +127,8 @@ const OrderHistory = () => {
                             <span className="fw-bold">{formatVND(order.totalPrice)}</span>
                           </td>
                           <td>
-                            <Link 
-                              to={`/order-detail/${order.orderNumber}`} 
+                            <Link
+                              to={`/order-detail/${order.orderNumber}`}
                               className="btn btn-outline-primary btn-sm"
                             >
                               <i className="bi bi-eye me-1"></i>
@@ -170,8 +174,8 @@ const OrderHistory = () => {
                           </div>
                         </div>
                         <div className="card-footer bg-transparent">
-                          <Link 
-                            to={`/order-detail/${order.orderNumber}`} 
+                          <Link
+                            to={`/order-detail/${order.orderNumber}`}
                             className="btn btn-primary w-100"
                           >
                             <i className="bi bi-eye me-2"></i>

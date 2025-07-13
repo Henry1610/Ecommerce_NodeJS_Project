@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Cart.css';
 import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,6 @@ import { MAX_STRIPE_AMOUNT } from '../../../config/constants';
 import Swal from 'sweetalert2';
 function Cart() {
     // Redux hooks
-    const location = useLocation();
     const modalRef = useRef(null);
     const dispatch = useDispatch();
     const { cart, error, loading, selectedDiscountSlice, discountLoading } = useSelector(state => state.user.userCart);
@@ -378,7 +377,7 @@ function Cart() {
 
     // Main render
     return (
-        <div className="container py-5">
+        <div className="container py-5 ">
             <div className="row gy-4">
                 {/* Left - Cart Items */}
                 <div className="col-md-8">
@@ -389,7 +388,7 @@ function Cart() {
                         const discountedPrice = Math.round(price * (1 - (discountPercent || 0) / 100));
 
                         return (
-                            <div key={_id} className="card mb-3 shadow-sm">
+                            <div key={_id} className="card mb-3 shadow-sm ">
                                 <div className="card-body">
                                     <div className="d-flex justify-content-between">
                                         <div className="d-flex">
@@ -450,8 +449,8 @@ function Cart() {
                 {/* Right - Summary */}
                 <div className="col-md-4">
                     {/* Promotion Section */}
-                    <div className="card mb-3">
-                        <div className="card-body">
+                    <div className="card mb-3 ">
+                        <div className="card-body ">
                             <h5 className="card-title">Khuyến mãi</h5>
                             <button
                                 className="btn btn-outline-secondary w-100 fw-bold"
@@ -487,9 +486,9 @@ function Cart() {
                     </div>
 
                     {/*Adress  */}
-                    <div className="d-flex justify-content-center align-items-center mb-3">
-                        <div className="w-100" style={{ maxWidth: '600px' }}>
-                            <div className="border shadow-sm p-4 bg-white text-secondary small" >
+                    <div className="d-flex justify-content-center align-items-center mb-3 ">
+                        <div className="w-100 " style={{ maxWidth: '600px' }}>
+                            <div className="border shadow-sm p-4 bg-white text-secondary small rounded" >
                                 <div className="d-flex justify-content-between border-bottom pb-3 mb-3">
                                     <span className="fw-semibold text-dark">Full Name</span>
                                     <span>{defaultAddressObj?.fullName}</span>
@@ -725,7 +724,7 @@ function Cart() {
                         {showModal === 'addOneAddress' && (
                             <>
                                 <div className="modal-backdrop fade show" />
-                                <div className="modal show d-block" tabIndex="-1">
+                                <div className="modal show d-block " tabIndex="-1">
                                     <div className="modal-dialog modal-dialog-centered">
                                         <div className="modal-content rounded-3 shadow-lg">
                                             <div className="modal-header">
@@ -820,7 +819,7 @@ function Cart() {
 
                     {/* Order Summary */}
                     <div className="card">
-                        <div className="card-body">
+                        <div className="card-body shadow">
                             <h5 className="card-title">Tóm tắt đơn hàng</h5>
 
                             <div className="d-flex justify-content-between text-muted small">
@@ -829,14 +828,14 @@ function Cart() {
                             </div>
 
                             {selectedDiscountSlice && (
-                                <div className="d-flex justify-content-between text-success">
+                                <div className="d-flex justify-content-between text-muted small">
                                     <span>Giảm giá ({selectedDiscountSlice.code})</span>
                                     <span>-{CartDiscountAmount.toLocaleString()}đ</span>
                                 </div>
                             )}
                             {
                                 defaultAddressObj && cart.items.length > 0 && (
-                                    <div className="d-flex justify-content-between text-success">
+                                    <div className="d-flex justify-content-between text-muted small">
                                         <span>Phí ship </span>
                                         <span>{(defaultAddressObj.city.fee).toLocaleString()}đ</span>
                                     </div>
@@ -852,13 +851,13 @@ function Cart() {
                             </div>
 
                             <button
-                                className="btn btn-info w-100 fw-bold mt-3"
+                                className="btn btn-info w-100 fw-bold mt-3 text-white"
                                 onClick={handlePay}
                                 disabled={isPaying || isDiscountProcessing}
                             >
                                 {isPaying ? (
                                     <>
-                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span className="spinner-border spinner-border-sm me-2 " role="status" aria-hidden="true"></span>
                                         Đang xử lý
                                     </>
                                 ) : (

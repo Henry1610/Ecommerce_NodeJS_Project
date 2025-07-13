@@ -20,6 +20,7 @@ import brandReducer from './public/brandSlice'
 import categoryReducer from './public/categorySlice'
 import discountReducer from './public/discountSlice'
 import reviewReducer from './public/reviewSlice'
+import compareReducer from './public/compareSlice';
 //---------------------admin-------------------------
 import adminBrandReducer from './admin/brandSlice'
 import adminCategoryReducer from './admin/categoriesSlice'
@@ -37,6 +38,7 @@ const publicReducer = combineReducers({
   publicCategory: categoryReducer,
   publicDiscount: discountReducer,
   publicReview: reviewReducer,
+  compare: compareReducer,
 });
 const userReducer = combineReducers({
   userCart: userCartReducer,
