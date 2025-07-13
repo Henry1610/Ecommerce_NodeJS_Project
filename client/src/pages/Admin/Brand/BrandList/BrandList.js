@@ -64,7 +64,7 @@ const BrandList = () => {
 
     // Lọc brands theo searchTerm
     const filteredBrands = brands.filter(brand =>
-      brand.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      brand?.name?.toLowerCase().includes(searchTerm.trim().toLowerCase())
     );
 
     if (loading) {

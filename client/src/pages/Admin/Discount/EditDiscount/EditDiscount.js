@@ -52,6 +52,22 @@ const EditDiscount = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const now = new Date();
+        now.setHours(0,0,0,0); // So sánh chỉ theo ngày
+        const from = new Date(formData.validFrom);
+        const to = new Date(formData.validTo);
+
+        if (from > to) {
+            toast.error('Ngày bắt đầu không được sau ngày kết thúc!');
+            return;
+        }
+        if (to < now) {
+            toast.error('Ngày kết thúc không được ở quá khứ!');
+            return;
+        }
+        // Cho phép validFrom ở quá khứ khi cập nhật
+
         try {
             await dispatch(updateDiscount({ id, updatedData: formData })).unwrap();
             toast.success('Cập nhật mã giảm giá thành công!');
