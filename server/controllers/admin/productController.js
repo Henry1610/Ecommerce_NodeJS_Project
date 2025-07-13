@@ -43,6 +43,12 @@ export const addProduct = async (req, res, next) => {
     try {
         const { name, description, price, stock, category, brand, discountPercent, statusCurrent, color, attributes } = req.body;
 
+        // Kiểm tra trùng tên sản phẩm
+        const existing = await Product.findOne({ name: name.trim() });
+        if (existing) {
+            return res.status(400).json({ message: 'Tên sản phẩm đã tồn tại.' });
+        }
+
         let processedAttributes = {};
         if (attributes) {
             try {
@@ -67,7 +73,7 @@ export const addProduct = async (req, res, next) => {
         const imagesPaths = files.map(file => file.path);
         
         const newProduct = new Product({
-            name,
+            name: name.trim(),
             description,
             price,
             stock: Number(stock),
@@ -112,6 +118,12 @@ export const updateProduct = async (req, res, next) => {
             attributes
         } = req.body;
 
+        // Kiểm tra trùng tên với sản phẩm khác
+        const existing = await Product.findOne({ name: name.trim(), _id: { $ne: id } });
+        if (existing) {
+            return res.status(400).json({ message: 'Tên sản phẩm đã tồn tại.' });
+        }
+
         // Xử lý attributes (có thể là stringified JSON hoặc object)
         let processedAttributes = {};
         if (attributes) {
@@ -149,7 +161,7 @@ export const updateProduct = async (req, res, next) => {
         console.log('NEW IMAGES:', newImages);
 
         await Product.findByIdAndUpdate(id, {
-            name,
+            name: name.trim(),
             description,
             price,
             stock,

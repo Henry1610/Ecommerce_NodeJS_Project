@@ -56,7 +56,7 @@ const CategoryList = () => {
       
     // Lọc categories theo searchTerm
     const filteredCategories = categories.filter(category =>
-      category.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      category?.name?.toLowerCase().includes(searchTerm.trim().toLowerCase())
     );
 
     return (

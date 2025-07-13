@@ -16,17 +16,21 @@ export const getCategories = async (req, res) => {
 export const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        const newCategory = new Category(
-            {
-                name,
-                description
-            }
-        )
-        const category = newCategory.save();
-        res.status(200).json(category)
+
+        // Kiểm tra trùng tên
+        const existing = await Category.findOne({ name: name.trim() });
+        if (existing) {
+            return res.status(400).json({ message: 'Tên danh mục đã tồn tại.' });
+        }
+
+        const newCategory = new Category({
+            name: name.trim(),
+            description
+        });
+        const category = await newCategory.save();
+        res.status(200).json(category);
     } catch (err) {
         res.status(500).json({ message: 'Lỗi khi thêm category', error: err.message });
-
     }
 }
 export const getCategoryById = async (req, res) => {
@@ -39,10 +43,17 @@ export const updateCategory = async (req, res) => {
         const { id } = req.params;
         const { name, description } = req.body;
 
-        const updatedCategory = await Category.findByIdAndUpdate(id, {
-            name,
-            description
-        }, { new: true });
+        // Kiểm tra trùng tên với category khác
+        const existing = await Category.findOne({ name: name.trim(), _id: { $ne: id } });
+        if (existing) {
+            return res.status(400).json({ message: 'Tên danh mục đã tồn tại.' });
+        }
+
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
+            { name: name.trim(), description },
+            { new: true }
+        );
 
         if (!updatedCategory) {
             return res.status(404).json({ message: 'Category không tồn tại' });

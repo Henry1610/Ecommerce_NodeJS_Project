@@ -64,6 +64,12 @@ export const updateBrand = async (req, res) => {
       return res.status(404).json({ message: 'Brand not found' });
     }
 
+    // Kiểm tra trùng tên với brand khác
+    const existing = await Brand.findOne({ name: name.trim(), _id: { $ne: id } });
+    if (existing) {
+      return res.status(400).json({ message: 'Tên brand đã tồn tại.' });
+    }
+
     console.log('🔥 Brand cũ:', brand); // ✅ Kiểm tra dữ liệu brand cũ
 
     let logo = brand.logo;
@@ -95,7 +101,7 @@ export const updateBrand = async (req, res) => {
       logo = req.file.path;
     }
 
-    brand.name = name;
+    brand.name = name.trim();
     brand.logo = logo;
 
     const updatedBrand = await brand.save();
