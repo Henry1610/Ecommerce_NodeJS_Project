@@ -283,18 +283,18 @@ function WishList() {
                 </div>
             ) : (
                 <div className="text-center py-5">
-                    <div className="card border-0 shadow-sm">
+                    <div className="card border-0 shadow-sm text-dark">
                         <div className="card-body py-5">
                             <div className="mb-4">
-                                <i className="fas fa-heart text-muted" style={{ fontSize: '5rem' }}></i>
+                                <i className="fas fa-heart text-danger" style={{ fontSize: '5rem' }}></i>
                             </div>
-                            <h3 className="text-muted mb-3">Danh sách yêu thích trống</h3>
+                            <h3 className="text-muted mb-3 fw-bold">Danh sách yêu thích trống</h3>
                             <p className="text-muted mb-4 fs-5">
                                 Bạn chưa có sản phẩm nào trong danh sách yêu thích.
                                 <br />
                                 Hãy khám phá và thêm những sản phẩm bạn yêu thích!
                             </p>
-                            <Link to="/product" className="btn btn-primary btn-lg">
+                            <Link to="/product" className="btn btn-info text-white btn-lg">
                                 <i className="fas fa-shopping-bag me-2"></i>
                                 Mua sắm ngay
                             </Link>
