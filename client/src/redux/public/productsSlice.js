@@ -81,19 +81,40 @@ export const getProductSuggestions = createAsyncThunk(
             if (!res.ok) {
                 return thunkAPI.rejectWithValue(data.message || 'Không thể gợi ý sản phẩm');
             }
-            
+
             return data.suggestions;
         } catch (error) {
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
-
+// Like hoặc Unlike review
+export const likeOrUnlikeReview = createAsyncThunk(
+    'reviews/likeOrUnlikeReview',
+    async (reviewId, thunkAPI) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/users/reviews/like/${reviewId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Không thể like review');
+            }
+            return { reviewId, likes: data.likes, likeCount: data.likeCount };
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
 const productsSlice = createSlice({
     name: 'products',
     initialState: {
         products: [],
-        productSuggestions: [], 
+        productSuggestions: [],
         reviews: [],
         product: null,
         total: 0,
@@ -160,8 +181,18 @@ const productsSlice = createSlice({
             .addCase(getProductSuggestions.rejected, (state, action) => {
                 state.productSuggestions = [];
                 state.error = action.payload;
-            });
-            
+            })
+            .addCase(likeOrUnlikeReview.fulfilled, (state, action) => {
+                const { reviewId, likes, likeCount } = action.payload;
+
+                const review = state.reviews.find(r => r._id === reviewId);
+                if (review) {
+                    review.likes = likes;         // server đã xử lý like/unlike chuẩn rồi
+                    review.likeCount = likeCount; // cập nhật lại tổng số like
+                }
+            })
+
+
     },
 });
 

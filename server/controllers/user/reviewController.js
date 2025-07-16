@@ -167,24 +167,37 @@ export const updateReviewByOrderNumberAndProduct = async (req, res) => {
     }
 };
 
-export const getReviewsByProductSlug = async (req, res) => {
-    const { slug } = req.params;
-
+export const likeOrUnlikeReview = async (req, res) => {
     try {
-        const product = await Product.findOne({ slug });
+        const { reviewId } = req.params;
+        const userId = req.user.id;
 
-        if (!product) {
-            return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'ID review không hợp lệ' });
         }
 
-        // Tìm tất cả review theo _id của product
-        const reviews = await Review.find({ product: product._id })
-            .populate('user', 'username')
-            .sort({ createdAt: -1 });
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: 'Không tìm thấy review' });
+        }
 
-        res.json({ reviews });
-    } catch (err) {
-        console.error('Lỗi khi lấy review theo slug:', err);
-        res.status(500).json({ message: 'Lỗi server khi lấy review' });
+        const index = review.likes.findIndex(id => id.toString() === userId);
+        if (index === -1) {
+            // Chưa like, thêm vào
+            review.likes.push(userId);
+        } else {
+            // Đã like, bỏ like
+            review.likes.splice(index, 1);
+        }
+        await review.save();
+
+        res.status(200).json({
+            message: index === -1 ? 'Đã thích review' : 'Đã bỏ thích review',
+            likes: review.likes,
+            likeCount: review.likes.length
+        });
+    } catch (error) {
+        console.error('Lỗi like/unlike review:', error);
+        res.status(500).json({ message: 'Lỗi server khi like/unlike review' });
     }
 };

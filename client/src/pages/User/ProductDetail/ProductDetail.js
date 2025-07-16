@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs } from 'swiper/modules';
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from "react-redux"
+import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchProductBySlug, resetProductDetail } from '../../../redux/public/productsSlice'
 import 'swiper/css';
@@ -17,6 +16,7 @@ import { fetchReviewStats } from '../../../redux/public/reviewSlice';
 import "./ProductDetail.css";
 import axios from 'axios';
 import RelatedProductItem from '../../../components/RelatedProductItem';
+import { likeOrUnlikeReview } from '../../../redux/public/productsSlice';
 
 // Constants
 const SERVICES = [
@@ -106,7 +106,7 @@ function ProductDetail() {
         }
 
         const isInWishlist = wishlist.some(item => item._id === product._id);
-        
+
         if (isInWishlist) {
             dispatch(removeFromWishlist(product._id))
                 .unwrap()
@@ -335,7 +335,7 @@ function AttributesSection() {
                     </tbody>
                 </table>
             </div>
-           
+
         </div>
     );
 }
@@ -602,55 +602,134 @@ function ReviewList({ reviews }) {
 }
 
 function ReviewItem({ review }) {
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
+
+    const currentUserId = user?.id;
+    const hasLiked = review.likes?.includes(currentUserId);
+    const likeCount = review.likes?.length || 0;
+
+
+    const handleLike = () => {
+        if (!currentUserId) {
+            toast.info(' Bạn cần đăng nhập để thích bình luận này!');
+            return;
+        }
+
+        dispatch(likeOrUnlikeReview(review._id))
+            .unwrap()
+            .then(() => {
+                toast.success(' Đã cập nhật lượt thích!');
+            })
+            .catch((error) => {
+                toast.error(` ${error || 'Có lỗi xảy ra khi thích bình luận'}`);
+            });
+    };
+
+
     return (
-        <article className="py-4">
-            <div className="d-flex align-items-start gap-3 mb-2">
+        <div className="position-relative ps-4 pb-4 mt-3">
+            {review.adminResponse?.responseContent && (
+                <>
+                    {/* Đường thẳng dọc */}
+                    <div
+                        className="position-absolute bg-secondary-subtle"
+                        style={{
+                            left: '42px',
+                            top: '50px',
+                            bottom: '100px',
+                            width: '2px',
+                        }}
+                    ></div>
+
+                    {/* Đường cong */}
+                    <div
+                        className="position-absolute"
+                        style={{
+                            left: '42px',
+                            top: 'calc(100% - 110px)',
+                            width: '20px',
+                            height: '20px',
+                            borderBottom: '2px solid #dee2e6',
+                            borderLeft: '2px solid #dee2e6',
+                            borderBottomLeftRadius: '8px',
+                        }}
+                    ></div>
+                </>
+            )}
+
+            {/* --- Review người dùng --- */}
+            <div className="d-flex align-items-start gap-2">
                 <img
                     src={review.user?.avatar || '/default-avatar.png'}
-                    alt="Avatar người dùng"
-                    className="rounded-circle border"
-                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                    alt="Avatar"
+                    className="rounded-circle"
+                    style={{ width: '44px', height: '44px', objectFit: 'cover' }}
                 />
-                <div>
-                    <p className="mb-1 small fw-medium">
-                        {review.user?.username || 'Người dùng'}
-                    </p>
-                    <div className="star-rating d-flex gap-1 text-sm">
-                        {[...Array(5)].map((_, i) => (
-                            <i
-                                key={i}
-                                className={`fas fa-star${i < review.rating ? ' text-warning' : ' text-muted'}`}
-                            ></i>
-                        ))}
+                <div className="bg-light rounded-4 px-3 py-2" style={{ maxWidth: '600px', width: '100%' }}>
+                    <div className="d-flex justify-content-between align-items-start">
+                        <strong className="me-2">{review.user?.username || 'Người dùng'}</strong>
+                        <div
+                            className="d-flex align-items-center gap-1 text-muted small"
+                            style={{ cursor: 'pointer', userSelect: 'none' }}
+                            onClick={handleLike}
+                            title={hasLiked ? 'Bỏ thích' : 'Thích bình luận này'}
+                        >
+                            <i className={`fas fa-thumbs-up${hasLiked ? ' text-primary' : ''}`}></i>
+                            <span>{likeCount}</span>
+                        </div>
                     </div>
-                    <time className="text-muted small d-block mt-1">
-                        {new Date(review.createdAt).toLocaleString('vi-VN')}
-                    </time>
+
+                    <div className="small mt-1">{review.comment}</div>
+
+                    {/* Hình ảnh */}
+                    {review.images?.length > 0 && (
+                        <div className="d-flex gap-2 mt-2">
+                            {review.images.slice(0, 3).map((img, idx) => (
+                                <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Ảnh đánh giá ${idx + 1}`}
+                                    className="rounded border"
+                                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="d-flex align-items-center gap-2 mt-2 small text-muted">
+                        <span>{new Date(review.createdAt).toLocaleString('vi-VN')}</span>
+                        <span>•</span>
+                        <span><i className="fas fa-star text-warning me-1"></i>{review.rating} sao</span>
+                    </div>
                 </div>
             </div>
 
-            <p className="small mb-3">{review.comment}</p>
-
-            {review.images?.length > 0 && (
-                <div className="d-flex gap-2 mb-2">
-                    {review.images.slice(0, 3).map((img, idx) => (
-                        <img
-                            key={idx}
-                            src={img}
-                            alt={`Đánh giá ${idx + 1}`}
-                            className="rounded border"
-                            style={{
-                                width: '100px',
-                                height: '100px',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    ))}
+            {/* --- Phản hồi Admin --- */}
+            {review.adminResponse?.responseContent && (
+                <div className="d-flex align-items-start gap-2 mt-3 ms-5">
+                    <img
+                        src="/admin-avatar.png"
+                        alt="Admin"
+                        className="rounded-circle"
+                        style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                    />
+                    <div className="bg-body-tertiary rounded-4 px-3 py-2">
+                        <strong className="text-primary d-block">Admin</strong>
+                        <div className="small">{review.adminResponse.responseContent}</div>
+                        <small className="text-muted d-block mt-1">
+                            {new Date(review.adminResponse.createdAt).toLocaleString('vi-VN')}
+                        </small>
+                    </div>
                 </div>
             )}
-        </article>
+        </div>
     );
 }
+
+
+
+
 
 function FloatingChatButton() {
     return (

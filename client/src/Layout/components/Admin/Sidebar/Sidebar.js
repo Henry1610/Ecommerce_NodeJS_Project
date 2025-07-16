@@ -208,10 +208,38 @@ const Sidebar = () => {
             <div className="accordion-body p-0">
               <div className="list-group list-group-flush">
                 <Link to="/admin/user" className="list-group-item list-group-item-action ps-5 py-3">
-                <i className="fa-solid fa-user me-2"></i> User List
+                <i className="fa-solid fa-list me-2"></i> User List
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
 
-
+        {/* REVIEWS */}
+        <div className="accordion-item">
+          <h2 className="accordion-header" id="headingReview">
+            <button
+              className="accordion-button collapsed bg-light"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseReview"
+              aria-expanded="false"
+              aria-controls="collapseReview"
+            >
+              <i className="fa-solid fa-comments me-2"></i> Reviews
+            </button>
+          </h2>
+          <div
+            id="collapseReview"
+            className="accordion-collapse collapse"
+            aria-labelledby="headingReview"
+            data-bs-parent="#sidebarAccordion"
+          >
+            <div className="accordion-body p-0">
+              <div className="list-group list-group-flush">
+                <Link to="/admin/reviews" className="list-group-item list-group-item-action ps-5 py-3">
+                  <i className="fa-solid fa-star me-2"></i> Product Reviews
+                </Link>
               </div>
             </div>
           </div>

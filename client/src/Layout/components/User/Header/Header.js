@@ -90,7 +90,9 @@ function Header() {
                         style={{ color: '#6c757d', fontWeight: 500, fontSize: "0.9rem" }} // nhỏ chữ + giảm đậm
                     >
                         <i className="fas fa-store-alt small"></i>
-                        <Link to='/store-address' className="text-decoration-none">Địa chỉ cửa hàng</Link>
+                        <Link to="/store-address" className="text-reset text-decoration-none">
+                            Địa chỉ cửa hàng
+                        </Link>
                     </button>
                     <button
                         className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
@@ -106,7 +108,7 @@ function Header() {
 
             <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
                 <div className="d-flex align-items-center gap-4">
-                    <Link to='/' className="text-primary fw-bold" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
+                    <Link to='/' className=" fw-bold text-decoration-none text-reset" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
                         <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
                         pro
                     </Link>
@@ -114,7 +116,7 @@ function Header() {
                         <i className="fas fa-bars fs-4"></i>
                     </button>
                     <nav className="d-none d-lg-flex align-items-center gap-4 text-secondary fw-semibold user-select-none" >
-                        <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3">
+                        <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
                             <i className="fas fa-bars"></i>
                             <span>Sản phẩm</span>
                         </Link>
@@ -251,7 +253,7 @@ function Header() {
                                     <i className="fa-solid fa-clock-rotate-left fs-4"></i>
                                 </button>
                             </div>
-                            <Link to='/profile'>
+                            <Link to='/profile'  className="text-decoration-none text-reset">
                                 <span className="d-flex align-items-center gap-2">
                                     {avatar ? (
                                         <img

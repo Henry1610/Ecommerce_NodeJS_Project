@@ -19,6 +19,7 @@ import OrderList from "../pages/Admin/Order/OrderList/OrderList";
 import OrderDetail from "../pages/Admin/Order/OrderDetail";
 import RefundOrder from "../pages/Admin/Order/RefundOrder";
 import AdminProfile from '../pages/Admin/Profile/AdminProfile';
+import ReviewList from "../pages/Admin/ReviewList/ReviewList";
 const adminRoutes = [
     { path: 'dashboard', component: Dashboard },
 
@@ -49,7 +50,7 @@ const adminRoutes = [
     { path: 'user', component: UserList },
 
     { path: 'shipping-zones', component: ShippingZoneList },
-    // { path: 'review', component: ReviewList },
+    { path: 'reviews', component: ReviewList },
 
     { path: 'profile', component: AdminProfile },
 ];

@@ -1,5 +1,6 @@
 import Product from '../../models/Product.js';
 import Review from '../../models/Review.js';
+import AdminReviewResponse from '../../models/AdminReviewResponse.js';
 import mongoose from 'mongoose';
 
 export const getPublicProducts = async (req, res) => {
@@ -137,11 +138,27 @@ export const getPublicProductBySlug = async (req, res) => {
         const reviews = await Review.find(reviewFilter)
             .populate('user', 'username avatar') 
             .sort({ createdAt: -1 })
-            .lean();
+            .lean(); // Dùng .lean() để có thể chỉnh sửa object
+
+        // Lấy tất cả admin responses cho các review này
+        const reviewIds = reviews.map(review => review._id);
+        const adminResponses = await AdminReviewResponse.find({ review: { $in: reviewIds } }).lean();
+
+        // Tạo map để dễ truy xuất
+        const responsesMap = adminResponses.reduce((acc, response) => {
+            acc[response.review.toString()] = response;
+            return acc;
+        }, {});
+
+        // Gắn adminResponse vào từng review
+        const reviewsWithAdminResponse = reviews.map(review => ({
+            ...review,
+            adminResponse: responsesMap[review._id.toString()] || null
+        }));
 
         res.status(200).json({
             success: true,
-            data: { product, reviews }
+            data: { product, reviews: reviewsWithAdminResponse }
         });
     } catch (error) {
         res.status(500).json({
