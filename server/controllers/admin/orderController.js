@@ -1,4 +1,5 @@
 import Order from '../../models/Order.js';
+import Product from '../../models/Product.js'
 
 // Lấy tất cả đơn hàng
 export const getOrders = async (req, res) => {
@@ -70,7 +71,7 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
 
-    const order = await Order.findOne({ orderNumber }).populate('payment');
+    const order = await Order.findOne({ orderNumber }).populate('payment').populate('items.product');;
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -122,14 +123,38 @@ export const updateOrderStatus = async (req, res) => {
     // Cập nhật trạng thái bình thường
     order.status = newStatus;
     order.statusHistory.push({ status: newStatus, updatedAt: new Date() });
-    if (newStatus === 'cancelled' && order.payment) {
-      order.payment.refundStatus = 'requested';
-      order.payment.refundHistory.push({
-        status: 'requested',
-        updatedAt: new Date(),
-      });
-      await order.payment.save();
+    if (newStatus === 'cancelled' && currentStatus !== 'cancelled') {
+      if (Array.isArray(order.items)) {
+        for (const item of order.items) {
+          // Lấy đúng _id sản phẩm (dù item.product là object hay chỉ là id)
+          const productId = item.product._id || item.product;
+          const product = await Product.findById(productId);
+          console.log('aaa:',product);
+          
+          if (product) {
+
+            product.stock += item.quantity;
+            product.sold = Math.max(0, product.sold - item.quantity);
+
+            await product.save();
+
+          }
+
+        }
+      }
+
+      // Cập nhật trạng thái refund cho payment nếu cần
+      if (order.payment) {
+        order.payment.refundStatus = 'requested';
+        order.payment.refundHistory.push({
+          status: 'requested',
+          updatedAt: new Date(),
+        });
+        await order.payment.save();
+      }
+
     }
+    
     await order.save();
 
     res.status(200).json({

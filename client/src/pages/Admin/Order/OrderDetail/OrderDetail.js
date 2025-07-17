@@ -93,7 +93,7 @@ const OrderDetail = () => {
     });
   };
 
- 
+
   const handleApproveRefund = () => {
     Swal.fire({
       title: 'Xác nhận hoàn tiền đơn hàng?',
@@ -141,7 +141,7 @@ const OrderDetail = () => {
   };
 
   return (
-    <div className="bg-light mt-3 container">
+    <div className=" mt-3 container">
       {/* Order Progress */}
       <div className="bg-white rounded-4 shadow-sm p-4 my-3" style={{ width: "100%" }}>
         <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
@@ -156,13 +156,13 @@ const OrderDetail = () => {
                   className="btn btn-danger btn-sm fw-medium"
                   onClick={handleCancel}
                 >
-                  ✅ Đồng ý hủy
+                  <i class="fa-solid fa-check"></i> Đồng ý hủy
                 </button>
                 <button
                   className="btn btn-secondary btn-sm fw-medium"
                   onClick={handleRejectCancel}
                 >
-                  ❌ Từ chối hủy
+                  <i class="fa-solid fa-circle-xmark"></i> Từ chối hủy
                 </button>
               </>
             )}
@@ -175,13 +175,13 @@ const OrderDetail = () => {
                     className="btn btn-success btn-sm fw-medium"
                     onClick={handleApproveRefund}
                   >
-                    💸 Đồng ý hoàn tiền
+                    <i class="fa-solid fa-money-check-dollar"></i> Đồng ý hoàn tiền
                   </button>
                   <button
                     className="btn btn-secondary btn-sm fw-medium"
                     onClick={handleRejectRefund}
                   >
-                    🚫 Từ chối hoàn tiền
+                    <i class="fa-solid fa-ban"></i> Từ chối hoàn tiền
                   </button>
                 </>
               )}
@@ -199,7 +199,7 @@ const OrderDetail = () => {
                       selectedOrder?.status === "delivered"
                     }
                   >
-                    🛑 Hủy đơn
+                    <i class="fa-solid fa-xmark"></i> Hủy đơn
                   </button>
                   <button
                     className="btn btn-outline-primary btn-sm fw-medium"
@@ -210,7 +210,7 @@ const OrderDetail = () => {
                       currentIndex === statuses.length - 1
                     }
                   >
-                    ⏭ {currentIndex === statuses.length - 1 ? "Hoàn tất" : "Chuyển bước"}
+                    <i class="fa-solid fa-forward-step"></i> {currentIndex === statuses.length - 1 ? "Hoàn tất" : "Chuyển bước"}
                   </button>
                 </>
               )}
@@ -328,7 +328,7 @@ const OrderDetail = () => {
 
 
       {/* Order Actions */}
-      <div className="card mb-4">
+      <div className=" mb-4">
         <div className="card-body">
           <div className="d-flex justify-content-between flex-wrap mb-3">
             <h2 className="h5 fw-semibold"> #{selectedOrder?.orderNumber}</h2>
@@ -343,8 +343,8 @@ const OrderDetail = () => {
             <div className="col-md-4 mb-3">
               <div className="card shadow-sm border-0 h-100">
                 <div className="card-body">
-                  <h6 className="border-bottom pb-2 fw-bold text-primary fs-6 mb-3">
-                    👤 User Information
+                  <h6 className="border-bottom pb-2 fw-bold text-dark fs-6 mb-3">
+                    <i class="fa-solid fa-user"></i> User Information
                   </h6>
                   <ul className="list-unstyled mb-0 small text-secondary">
                     <li className="mb-2">
@@ -365,13 +365,13 @@ const OrderDetail = () => {
             <div className="col-md-4 mb-3">
               <div className="card border-0 shadow-sm h-100">
                 <div className="card-body">
-                  <h6 className="border-bottom pb-2 fw-bold text-primary fs-6 mb-3">📦 Shipping Address</h6>
+                  <h6 className="border-bottom pb-2 fw-bold text-dark fs-6 mb-3"><i class="fa-solid fa-address-book"></i> Shipping Address</h6>
                   <div className="small text-secondary">
                     <p className="mb-1">{selectedOrder?.shippingAddress.address}</p>
                     <p className="mb-1">{selectedOrder?.shippingAddress.city}</p>
                     <p className="mb-1"><span className="fw-semibold">Shipping Zone:</span> {selectedOrder?.shippingAddress.shippingZoneName}</p>
 
-                    <p className="mt-3"><span className="fw-semibold">📞 Phone:</span> {selectedOrder?.shippingAddress.phoneNumber}</p>
+                    <p className="mt-3"><span className="fw-semibold"><i class="fa-solid fa-phone"></i> Phone:</span> {selectedOrder?.shippingAddress.phoneNumber}</p>
                   </div>
                 </div>
               </div>
@@ -381,7 +381,7 @@ const OrderDetail = () => {
             <div className="col-md-4 mb-3">
               <div className="card border-0 shadow-sm h-100">
                 <div className="card-body">
-                  <h6 className="border-bottom pb-2 fw-bold text-primary fs-6 mb-3">💳 Payment Details</h6>
+                  <h6 className="border-bottom pb-2 fw-bold text-dark fs-6 mb-3"><i class="fa-solid fa-credit-card"></i> Payment Details</h6>
                   <div className="small text-secondary">
                     <p className="mb-2"><span className="fw-semibold">Method:</span>{`Credit Card (${selectedOrder?.payment.paymentMethod}) `}</p>
                     <p className="mb-2">
@@ -400,56 +400,73 @@ const OrderDetail = () => {
       </div>
 
       {/* Order Items */}
-      <div className="card shadow-sm mb-4 border-0 rounded-3">
-  <div className="card-body">
-    <div className="table-responsive">
-      <table className="table align-middle table-hover border rounded-4 overflow-hidden">
-        <thead className="table-light">
-          <tr style={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
-            <th scope="col">#</th>
-            <th scope="col">Sản phẩm</th>
-            <th scope="col">Tên</th>
-            <th scope="col" className="text-center">SL</th>
-            <th scope="col" className="text-end">Giá bán</th>
-            <th scope="col" className="text-end">Giá gốc</th>
-            <th scope="col" className="text-end">Tổng</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            selectedOrder?.items.map((item, index) => (
-              <tr key={index} className="align-middle" style={{ transition: 'background 0.2s' }}>
-                <td className="text-muted small text-center" style={{ width: 36 }}>{index + 1}</td>
-                <td>
-                  <div style={{ width: 60, height: 60, borderRadius: 10, overflow: 'hidden', border: '1px solid #eee', transition: 'box-shadow 0.2s' }}
-                    className="bg-light position-relative hover-zoom">
-                    <img
-                      src={
-                        item.images && item.images.length > 0
-                          ? item.images[0]
-                          : item.image
-                            ? item.image
-                            : '/default-product.jpg'
-                      }
-                      alt={item.name}
-                      className="img-fluid"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10, transition: 'transform 0.2s' }}
-                    />
-                  </div>
-                </td>
-                <td className="fw-semibold" style={{ minWidth: 160, maxWidth: 260, whiteSpace: 'normal', wordBreak: 'break-word' }}>{item.name}</td>
-                <td className="text-center fw-bold" style={{ fontSize: 15 }}>{item.quantity}</td>
-                <td className="text-end text-success fw-bold" style={{ fontSize: 16 }}>{item.price.toLocaleString()}đ</td>
-                <td className="text-end text-muted text-decoration-line-through" style={{ fontSize: 14 }}>{item.originalPrice.toLocaleString()}đ</td>
-                <td className="text-end fw-bold text-dark" style={{ fontSize: 16 }}>{(item.price * item.quantity).toLocaleString()}đ</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
+      <div className=" shadow-sm mb-4 border-0 rounded-3">
+        <div className="">
+          <div className="table-responsive">
+            <table className="table align-middle table-hover  rounded-4 ">
+              <thead className="table-light">
+                <tr style={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+                  <th scope="col">#</th>
+                  <th scope="col">Sản phẩm</th>
+                  <th scope="col">Tên</th>
+                  <th scope="col" className="text-center">SL</th>
+                  <th scope="col" className="text-end">Giá bán</th>
+                  <th scope="col" className="text-end">Giá gốc</th>
+                  <th scope="col" className="text-end">Tổng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  selectedOrder?.items.map((item, index) => (
+                    <tr key={index} className="align-middle" style={{ transition: 'background 0.2s' }}>
+                      <td className="text-muted small text-center" style={{ width: 36 }}>{index + 1}</td>
+                      <td>
+  <div
+    style={{
+      width: 40,
+      height: 40,
+      borderRadius: 6,
+      overflow: 'hidden',
+      border: '1px solid #ddd',
+      backgroundColor: '#f8f9fa',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}
+  >
+    <img
+      src={
+        item.images && item.images.length > 0
+          ? item.images[0]
+          : item.image
+            ? item.image
+            : '/default-product.jpg'
+      }
+      alt={item.name}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+        transition: 'transform 0.2s'
+      }}
+    />
   </div>
-</div>
+</td>
+
+
+                      <td className="fw-semibold" style={{ minWidth: 160, maxWidth: 260, whiteSpace: 'normal', wordBreak: 'break-word' }}>{item.name}</td>
+                      <td className="text-center fw-bold" style={{ fontSize: 15 }}>{item.quantity}</td>
+                      <td className="text-end text-dark fw-bold" style={{ fontSize: 16 }}>{item.price.toLocaleString()}đ</td>
+                      <td className="text-end text-muted text-decoration-line-through" style={{ fontSize: 14 }}>{item.originalPrice.toLocaleString()}đ</td>
+                      <td className="text-end fw-bold text-dark" style={{ fontSize: 16 }}>{(item.price * item.quantity).toLocaleString()}đ</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
 
       <div className='d-flex  gap-4 mb-3 '>
@@ -482,7 +499,7 @@ const OrderDetail = () => {
 
             <hr className="my-4" />
 
-            <div className="d-flex justify-content-between align-items-center fw-bold fs-5 text-dark">
+            <div className="d-flex justify-content-between align-items-center fw-bold fs-6 text-dark">
               <span>Total</span>
               <span>
                 {selectedOrder?.totalPrice?.toLocaleString()}<sup>đ</sup>
@@ -493,8 +510,8 @@ const OrderDetail = () => {
 
 
         {/* Order Status */}
-        <div className="card shadow-sm flex-fill " style={{ maxHeight: '500px' }}>
-          <div className="card-body">
+        <div className=" shadow-sm flex-fill " style={{ maxHeight: '500px' }}>
+          <div className="p-3">
             <h5 className="card-title mb-4 text-primary">Order Status</h5>
 
             {selectedOrder?.statusHistory.map((item, idx) => (

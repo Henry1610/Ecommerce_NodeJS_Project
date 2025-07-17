@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaBell, FaUserCircle, FaFlagUsa, FaSearch, FaSignOutAlt, FaCog, FaUser, FaBars, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import './Header.css';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchAdminProfile } from '../../../../redux/admin/adminSlice';
 import { logout } from '../../../../redux/auth/authSlice';
 import Swal from 'sweetalert2';
 
@@ -20,8 +22,12 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
-  const admin = getAdminInfo();
   const dispatch = useDispatch();
+  const { profile, loading, error } = useSelector(state => state.admin.adminAdmin);
+
+  useEffect(() => {
+    dispatch(fetchAdminProfile());
+  }, [dispatch]);
 
   const toggleDropdown = (type) => {
     setActiveDropdown(prev => (prev === type ? null : type));
@@ -199,23 +205,23 @@ const Header = () => {
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center' }}
             aria-label="User menu"
           >
-            {admin.avatar ? (
-              <img src={admin.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+            {profile?.avatar ? (
+              <img src={profile.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
             ) : (
               <FaUserCircle size={28} style={{ marginRight: 8, color: '#3b82f6' }} />
             )}
-            <span style={{ fontWeight: 600, color: '#222', fontSize: 15 }}>{admin.name}</span>
+            <span style={{ fontWeight: 600, color: '#222', fontSize: 15 }}>{profile?.username || 'Admin'}</span>
             {activeDropdown === 'user' ? <FaChevronUp size={12} style={{ marginLeft: 6 }} /> : <FaChevronDown size={12} style={{ marginLeft: 6 }} />}
           </button>
           {activeDropdown === 'user' && (
             <ul className="admin-header-dropdown" style={{ minWidth: 180 }}>
               <li className="px-3 py-2 d-flex align-items-center">
-                {admin.avatar ? (
-                  <img src={admin.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+                {profile?.avatar ? (
+                  <img src={profile.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
                 ) : (
                   <FaUserCircle size={32} style={{ marginRight: 10, color: '#3b82f6' }} />
                 )}
-                <div><h6 className="mb-0">{admin.name}</h6><small className="text-muted">Admin</small></div>
+                <div><h6 className="mb-0">{profile?.username || 'Admin'}</h6><small className="text-muted">Admin</small></div>
               </li>
               <li><hr className="dropdown-divider" /></li>
               <li>

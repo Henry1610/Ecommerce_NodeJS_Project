@@ -40,11 +40,13 @@ const Dashboard = () => {
   const { categories } = useSelector((state) => state.admin.adminCategory);
   const { users } = useSelector((state) => state.admin.adminUser);
   const revenueByDate = {};
-  (orders || []).forEach(order => {
-    if (!order.createdAt) return;
-    const date = new Date(order.createdAt).toLocaleDateString("vi-VN");
-    revenueByDate[date] = (revenueByDate[date] || 0) + (order.totalPrice || 0);
-  });
+  (orders || [])
+    .filter(order => order.status !== 'cancelled')
+    .forEach(order => {
+      if (!order.createdAt) return;
+      const date = new Date(order.createdAt).toLocaleDateString("vi-VN");
+      revenueByDate[date] = (revenueByDate[date] || 0) + (order.totalPrice || 0);
+    });
 
   const sortedDates = Object.keys(revenueByDate).sort((a, b) => {
     const [da, ma, ya] = a.split("/");

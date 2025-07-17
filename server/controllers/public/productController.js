@@ -9,7 +9,7 @@ export const getPublicProducts = async (req, res) => {
             category,
             brand,
             color,
-            statusCurrent,
+            statusCurrent, // vẫn nhận nhưng sẽ override
             minPrice,
             maxPrice,
             minRating,
@@ -31,7 +31,8 @@ export const getPublicProducts = async (req, res) => {
             filter.brand = brand;
         }
         if (color) filter.color = color;
-        if (statusCurrent) filter.statusCurrent = statusCurrent;
+        // Luôn chỉ lấy sản phẩm active cho public
+        filter.statusCurrent = 'active';
 
         if (minPrice || maxPrice) {
             filter.price = {};
