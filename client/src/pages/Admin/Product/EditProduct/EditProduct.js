@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './EditProduct.css';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,8 @@ const EditProduct = () => {
     const { categories } = useSelector(state => state.admin.adminCategory);
     const { product, error, loading } = useSelector(state => state.admin.adminProduct)
     const [attributesList, setAttributesList] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const swiperRef = useRef();
 
     const { id: productId } = useParams()
     const [formData, setFormData] = useState({
@@ -54,7 +56,7 @@ const EditProduct = () => {
             });
         dispatch(fetchProductById(productId))
             .unwrap()
-          
+
             .catch((error) => {
                 toast.error(`Lỗi khi tải product: ${error}`);
             });
@@ -153,34 +155,34 @@ const EditProduct = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-      
+
         try {
-          const productData = new FormData();
-          const name = formData.name || "";
-          const slug = generateSlug(name);
-          productData.append("slug", slug);
-          // Append từng key
-          for (const key in formData) {
-            if (key === "images") {
-              newFiles.forEach((file) => productData.append("newImages", file));
-            } else if (key === "attributes") {
-              productData.append(key, JSON.stringify(formData[key]));
-            } else {
-              productData.append(key, formData[key]);
+            const productData = new FormData();
+            const name = formData.name || "";
+            const slug = generateSlug(name);
+            productData.append("slug", slug);
+            // Append từng key
+            for (const key in formData) {
+                if (key === "images") {
+                    newFiles.forEach((file) => productData.append("newImages", file));
+                } else if (key === "attributes") {
+                    productData.append(key, JSON.stringify(formData[key]));
+                } else {
+                    productData.append(key, formData[key]);
+                }
             }
-          }
-          imagesFromServer.forEach((img) => productData.append("oldImages", img));
-      
-          await dispatch(updateProduct({ productId, productData })).unwrap();
-          toast.success("Cập nhật sản phẩm thành công!");
+            imagesFromServer.forEach((img) => productData.append("oldImages", img));
+
+            await dispatch(updateProduct({ productId, productData })).unwrap();
+            toast.success("Cập nhật sản phẩm thành công!");
         } catch (err) {
-          toast.error("Cập nhật sản phẩm thất bại!");
-          console.error("Update error:", err);
+            toast.error("Cập nhật sản phẩm thất bại!");
+            console.error("Update error:", err);
         }
-      };
-      
-      
-      
+    };
+
+
+
     const renderedImages = [
         ...imagesFromServer.map(name => ({
             src: name, // hoặc Cloudinary link
@@ -203,7 +205,7 @@ const EditProduct = () => {
                         <Link to="/" className="text-secondary"><i className="fas fa-home me-1"></i>Trang chủ</Link>
                     </li>
                     <li className="breadcrumb-item">
-                        <Link to="/admin/products" className="text-secondary">Sản phẩm</Link>
+                        <Link to="/admin/product" className="text-secondary">Sản phẩm</Link>
                     </li>
                     <li className="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
                 </ol>
@@ -213,7 +215,7 @@ const EditProduct = () => {
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
                 <h2 className="h3 mb-3 mb-md-0 fw-bold text-dark">Chi tiết sản phẩm</h2>
                 <div className="d-flex gap-2">
-                    <Link to="/admin/products" className="btn btn-outline-secondary">
+                    <Link to="/admin/product" className="btn btn-outline-secondary">
                         <i className="fas fa-arrow-left"></i> Quay lại
                     </Link>
                     <button
@@ -363,91 +365,123 @@ const EditProduct = () => {
 
                 {/* Slide ảnh */}
                 <div className="col-lg-4">
-                    <div className="card shadow">
+                    <div className="card shadow-sm rounded-4 border-0">
                         <div className="card-body">
-                            <Swiper
-                                loop
-                                spaceBetween={10}
-                                navigation
-                                pagination={{ clickable: true }}
-                                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                                modules={[Pagination, Navigation, Thumbs]}
-                                className="mySwiper2 rounded"
-                            >
-                                {renderedImages?.map((img, index) => (
-                                    <SwiperSlide key={index}>
-                                        <div
-                                            key={index}
-                                            className="position-relative"
-                                            style={{ width: '120px', height: '120px' }}
-                                        >
-
-                                            <img
-                                                src={img.src}
-                                                alt={`${product.slug}`}
-                                                className="img-fluid rounded mb-2"
-                                                loading="lazy"
+                            {/* Ảnh chính */}
+                            {renderedImages.length > 0 ? (
+                                <Swiper
+                                    loop
+                                    spaceBetween={10}
+                                    navigation
+                                    pagination={{ clickable: true }}
+                                    thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                                    modules={[Pagination, Navigation, Thumbs]}
+                                    className="mySwiper2 rounded-4 border"
+                                    initialSlide={activeIndex}
+                                    onSwiper={swiper => (swiperRef.current = swiper)}
+                                    onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
+                                >
+                                    {renderedImages.map((img, index) => (
+                                        <SwiperSlide key={index}>
+                                            <div
+                                                className="position-relative mx-auto bg-white"
                                                 style={{
                                                     width: '100%',
-                                                    height: '100%',
-                                                    objectFit: 'cover',
-                                                    borderRadius: '8px',
+                                                    paddingTop: '100%',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    border: '1px solid #eee',
                                                 }}
-
-                                            />
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                style={{
-                                                    transform: 'translate(50%, -50%)',
-                                                    borderRadius: '50%',
-                                                    padding: '4 6px',
-                                                    fontSize: '12px',
-                                                    lineHeight: '1',
-                                                }}
-                                                onClick={() => handleRemoveImage(index, img.isNew)}
                                             >
-                                                <div className='fw-bold'>X</div>
-                                            </button>
-                                        </div>
+                                                <img
+                                                    src={img.src}
+                                                    alt={product?.slug || 'product'}
+                                                    className="position-absolute top-0 start-0 w-100 h-100"
+                                                    style={{ objectFit: 'contain', transition: 'transform 0.3s' }}
+                                                    loading="lazy"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index, img.isNew)}
+                                                    className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    style={{
+                                                        transform: 'translate( -20%,20%)',
+                                                        borderRadius: '50%',
+                                                        width: '26px',
+                                                        height: '26px',
+                                                        padding: 0,
+                                                        fontSize: '16px',
+                                                        fontWeight: 'bold',
+                                                        zIndex: 10,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        lineHeight: 1,
+                                                    }}
+                                                    title="Xoá ảnh"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            ) : (
+                                <div className="text-center py-5 text-muted">Chưa có ảnh sản phẩm</div>
+                            )}
 
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-
+                            {/* Thumbnail */}
                             <Swiper
                                 onSwiper={setThumbsSwiper}
-                                loop
-                                spaceBetween={10}
+                                loop={false}
+                                spaceBetween={12}
                                 slidesPerView={4}
-                                freeMode
+                                freeMode={true}
                                 watchSlidesProgress
                                 modules={[Pagination, Navigation, Thumbs]}
                                 className="mySwiper mt-3"
                             >
                                 {renderedImages?.map((img, index) => (
                                     <SwiperSlide key={index} className="cursor-pointer">
-                                        <img
-                                            src={img.src}
-                                            alt={`${product.slug}`}
-                                            className="img-fluid rounded"
-                                            loading="lazy"
-                                        />
+                                        <div
+                                            className="mx-auto"
+                                            style={{
+                                                width: '70px',
+                                                height: '70px',
+                                                borderRadius: '8px',
+                                                overflow: 'hidden',
+                                                border: '2px solid #eee',
+                                                position: 'relative',
+                                            }}
+                                        >
+                                            <img
+                                                src={img.src}
+                                                alt={product?.slug || 'thumbnail'}
+                                                className="position-absolute top-0 start-0 w-100 h-100"
+                                                style={{ objectFit: 'cover' }}
+                                                loading="lazy"
+                                            />
+                                        </div>
                                     </SwiperSlide>
                                 ))}
                             </Swiper>
-                            <input
-                                type="file"
-                                multiple
-                                className="form-control"
-                                accept="image/*"
-                                onChange={handleFileChange}
 
-                            />
+                            {/* Upload ảnh */}
+                            <div className="mt-3">
+                                <input
+                                    type="file"
+                                    multiple
+                                    className="form-control form-control-sm"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
                         </div>
-                        <div className="m-4">
-                            <h2 className="h6 fw-semibold text-dark mb-3">Thông tin sản phẩm</h2>
-                            <div className="bg-light p-3 rounded">
+
+                        {/* Thông tin sản phẩm */}
+                        <div className="px-4 pb-4">
+                            <h2 className="h6 fw-semibold text-dark mb-3 mt-3">Thông tin sản phẩm</h2>
+                            <div className="bg-body p-3 rounded-3 border">
                                 <ul className="list-unstyled text-secondary mb-0 small">
                                     {attributesList.map(([key, value], index) => (
                                         <li key={index} className="d-flex align-items-center gap-2 mb-2">
@@ -455,7 +489,7 @@ const EditProduct = () => {
                                                 type="text"
                                                 className="form-control form-control-sm w-25"
                                                 value={key}
-                                                onChange={(e) => handleAttributeChange(index, "key", e.target.value)}
+                                                onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
                                                 placeholder="Tên thuộc tính"
                                             />
                                             <span>:</span>
@@ -463,46 +497,39 @@ const EditProduct = () => {
                                                 type="text"
                                                 className="form-control form-control-sm w-50"
                                                 value={value}
-                                                onChange={(e) => handleAttributeChange(index, "value", e.target.value)}
+                                                onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
                                                 placeholder="Giá trị"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveAttribute(index)}
-                                                className="btn p-0 border-0 bg-transparent text-dark"
+                                                className="btn p-0 border-0 text-danger"
                                                 style={{
                                                     fontSize: '1.2rem',
-                                                    lineHeight: 1,
-                                                    cursor: 'pointer',
                                                     width: '24px',
                                                     height: '24px',
                                                 }}
-                                                aria-label="Xoá thuộc tính"
+                                                title="Xoá"
                                             >
                                                 ×
                                             </button>
-
-
                                         </li>
                                     ))}
                                 </ul>
 
                                 <button
                                     type="button"
-                                    className="btn btn-sm mt-2 border-0 border-top d-flex align-items-center gap-1 bg-transparent"
+                                    className="btn btn-sm mt-2 text-primary bg-light-subtle border rounded-2"
                                     onClick={handleAddAttribute}
                                 >
-                                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>+</span>
-                                    Thêm thuộc tính
+                                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>+</span> Thêm thuộc tính
                                 </button>
-
                             </div>
                         </div>
-
-
                     </div>
-
                 </div>
+
+
             </div>
 
 

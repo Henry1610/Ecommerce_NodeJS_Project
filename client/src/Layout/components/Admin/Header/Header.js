@@ -91,7 +91,7 @@ const Header = () => {
       </div>
 
       {/* Search */}
-      <form
+      {/* <form
         onSubmit={handleSearch}
         style={{
           display: 'flex',
@@ -130,11 +130,11 @@ const Header = () => {
         >
           <FaSearch />
         </button>
-      </form>
+      </form> */}
 
       {/* Right section */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-        {/* Language dropdown */}
+        {/* Language dropdown
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => toggleDropdown('lang')}
@@ -153,10 +153,10 @@ const Header = () => {
               <li><span role="img" aria-label="de">🇩🇪</span> German</li>
             </ul>
           )}
-        </div>
+        </div> */}
 
         {/* Notifications dropdown */}
-        <div style={{ position: 'relative' }}>
+        {/* <div style={{ position: 'relative' }}>
           <button
             onClick={() => toggleDropdown('notif')}
             className={`admin-header-btn${activeDropdown === 'notif' ? ' active' : ''}`}
@@ -195,7 +195,7 @@ const Header = () => {
               <li style={{ textAlign: 'center', padding: 8, color: '#3b82f6', cursor: 'pointer' }}>View all Notifications</li>
             </ul>
           )}
-        </div>
+        </div> */}
 
         {/* User dropdown */}
         <div style={{ position: 'relative' }}>
@@ -228,7 +228,8 @@ const Header = () => {
                 <Link className="dropdown-item" to="/admin/profile">
                   <FaUser className="me-2" /> My Profile
                 </Link>
-              </li>              <li><Link className="dropdown-item" to="/admin/settings"><FaCog className="me-2" /> Settings</Link></li>
+              </li>
+              
               <li><hr className="dropdown-divider" /></li>
               <li><button className="dropdown-item" onClick={handleLogout} style={{ color: '#fff', background: '#f43f5e', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '10px 18px', border: 'none', margin: 8, boxShadow: '0 2px 8px rgba(244,63,94,0.08)', transition: 'background 0.15s' }} onMouseOver={e => e.target.style.background = '#dc2626'} onMouseOut={e => e.target.style.background = '#f43f5e'}><FaSignOutAlt /> Đăng xuất</button></li>
             </ul>

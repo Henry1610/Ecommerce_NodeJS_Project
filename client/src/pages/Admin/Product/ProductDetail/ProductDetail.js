@@ -44,10 +44,10 @@ const ProductDetail = () => {
             <nav aria-label="breadcrumb" className="mb-4">
                 <ol className="breadcrumb">
                     <li className="breadcrumb-item">
-                        <Link to="/" className="text-secondary"><i className="fas fa-home me-1"></i>Trang chủ</Link>
+                        <Link to="/admin/dashboard" className="text-secondary"><i className="fas fa-home me-1"></i>Trang chủ</Link>
                     </li>
                     <li className="breadcrumb-item">
-                        <Link to="/admin/products" className="text-secondary">Sản phẩm</Link>
+                        <Link to="/admin/product" className="text-secondary">Sản phẩm</Link>
                     </li>
                     <li className="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
                 </ol>
@@ -57,7 +57,7 @@ const ProductDetail = () => {
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
                 <h2 className="h3 mb-3 mb-md-0 fw-bold text-dark">Chi tiết sản phẩm</h2>
                 <div className="d-flex gap-2">
-                    <Link to="/admin/products" className="btn btn-outline-secondary">
+                    <Link to="/admin/product" className="btn btn-outline-secondary">
                         <i className="fas fa-arrow-left me-2"></i>Quay lại
                     </Link>
                 </div>
