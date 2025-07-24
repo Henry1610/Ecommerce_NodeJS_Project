@@ -40,7 +40,8 @@ function ProductDetail() {
     const { stats, total } = useSelector(state => state.public.publicReview);
     const { wishlist } = useSelector(state => state.user.userWishlist);
     const { token } = useSelector(state => state.auth);
-
+    console.log('review:',reviews);
+    
     // Computed values
     const averageRating = (product?.ratings || 0).toFixed(1);
     const originalPrice = product?.price ?? 0;
@@ -709,13 +710,21 @@ function ReviewItem({ review }) {
             {review.adminResponse?.responseContent && (
                 <div className="d-flex align-items-start gap-2 mt-3 ms-5">
                     <img
-                        src="/admin-avatar.png"
-                        alt="Admin"
+                        src={
+                            review.adminResponse.admin?.avatar ||
+                            "https://static.tuoitre.vn/tto/r/2015/08/02/a-1438493457.jpg"
+                        }
+                        alt={review.adminResponse.admin?.username || "Admin"}
                         className="rounded-circle"
                         style={{ width: '36px', height: '36px', objectFit: 'cover' }}
                     />
                     <div className="bg-body-tertiary rounded-4 px-3 py-2">
-                        <strong className="text-primary d-block">Admin</strong>
+                        <strong className="text-primary d-block">
+                            {review.adminResponse.admin?.username || "Admin"}
+                            {review.adminResponse.admin?.email ? (
+                                <span className="text-muted small ms-2">({review.adminResponse.admin.email})</span>
+                            ) : null}
+                        </strong>
                         <div className="small">{review.adminResponse.responseContent}</div>
                         <small className="text-muted d-block mt-1">
                             {new Date(review.adminResponse.createdAt).toLocaleString('vi-VN')}

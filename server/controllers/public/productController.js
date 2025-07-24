@@ -143,7 +143,9 @@ export const getPublicProductBySlug = async (req, res) => {
 
         // Lấy tất cả admin responses cho các review này
         const reviewIds = reviews.map(review => review._id);
-        const adminResponses = await AdminReviewResponse.find({ review: { $in: reviewIds } }).lean();
+        const adminResponses = await AdminReviewResponse.find({ review: { $in: reviewIds } })
+          .populate('admin', 'username email avatar')
+          .lean();
 
         // Tạo map để dễ truy xuất
         const responsesMap = adminResponses.reduce((acc, response) => {

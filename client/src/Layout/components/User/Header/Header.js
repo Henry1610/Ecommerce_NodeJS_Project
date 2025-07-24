@@ -21,7 +21,7 @@ function Header() {
     const [keyword, setKeyword] = useState('');
     const debouncedKeyword = useDebounce(keyword, 500);
 
-    const { profile } = useSelector(state => state.user.userProfile);
+    const {  profile } = useSelector(state => state.user.userProfile);
     const authUser = useSelector(state => state.auth.user);
     const username = profile?.user?.username || authUser?.username || 'Tài khoản';
     const avatar = profile?.user?.avatar || authUser?.avatar || '';
@@ -257,7 +257,7 @@ function Header() {
                                 <span className="d-flex align-items-center gap-2">
                                     {avatar ? (
                                         <img
-                                            src={avatar}
+                                            src={profile?.user?.avatar}
                                             alt="avatar"
                                             style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }}
                                         />

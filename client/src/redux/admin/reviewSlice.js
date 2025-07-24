@@ -140,8 +140,17 @@ const reviewSlice = createSlice({
       })
       .addCase(getAdminReviewResponseByReviewId.rejected, (state, action) => {
         state.loading = false;
+      
+        const errorMsg = action.payload?.message || '';
+        
+        if (errorMsg.includes('Không tìm thấy phản hồi')) {
+          // Không set lỗi nếu chỉ là không có phản hồi
+          return;
+        }
+      
         state.error = action.payload;
       });
+      
   },
 });
 
