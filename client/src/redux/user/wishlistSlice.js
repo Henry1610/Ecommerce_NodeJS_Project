@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/wishlist';
 // Async thunks
 export const fetchWishlist = createAsyncThunk(
     'wishlist/fetchWishlist',
     async (_, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/users/wishlist', {
+            const response = await axios.get(`${API_BASE}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
@@ -22,7 +23,7 @@ export const addToWishlist = createAsyncThunk(
     async (productId, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/api/users/wishlist', { productId }, {
+            const response = await axios.post(`${API_BASE}`, { productId }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
@@ -37,7 +38,7 @@ export const removeFromWishlist = createAsyncThunk(
     async (productId, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.delete(`http://localhost:5000/api/users/wishlist/${productId}`, {
+            const response = await axios.delete(`${API_BASE}/${productId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return { productId, ...response.data };

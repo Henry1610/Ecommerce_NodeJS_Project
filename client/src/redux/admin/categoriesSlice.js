@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/categories';
 
 // Fetch all categories
 export const fetchCategories = createAsyncThunk(
     'categories/fetchCategories',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/categories', {
+            const res = await fetch(API_BASE, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const fetchCategoryById = createAsyncThunk(
     'categories/fetchCategoryById',
     async (id, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+            const res = await fetch(`${API_BASE}/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const addCategory = createAsyncThunk(
     'categories/addCategory',
     async ({ name, description }, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/categories', {
+            const res = await fetch(API_BASE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const addCategory = createAsyncThunk(
         async ({ categoryId, formData }, thunkAPI) => {
             
             try {
-                const res = await fetch(`http://localhost:5000/api/admin/categories/${categoryId}`, {
+                const res = await fetch(`${API_BASE}/${categoryId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export const deleteCategory = createAsyncThunk(
     async (id, thunkAPI) => {
         
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+            const res = await fetch(`${API_BASE}/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,

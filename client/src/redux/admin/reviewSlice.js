@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/admin/'; // Adjust if your API URL is different
+// Định nghĩa API_BASE một lần
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/reviews';
 
 // Async Thunks
 export const getAllReviewsAdmin = createAsyncThunk(
@@ -14,7 +15,7 @@ export const getAllReviewsAdmin = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       };
-      const response = await axios.get(`${API_URL}reviews`, config);
+      const response = await axios.get(`${API_BASE}`, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -33,7 +34,7 @@ export const createAdminReviewResponse = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       };
-      const response = await axios.post(`${API_URL}reviews/response`, { reviewId, responseContent }, config);
+      const response = await axios.post(`${API_BASE}/response`, { reviewId, responseContent }, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -52,7 +53,7 @@ export const updateAdminReviewResponse = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       };
-      const response = await axios.put(`${API_URL}reviews/response/${responseId}`, { responseContent }, config);
+      const response = await axios.put(`${API_BASE}/response/${responseId}`, { responseContent }, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -70,7 +71,7 @@ export const getAdminReviewResponseByReviewId = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       };
-      const response = await axios.get(`${API_URL}reviews/${reviewId}/response`, config);
+      const response = await axios.get(`${API_BASE}/${reviewId}/response`, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

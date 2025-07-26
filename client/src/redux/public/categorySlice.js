@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/categories';
+
 // Fetch all public categories
 export const fetchCategories = createAsyncThunk(
     'categories/fetchCategories', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/categories', {
+            const res = await fetch(`${API_BASE}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -33,7 +35,7 @@ export const fetchCategoryBySlug = createAsyncThunk(
     'categories/fetchCategoryBySlug', 
     async (slug, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/categories/public/${slug}`, {
+            const res = await fetch(`${API_BASE}/${slug}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

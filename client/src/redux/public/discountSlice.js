@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/discounts';
 // Fetch all valid public discounts
 export const fetchDiscounts = createAsyncThunk(
     'discounts/fetchDiscounts', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/discounts', {
+            const res = await fetch(`${API_BASE}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

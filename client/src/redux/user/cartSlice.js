@@ -1,8 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { selectShippingFee } from "./shippingAddressSlice";
+
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/cart';
+
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
   try {
-    const res = await fetch('http://localhost:5000/api/users/cart', {
+    const res = await fetch(`${API_BASE}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -22,7 +25,7 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) 
 export const setCart = createAsyncThunk('cart/setCart', async ({ items, appliedDiscount ,shippingFee}, thunkAPI) => {
   try {
     
-    const res = await fetch('http://localhost:5000/api/users/cart/set', {
+    const res = await fetch(`${API_BASE}/set`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +48,7 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, 
     const token = localStorage.getItem('token')
     console.log('slice',{quantity});
     
-    const res = await fetch('http://localhost:5000/api/users/cart/add', {
+    const res = await fetch(`${API_BASE}/add`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -71,7 +74,7 @@ export const applyDiscount = createAsyncThunk(
 
       const token = localStorage.getItem('token');
 
-      const res = await fetch('http://localhost:5000/api/users/cart/apply-discount', {
+      const res = await fetch(`${API_BASE}/apply-discount`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -100,7 +103,7 @@ export const removeDiscount = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
 
-      const res = await fetch('http://localhost:5000/api/users/cart/remove-discount', {
+      const res = await fetch(`${API_BASE}/remove-discount`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

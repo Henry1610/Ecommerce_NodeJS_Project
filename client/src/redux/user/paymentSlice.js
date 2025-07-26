@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/payments';
 // THUNK: Gọi API tạo Stripe Checkout Session
 export const createCheckoutSession = createAsyncThunk(
   'payment/createCheckoutSession',
   async (orderData, thunkAPI) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/payments/checkout-session`, {
+      const res = await fetch(`${API_BASE}/checkout-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +33,7 @@ export const requestRefund = createAsyncThunk(
     try {
       console.log('rss:',orderNumber);
       
-      const res = await fetch(`http://localhost:5000/api/users/payments/refund/${orderNumber}`, {
+      const res = await fetch(`${API_BASE}/refund/${orderNumber}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

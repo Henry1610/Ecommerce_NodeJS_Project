@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/products';
+
 // Async thunks
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts',
     async () => {
-        const res = await fetch('http://localhost:5000/api/admin/products', {
+        const res = await fetch(API_BASE, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,7 +24,7 @@ export const fetchProductById = createAsyncThunk(
     'products/fetchProductById',
     async (productId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`,
+            const res = await fetch(`${API_BASE}/${productId}`,
                 {
                     method: 'GET',
                     headers: {
@@ -53,7 +55,7 @@ export const addProduct = createAsyncThunk(
             console.log(`${key}:`, value);
           }
           
-        const res = await fetch('http://localhost:5000/api/admin/products', {
+        const res = await fetch(API_BASE, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -71,7 +73,7 @@ export const updateProduct = createAsyncThunk(
     async ({ productId, productData }) => {
         console.log('productIdSlice:', productId);
 
-        const res = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+        const res = await fetch(`${API_BASE}/${productId}`, {
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -88,7 +90,7 @@ export const deleteProduct = createAsyncThunk(
     'products/deleteProduct',
     async (id) => {
 
-        const res = await fetch(`http://localhost:5000/api/admin/products/${id}`, {
+        const res = await fetch(`${API_BASE}/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/orders';
 // Lấy danh sách đơn hàng của người dùng
 export const fetchMyOrders = createAsyncThunk(
   'orders/fetchMyOrders',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/orders', {
+      const res = await fetch(`${API_BASE}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ export const fetchOrderByOrderNumber = createAsyncThunk(
   async (orderNumber, thunkAPI) => {
     
     try {
-      const res = await fetch(`http://localhost:5000/api/users/orders/${orderNumber}`, {
+      const res = await fetch(`${API_BASE}/${orderNumber}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

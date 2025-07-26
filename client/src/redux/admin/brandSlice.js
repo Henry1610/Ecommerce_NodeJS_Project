@@ -1,8 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/brands';
+
 export const fetchBrands = createAsyncThunk('brands/fetchBrands', async (_, thunkAPI) => {
   try {
-    const res = await fetch('http://localhost:5000/api/admin/brands', {
+    const res = await fetch(API_BASE, {
       method: 'GET',
 
       headers: {
@@ -21,7 +23,7 @@ export const fetchBrands = createAsyncThunk('brands/fetchBrands', async (_, thun
 })
 export const fetchBrandById = createAsyncThunk('brands/fetchBrandById', async (brandId, thunkAPI) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/admin/brands/${brandId}`, {
+    const res = await fetch(API_BASE + `/${brandId}`, {
       method: 'GET',
 
       headers: {
@@ -43,7 +45,7 @@ export const updateBrand = createAsyncThunk('brands/updateBrand', async ({brandD
 
 
   try {
-    const res = await fetch(`http://localhost:5000/api/admin/brands/${brandId}`, {
+    const res = await fetch(API_BASE + `/${brandId}`, {
       method: 'PUT',
 
       headers: {
@@ -65,7 +67,7 @@ export const updateBrand = createAsyncThunk('brands/updateBrand', async ({brandD
 })
 export const removeBrand = createAsyncThunk('brands/removeBrand', async (brandId, thunkAPI) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/admin/brands/${brandId}`, {
+    const res = await fetch(API_BASE + `/${brandId}`, {
       method: 'DELETE',
 
       headers: {
@@ -89,7 +91,7 @@ export const addBrand = createAsyncThunk(
   'brands/addBrand',
   async (brandData, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/brands', {
+      const res = await fetch(API_BASE, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`

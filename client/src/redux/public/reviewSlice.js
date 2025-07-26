@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/reviews';
 export const fetchReviewStats = createAsyncThunk(
     'reviews/getReviewStats',
     async (slug, thunkAPI) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/reviews/${slug}/stats`, {
+        const res = await fetch(`${API_BASE}/${slug}/stats`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

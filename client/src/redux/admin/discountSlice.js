@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/discounts';
+
 // Fetch all discounts
 export const fetchDiscounts = createAsyncThunk(
     'discounts/fetchDiscounts',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/discounts', {
+            const res = await fetch(API_BASE, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,7 +34,7 @@ export const createDiscount = createAsyncThunk(
     'discounts/createDiscount',
     async (discountData, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/discounts', {
+            const res = await fetch(API_BASE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,7 +63,7 @@ export const fetchDiscountById = createAsyncThunk(
     'discounts/fetchDiscountById',
     async (discountId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/discounts/${discountId}`, {
+            const res = await fetch(`${API_BASE}/${discountId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +89,7 @@ export const deleteDiscount = createAsyncThunk(
     'discounts/deleteDiscount',
     async (discountId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/discounts/${discountId}`, {
+            const res = await fetch(`${API_BASE}/${discountId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,7 +115,7 @@ export const updateDiscount = createAsyncThunk(
     'discounts/updateDiscount',
     async ({ id, updatedData }, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/discounts/${id}`, {
+            const res = await fetch(`${API_BASE}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

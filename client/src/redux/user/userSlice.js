@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users';
+
 // Lấy thông tin user
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/me', {
+      const res = await fetch(`${API_BASE}/me`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -42,7 +44,7 @@ export const updateUserProfile = createAsyncThunk(
         options.headers['Content-Type'] = 'application/json';
         options.body = JSON.stringify(updatedData);
       }
-      const res = await fetch('http://localhost:5000/api/users/me', options);
+      const res = await fetch(`${API_BASE}/me`, options);
       const data = await res.json();
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Failed to update user');
@@ -59,7 +61,7 @@ export const changePassword = createAsyncThunk(
   'user/changePassword',
   async (passwordData, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/change-password', {
+      const res = await fetch(`${API_BASE}/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE = 'http://localhost:5000/api/admin';
+// Sử dụng biến môi trường thay cho URL cứng
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin';
 
 export const fetchAdminProfile = createAsyncThunk('admin/fetchAdminProfile', async (_, thunkAPI) => {
   try {

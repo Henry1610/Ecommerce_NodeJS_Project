@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/payments';
+
 // Approve refund
 export const approveRefund = createAsyncThunk(
   'orders/approveRefund',
   async (orderId, thunkAPI) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/payments/approve-refund/${orderId}`, {
+      const res = await fetch(`${API_BASE}/approve-refund/${orderId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +33,7 @@ export const rejectRefund = createAsyncThunk(
   'orders/rejectRefund',
   async (orderId, thunkAPI) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/payments/reject-refund/${orderId}`, {
+      const res = await fetch(`${API_BASE}/reject-refund/${orderId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

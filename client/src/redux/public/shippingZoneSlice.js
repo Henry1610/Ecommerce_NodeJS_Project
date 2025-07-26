@@ -1,10 +1,12 @@
 import { createAsyncThunk,createSlice  } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/shipping-zones';
+
 export const fetchPublicShippingZones = createAsyncThunk(
   'publicShippingZones/fetchPublicShippingZones',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/shipping-zones', {
+      const res = await fetch(`${API_BASE}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

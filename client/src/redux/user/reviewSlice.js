@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/reviews';
+
 // Thêm review mới
 export const createReview = createAsyncThunk(
   'reviews/createReview',
@@ -9,7 +11,7 @@ export const createReview = createAsyncThunk(
         console.log(`${pair[0]}:`, pair[1]);
       }
 
-      const res = await fetch(`http://localhost:5000/api/users/reviews/${slug}`, {
+      const res = await fetch(`${API_BASE}/${slug}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -36,7 +38,7 @@ export const fetchMyReviews = createAsyncThunk(
   'reviews/fetchMyReviews',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/reviews', {
+      const res = await fetch(`${API_BASE}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ export const getReviewByOrderNumberAndProduct = createAsyncThunk(
     try {
 
 
-      const res = await fetch(`http://localhost:5000/api/users/reviews/${orderNumber}/${productId}`, {
+      const res = await fetch(`${API_BASE}/${orderNumber}/${productId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -95,7 +97,7 @@ export const updateReviewByOrderNumberAndProduct = createAsyncThunk(
         console.log(`${pair[0]}:`, pair[1]);
       }
 
-      const res = await fetch(`http://localhost:5000/api/users/reviews/${orderNumber}/${productId}`, {
+      const res = await fetch(`${API_BASE}/${orderNumber}/${productId}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`

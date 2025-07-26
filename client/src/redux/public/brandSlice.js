@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/brands';
+
 // Fetch all public brands
 export const fetchBrands = createAsyncThunk(
     'brands/fetchBrands', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/brands', {
+            const res = await fetch(`${API_BASE}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -33,7 +35,7 @@ export const fetchBrandBySlug = createAsyncThunk(
     'brands/fetchBrandBySlug', 
     async (slug, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/brands/public/${slug}`, {
+            const res = await fetch(`${API_BASE}/${slug}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/shipping-addresses';
 // Async thunk
 export const getSavedShippingAddresses = createAsyncThunk(
     'shippingAddress/getSavedShippingAddresses',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/shipping-addresses`, {
+            const res = await fetch(`${API_BASE}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ export const getShippingAddressById = createAsyncThunk(
     'shippingAddress/getShippingAddressById',
     async (addressId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}`, {
+            const res = await fetch(`${API_BASE}/${addressId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ export const updateShippingAddress = createAsyncThunk(
     'shippingAddress/updateShippingAddress',
     async ({ addressId, updates }, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}`, {
+            const res = await fetch(`${API_BASE}/${addressId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export const createShippingAddress = createAsyncThunk(
     'shippingAddress/createShippingAddress',
     async (newAddress, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/users/shipping-addresses', {
+            const res = await fetch(`${API_BASE}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ export const getDefaultShippingAddress = createAsyncThunk(
     'shippingAddress/getDefaultShippingAddress',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/users/shipping-addresses/default', {
+            const res = await fetch(`${API_BASE}/default`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +130,7 @@ export const setDefaultShippingAddress = createAsyncThunk(
     'shippingAddress/setDefaultShippingAddress',
     async (addressId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}/default`, {
+            const res = await fetch(`${API_BASE}/${addressId}/default`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export const deleteShippingAddress = createAsyncThunk(
     'shippingAddress/deleteShippingAddress',
     async (addressId, thunkAPI) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/shipping-addresses/${addressId}`, {
+        const res = await fetch(`${API_BASE}/${addressId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
