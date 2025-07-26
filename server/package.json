@@ -17,6 +17,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrate:shipping-address": "node utils/migrateOrderShippingAddress.js"
+    "migrate:shipping-address": "node utils/migrateOrderShippingAddress.js",
+    "postinstall": "npm install multer-storage-cloudinary --legacy-peer-deps"
   }
 }
