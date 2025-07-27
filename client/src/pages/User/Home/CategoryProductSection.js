@@ -18,6 +18,7 @@ const LOAD_MORE_COUNT = 4;
 
 function CategoryProductSection() {
     const dispatch = useDispatch();
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL;
     const { categories, loading: categoriesLoading } = useSelector((state) => state.public.publicCategory);
     const [activeTabCategories, setActiveTabCategories] = useState(null);
     const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
@@ -33,7 +34,7 @@ function CategoryProductSection() {
     useEffect(() => {
         if (activeTabCategories) {
             setLoading(true);
-            axios.get(`http://localhost:5000/api/products/filter?category=${activeTabCategories}`)
+            axios.get(`${SERVER_URL}/api/products/filter?category=${activeTabCategories}`)
                 .then(res => setProducts(res.data.products))
                 .catch(() => setProducts([]))
                 .finally(() => setLoading(false));

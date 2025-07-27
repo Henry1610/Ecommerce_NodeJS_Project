@@ -16,16 +16,19 @@ const app = express();
 
 
 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(errorHandler)
-app.use(cors());
-app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }),stripeWebhook);
+app.use(cors({
+    origin: [process.env.CLIENT_URL, "http://localhost:3000"],
+    credentials: true,
+}));
+app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json());
 
 connectDB();
 route(app);
+app.use(errorHandler)
 
 
 const PORT = process.env.PORT || 5000;

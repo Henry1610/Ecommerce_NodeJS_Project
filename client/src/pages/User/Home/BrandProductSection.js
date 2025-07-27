@@ -18,6 +18,7 @@ const LOAD_MORE_COUNT = 4;
 
 function BrandProductSection() {
     const dispatch = useDispatch();
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL;
     const { brands, loading: brandsLoading } = useSelector((state) => state.public.publicBrand || { brands: [], loading: false });
     const [activeTabBrands, setActiveTabBrands] = useState(null);
     const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
@@ -33,7 +34,7 @@ function BrandProductSection() {
     useEffect(() => {
         if (activeTabBrands) {
             setLoading(true);
-            axios.get(`http://localhost:5000/api/products/filter?brand=${activeTabBrands}`)
+            axios.get(`${SERVER_URL}/api/products/filter?brand=${activeTabBrands}`)
                 .then(res => setProducts(res.data.products))
                 .catch(() => setProducts([]))
                 .finally(() => setLoading(false));
