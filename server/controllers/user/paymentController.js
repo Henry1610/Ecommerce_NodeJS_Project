@@ -66,7 +66,7 @@ export const createCheckoutSession = async (req, res) => {
     if (!shippingAddress) {
       return res.status(400).json({ message: 'Không tìm thấy địa chỉ giao hàng' });
     }
-    
+
     // Calculate shipping fee using utility function
     const { fee: shippingFee, zone } = await calculateShippingFee(shippingAddress.city.city);
 
@@ -99,8 +99,8 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/order-success`,
-      cancel_url: `${process.env.CLIENT_URL}/order-fail`,
+      success_url: `${process.env.CLIENT_URL }/order-success`,
+      cancel_url: `${process.env.CLIENT_URL }/order-fail`,
       shipping_options: [{
         shipping_rate_data: {
           type: 'fixed_amount',
@@ -218,7 +218,7 @@ export const stripeWebhook = async (req, res) => {
           })
         )
       );
-      
+
 
       // Trừ lượt mã giảm giá
       if (appliedDiscount) {

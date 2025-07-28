@@ -3,6 +3,7 @@ import Header from "../components/Admin/Header";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE = process.env.REACT_APP_SERVER_URL;
 function AdminLayout({ children }) {
     const [dashboardData, setDashboardData] = useState(null);
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ function AdminLayout({ children }) {
 
             navigate('/login');
         } else {
-            fetch('http://localhost:5000/api/admin/dashboard', {
+            fetch(`${API_BASE}/api/admin/dashboard`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import { fetchBrands, removeBrand } from '../../../../redux/admin/brandSlice'
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import ErrorPage from '../../../../components/ErrorPage/ErrorPage'
+const API_BASE = process.env.REACT_APP_SERVER_URL;
+
 const BrandList = () => {
     const dispatch = useDispatch();
     const { brands, error, loading } = useSelector(state => state.admin.adminBrand);
@@ -242,7 +243,7 @@ const BrandList = () => {
                                                     <div style={{ width: 100, height: 60, borderRadius: '12px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
                                                         {brand.logo ? (
                                                             <img
-                                                                src={brand.logo.startsWith('http') ? brand.logo : `http://localhost:5000/${brand.logo}`}
+                                                                src={brand.logo.startsWith('http') ? brand.logo : `${API_BASE}/${brand.logo}`}
                                                                 alt={brand.name}
                                                                 style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }}
                                                             />

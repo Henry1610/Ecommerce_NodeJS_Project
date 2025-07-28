@@ -83,7 +83,7 @@ export const forgotPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 phút
         await user.save();
         // Gửi mail bằng nodemailer
-        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,

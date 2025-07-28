@@ -1,9 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/auth';
+
 export const register = createAsyncThunk(
     'auth/register'
     , async ({ username, password, email }, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/auth/register', {
+            const res = await fetch(`${API_BASE}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -32,7 +34,7 @@ export const register = createAsyncThunk(
 export const login = createAsyncThunk(
     'auth/login', async ({ email, password }, thunkAPI) => {
         try {
-            const res = await fetch('http://localhost:5000/api/auth/login', {
+            const res = await fetch(`${API_BASE}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,7 +64,7 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ email }, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/forgot-password', {
+      const res = await fetch(`${API_BASE}/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -82,7 +84,7 @@ export const resetPasswordConfirm = createAsyncThunk(
   'auth/resetPasswordConfirm',
   async ({ token, newPassword }, thunkAPI) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+      const res = await fetch(`${API_BASE}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword })

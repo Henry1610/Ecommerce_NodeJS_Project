@@ -18,9 +18,20 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:3000'
+];
 app.use(cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:3000"],
-    credentials: true,
+    origin: function (origin, callback) {
+        // Cho phép cả call từ Postman (origin === undefined)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }));
 app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
