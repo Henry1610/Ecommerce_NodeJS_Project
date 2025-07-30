@@ -31,7 +31,6 @@ export const requestRefund = createAsyncThunk(
   'payment/requestRefund',
   async ( orderNumber , thunkAPI) => {
     try {
-      console.log('rss:',orderNumber);
       
       const res = await fetch(`${API_BASE}/refund/${orderNumber}`, {
         method: 'POST',

@@ -40,7 +40,6 @@ function ProductDetail() {
     const { stats, total } = useSelector(state => state.public.publicReview);
     const { wishlist } = useSelector(state => state.user.userWishlist);
     const { token } = useSelector(state => state.auth);
-    console.log('review:',reviews);
     
     // Computed values
     const averageRating = (product?.ratings || 0).toFixed(1);
@@ -304,7 +303,7 @@ function AttributesSection() {
     const [relatedProducts, setRelatedProducts] = useState([]);
     useEffect(() => {
         if (product?.category?._id) {
-            axios.get(`http://localhost:5000/api/products/filter?category=${product.category._id}&limit=8`)
+            axios.get(`${process.env.REACT_APP_SERVER_URL}/api/products/filter?category=${product.category._id}&limit=8`)
                 .then(res => {
                     // Loại bỏ sản phẩm hiện tại khỏi danh sách
                     const filtered = res.data.products.filter(p => p._id !== product._id);
@@ -357,7 +356,7 @@ function ProductInfo({
     const [relatedProducts, setRelatedProducts] = useState([]);
     useEffect(() => {
         if (product?.category?._id) {
-            axios.get(`http://localhost:5000/api/products/filter?category=${product.category._id}&limit=8`)
+            axios.get(`${process.env.REACT_APP_SERVER_URL}/api/products/filter?category=${product.category._id}&limit=8`)
                 .then(res => {
                     const filtered = res.data.products.filter(p => p._id !== product._id);
                     setRelatedProducts(filtered);
@@ -403,7 +402,7 @@ function ProductHeader({ product }) {
                 {product.brand && product.brand.logo && (
                     <div style={{ width: 95, height: 59, borderRadius: '12px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
                         <img
-                            src={product.brand.logo.startsWith('http') ? product.brand.logo : `http://localhost:5000/${product.brand.logo}`}
+                            src={product.brand.logo.startsWith('http') ? product.brand.logo : `${process.env.REACT_APP_SERVER_URL}/${product.brand.logo}`}
                             alt={product.brand.name}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }}
                         />

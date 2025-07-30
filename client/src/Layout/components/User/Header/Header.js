@@ -4,7 +4,7 @@ import { logout } from '../../../../redux/auth/authSlice';
 import { Link } from 'react-router-dom';
 import './Header.css'
 import { fetchCart } from '../../../../redux/user/cartSlice';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { fetchProducts, resetSuggestions } from '../../../../redux/public/productsSlice';
 import { getProductSuggestions } from '../../../../redux/public/productsSlice';
@@ -21,21 +21,25 @@ function Header() {
     const [keyword, setKeyword] = useState('');
     const debouncedKeyword = useDebounce(keyword, 500);
 
-    const {  profile } = useSelector(state => state.user.userProfile);
+    const { profile } = useSelector(state => state.user.userProfile);
     const authUser = useSelector(state => state.auth.user);
     const username = profile?.user?.username || authUser?.username || 'Tài khoản';
     const avatar = profile?.user?.avatar || authUser?.avatar || '';
+    
+    // Kiểm tra xem user có phải là admin không
+    const isAdmin = authUser?.role === 'admin';
+    
     useEffect(() => {
-        dispatch(fetchUserProfile());
-    }, [dispatch]);
+        if (token && !isAdmin) {
+            dispatch(fetchUserProfile());
+        }
+    }, [token, dispatch, isAdmin]);
     const handleSearch = (e) => {
         e.preventDefault();
-
         const trimmed = keyword.trim();
         if (trimmed) {
-            dispatch(fetchProducts({ name: trimmed }));
-            setKeyword('')
-            navigate('/product');
+            setKeyword('');
+            navigate(`/product?name=${encodeURIComponent(trimmed)}`);
         }
     };
     const handleChangeKeyword = (e) => {
@@ -44,7 +48,7 @@ function Header() {
     useEffect(() => {
         const trimmed = debouncedKeyword.trim();
 
-        if (trimmed.length >= 2) {
+        if (trimmed.length > 0) {
             dispatch(getProductSuggestions(trimmed));
         } else {
             dispatch(resetSuggestions());
@@ -60,48 +64,97 @@ function Header() {
         navigate('/login');
     };
     useEffect(() => {
-        if (isAuthenticated && authUser?.role === 'user') {
+        if (token && !isAdmin) {
             dispatch(fetchCart())
                 .unwrap()
                 .catch(error => toast.error(`Lỗi khi tải giỏ hàng: ${error}`));
         }
-    }, [dispatch, isAuthenticated, authUser]);
+    }, [dispatch, token, isAdmin]);
 
     const wishlistCount = useSelector(state => state.user.userWishlist.wishlist.length);
 
     return (
         <>
             <div className="d-flex justify-content-between align-items-center text-secondary mt-3" style={{ fontSize: "0.75rem" }}>
-                <div className="d-inline-flex border rounded-pill overflow-hidden shadow-sm bg-white">
-                    <div className="d-flex align-items-center px-3 py-2 gap-2 border-end">
+                <div className="d-inline-flex border rounded-pill overflow-hidden shadow-sm bg-white" style={{ transition: 'all 0.3s ease' }}>
+                    <div
+                        className="d-flex align-items-center px-3 py-2 gap-2 border-end"
+                        style={{
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.backgroundColor = '#f0f9ff';
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                    >
                         <i className="fas fa-phone-alt" style={{ color: '#06b6d4' }}></i>
-                        <span className="fw-bold text-dark">1900.63.3579</span>
+                        <span className="fw-bold text-dark">1900.79.7979</span>
                     </div>
-                    <div className="d-flex align-items-center px-3 py-2 gap-2">
+                    <div
+                        className="d-flex align-items-center px-3 py-2 gap-2"
+                        style={{
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.backgroundColor = '#f0f9ff';
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                    >
                         <i className="fas fa-life-ring" style={{ color: '#22c55e' }}></i>
                         <span className="fw-bold text-dark">Hỗ trợ</span>
                     </div>
                 </div>
 
-                <div className="d-flex align-items-center gap-3"> {/* giảm gap từ 4 → 3 */}
-                    <button
-                        className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
-                        type="button"
-                        style={{ color: '#6c757d', fontWeight: 500, fontSize: "0.9rem" }} // nhỏ chữ + giảm đậm
+                <div className="d-flex align-items-center gap-3">
+                    <div
+                        style={{
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '0.75rem', 
+                            transition: 'background-color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f3f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                        <i className="fas fa-store-alt small"></i>
-                        <Link to="/store-address" className="text-reset text-decoration-none">
-                            Địa chỉ cửa hàng
-                        </Link>
-                    </button>
-                    <button
-                        className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
-                        type="button"
-                        style={{ color: '#6c757d', fontWeight: 500, fontSize: "1rem" }}
+                        <button
+                            className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
+                            type="button"
+                            style={{ color: '#6c757d', fontWeight: 500, fontSize: "0.9rem" }}
+                        >
+                            <i className="fas fa-store-alt small"></i>
+                            <Link to="/store-address" className="text-reset text-decoration-none">
+                                Địa chỉ cửa hàng
+                            </Link>
+                        </button>
+                    </div>
+
+                    <div
+                        style={{
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '0.75rem',
+                            transition: 'background-color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f3f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                        <i className="far fa-newspaper small"></i>
-                        <span>Tin tức</span>
-                    </button>
+                        <button
+                            className="btn btn-link d-flex align-items-center gap-1 p-0 text-decoration-none"
+                            type="button"
+                            style={{ color: '#6c757d', fontWeight: 500, fontSize: "1rem" }}
+                        >
+                            <i className="far fa-newspaper small"></i>
+                            <span>Tin tức</span>
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -253,7 +306,7 @@ function Header() {
                                     <i className="fa-solid fa-clock-rotate-left fs-4"></i>
                                 </button>
                             </div>
-                            <Link to='/profile'  className="text-decoration-none text-reset">
+                            <Link to='/profile' className="text-decoration-none text-reset">
                                 <span className="d-flex align-items-center gap-2">
                                     {avatar ? (
                                         <img
@@ -276,14 +329,16 @@ function Header() {
                             </button>
                         </>
                     ) : (
-                        <Link to='/login'>
+                        <Link to="/login" className="text-decoration-none">
                             <button
-                                className="btn btn-login  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
+                                className="btn btn-login d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
                                 type="button"
                             >
-                                <i class="fa-solid fa-right-to-bracket"></i>  <span className="fw-semibold">Đăng nhập</span>
+                                <i className="fa-solid fa-right-to-bracket"></i>
+                                <span className="fw-semibold">Đăng nhập</span>
                             </button>
                         </Link>
+
                     )}
                 </div>
 

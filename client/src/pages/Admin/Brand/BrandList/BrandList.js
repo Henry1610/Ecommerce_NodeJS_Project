@@ -87,11 +87,7 @@ const BrandList = () => {
         );
     }
 
-    if (error) {
-        console.log('err:',error);
-        
-    }
-
+  
     if (!brands || brands.length === 0) {
         return (
             <div className="container-fluid py-4">

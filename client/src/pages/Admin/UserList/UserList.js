@@ -126,7 +126,7 @@ const UserList = () => {
                                                     <td style={{ border: 'none' }}>{index + 1}</td>
                                                     <td style={{ border: 'none' }}>
                                                         <img
-                                                            src={user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `http://localhost:5000/${user.avatar}`) : '/assets/img/customer/default.jpg'}
+                                                            src={user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `${process.env.REACT_APP_SERVER_URL}/${user.avatar}`) : '/assets/img/customer/default.jpg'}
                                                             alt="avatar"
                                                             className="user-img"
                                                             style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}

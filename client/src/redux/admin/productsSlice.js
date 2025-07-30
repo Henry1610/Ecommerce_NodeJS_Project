@@ -34,7 +34,6 @@ export const fetchProductById = createAsyncThunk(
                 }
             );
             const data = await res.json();
-            console.log('data:',data);
             
             if (!res.ok) {
                 console.error('Error fetching category:', data);
@@ -71,7 +70,6 @@ export const addProduct = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
     'products/updateProduct',
     async ({ productId, productData }) => {
-        console.log('productIdSlice:', productId);
 
         const res = await fetch(`${API_BASE}/${productId}`, {
             method: 'PUT',

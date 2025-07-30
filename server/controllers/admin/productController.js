@@ -158,7 +158,6 @@ export const updateProduct = async (req, res, next) => {
 
         // Ảnh mới (upload)
         const newImages = req.files?.map(file => file.path) || [];
-        console.log('NEW IMAGES:', newImages);
 
         await Product.findByIdAndUpdate(id, {
             name: name.trim(),

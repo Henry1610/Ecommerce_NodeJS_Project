@@ -16,6 +16,7 @@ body {
     color: #4b5563;
     line-height: 1.2;
   }
+  
   @media (min-width: 576px) {
     .category-text {
       font-size: 11px;

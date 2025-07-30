@@ -8,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
-const API_BASE = process.env.REACT_APP_SERVER_URL|| 'http://localhost:5000';
+const API_BASE = process.env.REACT_APP_SERVER_URL;
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -196,7 +196,7 @@ const ProductDetail = () => {
                                 {product.images?.map((img, index) => (
                                     <SwiperSlide key={index} className="cursor-pointer">
                                         <img
-                                            src={`http://localhost:5000/uploads/products/${product._id}/${img}`}
+                                            src={`${API_BASE}/uploads/products/${product._id}/${img}`}
                                             alt={`${product.name} - Ảnh ${index + 1}`}
                                             className="img-fluid rounded"
                                             loading="lazy"

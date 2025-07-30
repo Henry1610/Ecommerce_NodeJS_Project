@@ -15,7 +15,6 @@ export const fetchUserProfile = createAsyncThunk(
       });
 
       const data = await res.json();
-      console.log('data:',data);
       
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Failed to fetch user info');

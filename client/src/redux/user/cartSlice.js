@@ -46,7 +46,6 @@ export const setCart = createAsyncThunk('cart/setCart', async ({ items, appliedD
 export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, quantity }, thunkAPI) => {
   try {
     const token = localStorage.getItem('token')
-    console.log('slice',{quantity});
     
     const res = await fetch(`${API_BASE}/add`, {
       method: 'POST',
@@ -70,7 +69,6 @@ export const applyDiscount = createAsyncThunk(
   'cart/applyDiscount',
   async (code, thunkAPI) => {
     try {
-      console.log('codeslice:', code);
 
       const token = localStorage.getItem('token');
 

@@ -129,7 +129,6 @@ export const updateOrderStatus = async (req, res) => {
           // Lấy đúng _id sản phẩm (dù item.product là object hay chỉ là id)
           const productId = item.product._id || item.product;
           const product = await Product.findById(productId);
-          console.log('aaa:',product);
           
           if (product) {
 

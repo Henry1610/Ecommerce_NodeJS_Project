@@ -36,8 +36,12 @@ const OrderDetail = () => {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(requestRefund(orderNumber));
-        Swal.fire('Đã gửi yêu cầu hủy!', '', 'success');
+        dispatch(requestRefund(orderNumber))
+          .unwrap()
+          .then(() => {
+            dispatch(fetchOrderByOrderNumber(orderNumber));
+            Swal.fire('Đã gửi yêu cầu hủy!', '', 'success');
+          });
       }
     });
   };
@@ -127,7 +131,7 @@ const OrderDetail = () => {
       icon,
       label,
       completed: Boolean(found),
-      date: found ? new Date(found.updatedAt).toLocaleString() : '-'
+      date: found ? found.updatedAt : null
     };
   });
 

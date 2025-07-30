@@ -33,13 +33,7 @@ const Header = () => {
     setActiveDropdown(prev => (prev === type ? null : type));
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (search.trim()) {
-      // You can implement real search logic here
-      console.log('Searching:', search);
-    }
-  };
+  
 
   const handleLogout = async () => {
     const result = await Swal.fire({

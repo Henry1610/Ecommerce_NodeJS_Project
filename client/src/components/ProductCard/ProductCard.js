@@ -9,6 +9,7 @@ import { fetchCart } from '../../redux/user/cartSlice';
 import { MAX_STRIPE_AMOUNT } from '../../config/constants';
 import { selectCartTotalPrice } from '../../redux/user/cartSlice';
 import { addToCompare, removeFromCompare } from '../../redux/public/compareSlice';
+import { fetchWishlist } from '../../redux/user/wishlistSlice';
 
 function ProductCard({ product, compareEnabled }) {
     const dispatch = useDispatch();
@@ -21,8 +22,11 @@ function ProductCard({ product, compareEnabled }) {
     const compareList = useSelector(state => state.public.compare.compareList);
 
     useEffect(() => {
-        dispatch(fetchCart());
-    }, [dispatch]);
+        if(token){
+            dispatch(fetchCart());
+            dispatch(fetchWishlist());
+        }
+    }, [dispatch, token]);
 
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);

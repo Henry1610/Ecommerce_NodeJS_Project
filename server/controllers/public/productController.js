@@ -9,7 +9,6 @@ export const getPublicProducts = async (req, res) => {
             category,
             brand,
             color,
-            statusCurrent, // vẫn nhận nhưng sẽ override
             minPrice,
             maxPrice,
             minRating,

@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/products';
-
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts',
     async (params = {}, thunkAPI) => {
@@ -9,7 +7,7 @@ export const fetchProducts = createAsyncThunk(
             const query = new URLSearchParams(params).toString();
             console.log(query);
 
-            const url = `${API_BASE}/filter?${query}`;
+            const url = `${process.env.REACT_APP_SERVER_URL}/api/products/filter?${query}`;
 
             const res = await fetch(url, {
                 method: 'GET',
@@ -39,7 +37,7 @@ export const fetchProductBySlug = createAsyncThunk(
 
             const queryParams = new URLSearchParams();
             if (rating) queryParams.append('rating', rating);
-            const res = await fetch(`${API_BASE}/${slug}?${queryParams.toString()}`
+            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/products/${slug}?${queryParams.toString()}`
                 , {
                     method: 'GET',
                     headers: {
@@ -51,7 +49,6 @@ export const fetchProductBySlug = createAsyncThunk(
                 }
             )
             const data = await res.json();
-            console.log('da:', data);
 
             if (!res.ok) {
                 console.error('Error fetching product:', data);
@@ -70,7 +67,7 @@ export const getProductSuggestions = createAsyncThunk(
     async (keyword, thunkAPI) => {
         try {
             const query = new URLSearchParams({ keyword, limit: 10 }).toString();
-            const res = await fetch(`${API_BASE}/suggestions?${query}`, {
+            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/products/suggestions?${query}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +92,7 @@ export const likeOrUnlikeReview = createAsyncThunk(
     'reviews/likeOrUnlikeReview',
     async (reviewId, thunkAPI) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/reviews/like/${reviewId}`, {
+            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/users/reviews/like/${reviewId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

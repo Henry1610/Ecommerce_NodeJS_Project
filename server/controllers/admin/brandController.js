@@ -70,7 +70,6 @@ export const updateBrand = async (req, res) => {
       return res.status(400).json({ message: 'Tên brand đã tồn tại.' });
     }
 
-    console.log('🔥 Brand cũ:', brand); // ✅ Kiểm tra dữ liệu brand cũ
 
     let logo = brand.logo;
 
@@ -84,15 +83,12 @@ export const updateBrand = async (req, res) => {
     }
 
     if (req.file) {
-      console.log('🆕 Có file logo mới:', req.file.path);
 
       if (brand.logo) {
         const publicId = getPublicIdFromUrl(brand.logo);
-        console.log('📦 publicId tách ra:', publicId); // ✅ Kiểm tra publicId
 
         if (publicId) {
           const result = await cloudinary.uploader.destroy(publicId);
-          console.log('🗑️ Kết quả xoá logo cũ:', result); // ✅ Kiểm tra kết quả xoá
         } else {
           console.warn('⚠️ Không tách được publicId từ URL:', brand.logo);
         }
@@ -106,7 +102,6 @@ export const updateBrand = async (req, res) => {
 
     const updatedBrand = await brand.save();
 
-    console.log('✅ Brand cập nhật:', updatedBrand); // ✅ Kiểm tra dữ liệu mới
 
     res.status(200).json({
       message: 'Cập nhật brand thành công',
@@ -138,7 +133,6 @@ export const deleteBrand = async (req, res) => {
       return res.status(404).json({ message: 'Brand not found' });
     }
 
-    console.log('👉 Brand tìm được:', brand.name, '| Slug:', brand.slug);
 
     // 3. Xoá folder Cloudinary nếu có slug
     if (brand.slug) {

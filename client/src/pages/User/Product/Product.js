@@ -5,25 +5,29 @@ import { fetchProducts } from '../../../redux/public/productsSlice';
 import { fetchCategories } from '../../../redux/public/categorySlice';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 import Select from 'react-select';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toggleCompare } from '../../../redux/public/compareSlice';
 import CompareBar from '../../../components/CompareBar/CompareBar';
 function Product() {
   const dispatch = useDispatch();
-  const { products, loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
+  const { products = [], loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
 
-  const { categories } = useSelector((state) => state.public.publicCategory || { categories: [] });
-  const { brands } = useSelector((state) => state.public.publicBrand || { brands: [] });
+  const { categories = [] } = useSelector((state) => state.public.publicCategory || { categories: [] });
+  const { brands = [] } = useSelector((state) => state.public.publicBrand || { brands: [] });
   const compareEnabled = useSelector(state => state.public.compare.enabled);
 
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Đọc filter từ URL
   const [filters, setFilters] = useState({
-    category: '',
-    brand: '',
-    minPrice: '',
-    maxPrice: '',
-    sortBy: '',
+    name: searchParams.get('name') || '',
+    category: searchParams.get('category') || '',
+    brand: searchParams.get('brand') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    sortBy: searchParams.get('sortBy') || '',
   });
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
 
   const limit = 4;
 
@@ -34,17 +38,28 @@ function Product() {
     dispatch(fetchBrands());
   }, [dispatch]);
 
+  // Khi searchParams thay đổi (user reload hoặc share link), cập nhật filter và page
   useEffect(() => {
-    const filterParams = {
-      category,
-      brand,
-      minPrice,
-      maxPrice,
-      sortBy,
-    };
+    setFilters({
+      name: searchParams.get('name') || '',
+      category: searchParams.get('category') || '',
+      brand: searchParams.get('brand') || '',
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      sortBy: searchParams.get('sortBy') || '',
+    });
+    setPage(Number(searchParams.get('page')) || 1);
+  }, [searchParams]);
 
-    dispatch(fetchProducts({ page, limit, ...filterParams }));
-  }, [dispatch, page, category, brand, minPrice, maxPrice, sortBy]);
+  // Khi filter hoặc page thay đổi, cập nhật URL và fetch sản phẩm
+  useEffect(() => {
+    const params = { ...filters, page };
+    Object.keys(params).forEach(key => {
+      if (!params[key]) delete params[key];
+    });
+    setSearchParams(params);
+    dispatch(fetchProducts({ page, limit, ...filters }));
+  }, [dispatch, page, filters, setSearchParams]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +72,7 @@ function Product() {
 
   const clearFilters = () => {
     setFilters({
+      name: '',
       category: '',
       brand: '',
       minPrice: '',
@@ -70,7 +86,7 @@ function Product() {
   const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
 
   // Tạo options cho react-select brand
-  const brandOptions = brands.map(br => ({
+  const brandOptions = (brands || []).map(br => ({
     value: br._id,
     label: br.name,
     logo: br.logo
@@ -221,7 +237,7 @@ function Product() {
                   style={{ transition: 'border 0.2s', boxShadow: 'none' }}
                 >
                   <option value="">Tất cả danh mục</option>
-                  {categories.map(cat => (
+                  {(categories || []).map(cat => (
                     <option key={cat._id} value={cat._id}>
                       {cat.name}
                     </option>
@@ -238,7 +254,10 @@ function Product() {
                 <Select
                   options={brandOptions}
                   value={brandOptions.find(opt => opt.value === filters.brand) || null}
-                  onChange={opt => setFilters(f => ({ ...f, brand: opt ? opt.value : '' }))}
+                  onChange={opt => {
+                    setFilters(f => ({ ...f, brand: opt ? opt.value : '' }));
+                    setPage(1);
+                  }}
                   isClearable
                   placeholder="Tất cả brand"
                   formatOptionLabel={formatBrandOptionLabel}
@@ -265,7 +284,7 @@ function Product() {
                     )}
                     {category && (
                       <span className="badge bg-success d-flex align-items-center gap-1">
-                        {categories.find(c => c._id === category)?.name}
+                        {(categories || []).find(c => c._id === category)?.name}
                         <button type="button" className="btn btn-sm btn-link p-0 ms-1 text-white" style={{ lineHeight: 1 }} onClick={() => setFilters(f => ({ ...f, category: '' }))}>
                           <i className="bi bi-x-circle"></i>
                         </button>
@@ -273,7 +292,7 @@ function Product() {
                     )}
                     {brand && (
                       <span className="badge bg-warning d-flex align-items-center gap-1">
-                        {brands.find(b => b._id === brand)?.name}
+                        {(brands || []).find(b => b._id === brand)?.name}
                         <button type="button" className="btn btn-sm btn-link p-0 ms-1 text-dark" style={{ lineHeight: 1 }} onClick={() => setFilters(f => ({ ...f, brand: '' }))}>
                           <i className="bi bi-x-circle"></i>
                         </button>
@@ -301,9 +320,9 @@ function Product() {
           {/* Results Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0">
-              {loading ? 'Đang tải...' : `Hiển thị ${products.length} sản phẩm`}
+              {loading ? 'Đang tải...' : `Hiển thị ${products?.length || 0} sản phẩm`}
             </h5>
-            {!loading && products.length > 0 && (
+            {!loading && products?.length > 0 && (
               <small className="text-muted">
                 Trang {currentPage} / {totalPages}
               </small>
@@ -317,7 +336,7 @@ function Product() {
               </div>
               <p className="mt-2 text-muted">Đang tải sản phẩm...</p>
             </div>
-          ) : products.length === 0 ? (
+          ) : products?.length === 0 ? (
             <div className="text-center py-5">
               <div className="mb-3">
                 <i className="bi bi-search display-1 text-muted"></i>
@@ -331,7 +350,7 @@ function Product() {
           ) : (
             <>
               <div className="row g-3">
-                {products.map(product => (
+                {products?.map(product => (
                   <div className="col-6 col-lg-4 col-xl-3" key={product._id}>
                     <ProductCard product={product} compareEnabled={compareEnabled} />
                   </div>
