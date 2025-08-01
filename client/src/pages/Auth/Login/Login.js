@@ -125,8 +125,7 @@ function Login() {
                         </div>
                         <Link to="/reset-password" style={{ color: '#3b82f6', fontWeight: 500, fontSize: 15 }}>Quên mật khẩu?</Link>
                     </div>
-                    <button type="submit" className="btn btn-primary w-100 fw-bold" style={{
-                        background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',
+                    <button type="submit" className="btn btn-primary w-100 fw-bold btn-info text-white" style={{
                         border: 'none',
                         borderRadius: 10,
                         height: 44,

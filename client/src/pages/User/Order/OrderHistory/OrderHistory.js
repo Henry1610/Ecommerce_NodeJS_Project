@@ -176,7 +176,7 @@ const OrderHistory = () => {
                         <div className="card-footer bg-transparent">
                           <Link
                             to={`/order-detail/${order.orderNumber}`}
-                            className="btn btn-primary w-100"
+                            className="btn btn-info w-100 text-white"
                           >
                             <i className="bi bi-eye me-2"></i>
                             Xem chi tiết

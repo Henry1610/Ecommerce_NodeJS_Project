@@ -6,14 +6,14 @@ const stores = [
     locations: [
       {
         image: 'https://pendecor.vn/uploads/files/2024/01/28/thiet-ke-showroom-dien-may-1.jpg',
-        address: 'Số 5 - 7 Nguyễn Huy Tưởng, F6, Q. Bình Thạnh',
+        address: '123 Lê Văn Sỹ, Phường 13, Quận Phú Nhuận',
         time: '09:00 - 21:00',
         status: 'Đóng cửa',
         map: '#',
       },
       {
         image: 'https://pendecor.vn/uploads/files/2024/01/28/thiet-ke-showroom-dien-may-5.jpg',
-        address: '95 Trần Thiện Chánh, Q10',
+        address: '18 Nguyễn Thị Minh Khai, Phường Đa Kao, Quận 1',
         time: '09:00 - 21:00',
         status: 'Đóng cửa',
         map: '#',
@@ -25,7 +25,7 @@ const stores = [
     locations: [
       {
         image: 'https://pendecor.vn/uploads/files/2024/01/28/thiet-ke-showroom-dien-may-11.jpg',
-        address: '53 Thái Hà, Đống Đa',
+        address: '128 Trần Duy Hưng, Phường Trung Hòa, Quận Cầu Giấy',
         time: '09:00 - 22:00',
         status: 'Đóng cửa',
         map: '#',

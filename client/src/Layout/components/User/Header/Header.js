@@ -25,10 +25,10 @@ function Header() {
     const authUser = useSelector(state => state.auth.user);
     const username = profile?.user?.username || authUser?.username || 'Tài khoản';
     const avatar = profile?.user?.avatar || authUser?.avatar || '';
-    
+
     // Kiểm tra xem user có phải là admin không
     const isAdmin = authUser?.role === 'admin';
-    
+
     useEffect(() => {
         if (token && !isAdmin) {
             dispatch(fetchUserProfile());
@@ -75,7 +75,7 @@ function Header() {
 
     return (
         <>
-            <div className="d-flex justify-content-between align-items-center text-secondary mt-3" style={{ fontSize: "0.75rem" }}>
+            <div className="d-none d-md-flex justify-content-between align-items-center text-secondary mt-3" style={{ fontSize: "0.75rem" }}>
                 <div className="d-inline-flex border rounded-pill overflow-hidden shadow-sm bg-white" style={{ transition: 'all 0.3s ease' }}>
                     <div
                         className="d-flex align-items-center px-3 py-2 gap-2 border-end"
@@ -119,7 +119,7 @@ function Header() {
                     <div
                         style={{
                             padding: '0.25rem 0.5rem',
-                            borderRadius: '0.75rem', 
+                            borderRadius: '0.75rem',
                             transition: 'background-color 0.3s ease',
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f3f5'}
@@ -165,9 +165,12 @@ function Header() {
                         <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
                         pro
                     </Link>
-                    <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
-                        <i className="fas fa-bars fs-4"></i>
-                    </button>
+                    <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
+                        <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
+                            <i className="fas fa-bars fs-4"></i>
+                        </button>
+                    </Link>
+
                     <nav className="d-none d-lg-flex align-items-center gap-4 text-secondary fw-semibold user-select-none" >
                         <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
                             <i className="fas fa-bars"></i>

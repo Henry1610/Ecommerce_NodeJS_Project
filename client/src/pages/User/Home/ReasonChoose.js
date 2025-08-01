@@ -46,7 +46,7 @@ function ReasonChoose() {
             <div className="card shadow border-0 rounded-4 overflow-hidden">
                 <div className="row g-0">
                     {/* Sidebar Buttons */}
-                    <div className="col-md-4 bg-white p-4 d-flex flex-column justify-content-center">
+                    <div className="col-12 col-md-4 bg-white p-4 d-flex flex-column justify-content-center mb-3 mb-md-0">
                         <div className="d-flex flex-column gap-2">
                             {slides.map((item, idx) => (
                                 <button
@@ -63,20 +63,20 @@ function ReasonChoose() {
                     </div>
 
                     {/* Slide Content */}
-                    <div className="col-md-8 bg-white p-5 d-flex align-items-center">
+                    <div className="col-12 col-md-8 bg-white p-3 p-md-5 d-flex align-items-center">
                         <div className="row w-100">
                             {/* Left - Image */}
-                            <div className="col-md-6 d-flex justify-content-center align-items-center">
+                            <div className="col-12 col-md-6 d-flex justify-content-center align-items-center mb-4 mb-md-0">
                                 <img
                                     src={current.img}
                                     alt={current.title}
                                     className="img-fluid rounded-3"
-                                    style={{ maxHeight: '500px', objectFit: 'cover' }}
+                                    style={{ maxHeight: '400px', objectFit: 'cover' }}
                                 />
                             </div>
 
                             {/* Right - Text */}
-                            <div className="col-md-6">
+                            <div className="col-12 col-md-6">
                                 <h5 className="card-title mb-3 fs-3 text-dark fw-bold">
                                     {current.title}
                                 </h5>
@@ -84,8 +84,6 @@ function ReasonChoose() {
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>

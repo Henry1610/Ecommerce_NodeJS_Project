@@ -68,8 +68,8 @@ const CategoryList = () => {
                             <h4 className="fw-bold">Product Category List</h4>
                             <h6 className="text-muted">View/Search product Category</h6>
                         </div>
-                        <Link  to="/admin/category/add" className="btn btn-primary d-flex align-items-center">
-                            <i className="fas fa-plus me-2"></i>Add Category
+                        <Link  to="/admin/category/add" className="btn btn-primary d-flex align-items-center text-white">
+                            <i className="fas fa-plus me-2 "></i>Add Category
                         </Link>
                     </div>
                     <div className="row mb-3">

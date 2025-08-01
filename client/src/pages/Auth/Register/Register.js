@@ -1,21 +1,44 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { register } from '../../../redux/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { sendOTP, registerWithOTP, clearOTPState } from '../../../redux/auth/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUser, FaKey } from 'react-icons/fa';
 
 function Register() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [username, setUsername] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const { loading, error, otpSent, otpEmail } = useSelector(state => state.auth);
+    
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        otp: ''
+    });
 
-    const handleRegister = async (e) => {
+    const handleInputChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSendOTP = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
+        
+        // Validation
+        if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Vui lòng điền đầy đủ thông tin',
+            });
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
             Swal.fire({
                 icon: 'error',
                 title: 'Lỗi!',
@@ -23,14 +46,63 @@ function Register() {
             });
             return;
         }
+
+        if (formData.password.length < 6) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Mật khẩu phải có ít nhất 6 ký tự',
+            });
+            return;
+        }
+
         try {
-            const result = await dispatch(register({ email, password, username })).unwrap();
+            await dispatch(sendOTP({ 
+                username: formData.username, 
+                email: formData.email 
+            })).unwrap();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Mã OTP đã được gửi đến email của bạn',
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error || 'Gửi OTP thất bại',
+            });
+        }
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        
+        if (!formData.otp) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Vui lòng nhập mã OTP',
+            });
+            return;
+        }
+
+        try {
+            const result = await dispatch(registerWithOTP({
+                username: formData.username,
+                email: formData.email,
+                password: formData.password,
+                otp: formData.otp
+            })).unwrap();
+            
             if (result) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Đăng ký thành công!',
+                    text: 'Chào mừng bạn đến với chúng tôi!',
                 });
-                navigate('/login');
+                navigate('/');
             }
         } catch (error) {
             Swal.fire({
@@ -41,126 +113,211 @@ function Register() {
         }
     };
 
+    const handleResendOTP = async () => {
+        try {
+            await dispatch(sendOTP({ 
+                username: formData.username, 
+                email: formData.email 
+            })).unwrap();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Mã OTP mới đã được gửi đến email của bạn',
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error || 'Gửi OTP thất bại',
+            });
+        }
+    };
+
+    const handleBackToForm = () => {
+        dispatch(clearOTPState());
+        setFormData({
+            ...formData,
+            otp: ''
+        });
+    };
+
     return (
-        <div className="register-bg" style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="register-card" style={{
-                background: '#fff',
-                borderRadius: 18,
-                boxShadow: '0 4px 32px rgba(59,130,246,0.10)',
-                padding: '40px 32px',
-                maxWidth: 400,
-                width: '100%',
-                margin: '32px 0',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <h2 style={{ fontWeight: 700, color: '#3b82f6', marginBottom: 18, fontSize: 28 }}>Đăng ký</h2>
-                <form onSubmit={handleRegister} style={{ width: '100%' }}>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="username" className="form-label" style={{ fontWeight: 500 }}>Họ và tên</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaUser style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="username"
-                                placeholder="Nhập họ và tên"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
-                                }}
-                            />
+        <div className="register-bg" style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+        }}>
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-md-6 col-lg-5">
+                        <div className="card shadow-lg border-0 rounded-4">
+                            <div className="card-body p-5">
+                                <div className="text-center mb-4">
+                                    <h2 className="fw-bold text-dark mb-2">
+                                        {otpSent ? 'Xác thực OTP' : 'Đăng ký tài khoản'}
+                                    </h2>
+                                    <p className="text-muted">
+                                        {otpSent 
+                                            ? 'Nhập mã OTP đã được gửi đến email của bạn'
+                                            : 'Tạo tài khoản mới để bắt đầu mua sắm'
+                                        }
+                                    </p>
+                                </div>
+
+                                {!otpSent ? (
+                                    // Form đăng ký
+                                    <form onSubmit={handleSendOTP}>
+                                        <div className="mb-3">
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaUser className="text-muted" />
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    className="form-control border-start-0"
+                                                    placeholder="Tên đăng nhập"
+                                                    value={formData.username}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaEnvelope className="text-muted" />
+                                                </span>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    className="form-control border-start-0"
+                                                    placeholder="Email"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaLock className="text-muted" />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    name="password"
+                                                    className="form-control border-start-0"
+                                                    placeholder="Mật khẩu"
+                                                    value={formData.password}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaLock className="text-muted" />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    name="confirmPassword"
+                                                    className="form-control border-start-0"
+                                                    placeholder="Xác nhận mật khẩu"
+                                                    value={formData.confirmPassword}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="btn btn-info text-white w-100 py-2 fw-bold"
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
+                                        </button>
+                                    </form>
+                                ) : (
+                                    // Form xác thực OTP
+                                    <form onSubmit={handleRegister}>
+                                        <div className="text-center mb-4">
+                                            <div className="bg-light rounded-3 p-3 mb-3">
+                                                <small className="text-muted">
+                                                    Mã OTP đã được gửi đến:
+                                                </small>
+                                                <div className="fw-bold text-dark">
+                                                    {otpEmail}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaKey className="text-muted" />
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    name="otp"
+                                                    className="form-control border-start-0 text-center fw-bold fs-4"
+                                                    placeholder="000000"
+                                                    value={formData.otp}
+                                                    onChange={handleInputChange}
+                                                    maxLength="6"
+                                                    style={{ letterSpacing: '8px' }}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="btn btn-info text-white w-100 py-2 fw-bold mb-3"
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Đang xác thực...' : 'Xác thực & Đăng ký'}
+                                        </button>
+
+                                        <div className="d-flex justify-content-between">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary btn-sm"
+                                                onClick={handleBackToForm}
+                                            >
+                                                Quay lại
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary btn-sm"
+                                                onClick={handleResendOTP}
+                                                disabled={loading}
+                                            >
+                                                Gửi lại OTP
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                <div className="text-center mt-4">
+                                    <p className="text-muted mb-0">
+                                        Đã có tài khoản?{' '}
+                                        <Link to="/login" className="text-decoration-none fw-bold">
+                                            Đăng nhập ngay
+                                        </Link>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="email" className="form-label" style={{ fontWeight: 500 }}>Email</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaEnvelope style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
-                            <input
-                                type="email"
-                                className="form-control"
-                                id="email"
-                                placeholder="Nhập email của bạn"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="password" className="form-label" style={{ fontWeight: 500 }}>Mật khẩu</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
-                            <input
-                                type="password"
-                                className="form-control"
-                                id="password"
-                                placeholder="Nhập mật khẩu"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="confirmPassword" className="form-label" style={{ fontWeight: 500 }}>Xác nhận mật khẩu</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
-                            <input
-                                type="password"
-                                className="form-control"
-                                id="confirmPassword"
-                                placeholder="Nhập lại mật khẩu"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <button type="submit" className="btn btn-primary w-100 fw-bold" style={{
-                        background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',
-                        border: 'none',
-                        borderRadius: 10,
-                        height: 44,
-                        fontSize: 17,
-                        marginBottom: 8
-                    }}>Đăng ký</button>
-                </form>
-                <div className="mt-3 text-center">
-                    <span style={{ color: '#6b7280', fontSize: 15 }}>Đã có tài khoản? </span>
-                    <Link to="/login" style={{ color: '#3b82f6', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Đăng nhập</Link>
                 </div>
             </div>
         </div>

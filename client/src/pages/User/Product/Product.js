@@ -316,7 +316,7 @@ function Product() {
         </div>
 
         {/* Products Content */}
-        <div className="col-md-9 col-lg-10">
+        <div className="col-md-9 col-lg-10  mt-2">
           {/* Results Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0">

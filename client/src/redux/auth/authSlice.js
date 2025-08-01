@@ -1,6 +1,55 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/auth';
 
+// Gửi OTP
+export const sendOTP = createAsyncThunk(
+    'auth/sendOTP',
+    async ({ username, email }, thunkAPI) => {
+        try {
+            const res = await fetch(`${API_BASE}/send-otp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Gửi OTP thất bại');
+            }
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
+
+// Đăng ký với OTP
+export const registerWithOTP = createAsyncThunk(
+    'auth/registerWithOTP',
+    async ({ username, email, password, otp }, thunkAPI) => {
+        try {
+            const res = await fetch(`${API_BASE}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password, otp }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Đăng ký thất bại');
+            }
+            localStorage.setItem('token', data.token);
+            const { _id: regId, ...regUserWithRole } = data.user || {};
+            localStorage.setItem('user', JSON.stringify(regUserWithRole));
+            return { token: data.token, user: regUserWithRole };
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
+
 export const register = createAsyncThunk(
     'auth/register'
     , async ({ username, password, email }, thunkAPI) => {
@@ -108,6 +157,8 @@ const authSlice = createSlice({
         loading: false,
         error: null,
         resetSuccess: false,
+        otpSent: false,
+        otpEmail: null,
     },
     reducers: {
         logout: (state) => {
@@ -115,15 +166,51 @@ const authSlice = createSlice({
             state.token = null;
             localStorage.removeItem('token')
             localStorage.removeItem('user')
-
         },
         clearResetState: (state) => {
             state.resetSuccess = false;
             state.error = null;
         },
+        clearOTPState: (state) => {
+            state.otpSent = false;
+            state.otpEmail = null;
+            state.error = null;
+        },
     }
     , extraReducers: (builder) => {
         builder
+            // Send OTP cases
+            .addCase(sendOTP.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(sendOTP.fulfilled, (state, action) => {
+                state.loading = false;
+                state.otpSent = true;
+                state.otpEmail = action.payload.email;
+            })
+            .addCase(sendOTP.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            
+            // Register with OTP cases
+            .addCase(registerWithOTP.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerWithOTP.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.otpSent = false;
+                state.otpEmail = null;
+            })
+            .addCase(registerWithOTP.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            
             .addCase(register.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -185,5 +272,5 @@ const authSlice = createSlice({
 
 
 )
-export const { logout, clearResetState } = authSlice.actions;
+export const { logout, clearResetState, clearOTPState } = authSlice.actions;
 export default authSlice.reducer;

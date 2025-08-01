@@ -1,7 +1,149 @@
 import User from '../models/User.js';
+import OTP from '../models/OTP.js';
 import generateToken from '../utils/generateToken.js';
 import transporter from '../config/mailer.js';
 import crypto from 'crypto';
+
+// Tạo OTP ngẫu nhiên
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Gửi OTP qua email
+const sendOTPEmail = async (email, otp) => {
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Mã xác thực đăng ký tài khoản',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333; text-align: center;">Xác thực đăng ký tài khoản</h2>
+        <p>Xin chào!</p>
+        <p>Cảm ơn bạn đã đăng ký tài khoản. Vui lòng sử dụng mã OTP sau để hoàn tất quá trình đăng ký:</p>
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+          <h1 style="color: #007bff; font-size: 32px; letter-spacing: 8px; margin: 0;">${otp}</h1>
+        </div>
+        <p><strong>Lưu ý:</strong></p>
+        <ul>
+          <li>Mã OTP có hiệu lực trong 5 phút</li>
+          <li>Không chia sẻ mã này với bất kỳ ai</li>
+          <li>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này</li>
+        </ul>
+        <p>Trân trọng,<br>Đội ngũ hỗ trợ</p>
+      </div>
+    `
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+// Gửi OTP cho đăng ký
+export const sendRegisterOTP = async (req, res) => {
+  try {
+    const { email, username } = req.body;
+
+    // Kiểm tra email và username đã tồn tại chưa
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: 'Email đã được sử dụng' });
+      }
+      if (existingUser.username === username) {
+        return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
+      }
+    }
+
+    // Tạo OTP mới
+    const otp = generateOTP();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 phút
+
+    // Xóa OTP cũ nếu có
+    await OTP.deleteMany({ email, type: 'register' });
+
+    // Lưu OTP mới
+    await OTP.create({
+      email,
+      otp,
+      type: 'register',
+      expiresAt
+    });
+
+    // Gửi email OTP
+    await sendOTPEmail(email, otp);
+
+    res.status(200).json({
+      message: 'Mã OTP đã được gửi đến email của bạn',
+      email
+    });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ message: 'Lỗi gửi OTP', error: error.message });
+  }
+};
+
+// Xác thực OTP và đăng ký
+export const verifyOTPAndRegister = async (req, res) => {
+  try {
+    const { username, email, password, otp } = req.body;
+
+    // Tìm OTP hợp lệ
+    const otpRecord = await OTP.findOne({
+      email,
+      otp,
+      type: 'register',
+      isUsed: false,
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Mã OTP không hợp lệ hoặc đã hết hạn' });
+    }
+
+    // Kiểm tra lại email và username
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: 'Email đã được sử dụng' });
+      }
+      if (existingUser.username === username) {
+        return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
+      }
+    }
+
+    // Tạo user mới
+    const user = await User.create({
+      username,
+      email,
+      password
+    });
+
+    // Đánh dấu OTP đã sử dụng
+    await OTP.findByIdAndUpdate(otpRecord._id, { isUsed: true });
+
+    // Tạo token
+    const token = generateToken(user._id, user.role);
+
+    res.status(201).json({
+      message: 'Đăng ký thành công',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      },
+      token,
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
 
 export const login = async function (req, res) {
     try {
@@ -30,42 +172,6 @@ export const login = async function (req, res) {
         });
     } catch (error) {
         console.error('Register error:', error);
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
-
-export const register = async function (req, res) {
-    try {
-        const { username, email, password } = req.body;
-        const existingUsername = await User.findOne({ username });
-        const existingEmail = await User.findOne({ email });
-        if (existingUsername && existingEmail) {
-            return res.status(400).json({ message: 'Tên đăng nhập và email đã tồn tại' });
-        } else if (existingUsername) {
-            return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
-        } else if (existingEmail) {
-            return res.status(400).json({ message: 'Email đã được sử dụng' });
-        }
-
-        const user = await User.create({
-            username,
-            email,
-            password
-        });
-
-        const token = generateToken(user._id, user.role);
-
-        res.status(201).json({
-            message: 'Đăng ký thành công',
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role
-            },
-            token,
-        });
-    } catch (error) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
     }
 };
