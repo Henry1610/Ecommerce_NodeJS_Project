@@ -2,6 +2,7 @@ import Cart from '../../models/Cart.js';
 import Discount from '../../models/Discount.js'
 import { MAX_STRIPE_AMOUNT } from '../../../client/src/config/constants.js';
 import Product from '../../models/Product.js'
+import { getApplicableDiscounts, validateDiscountForCart } from '../../utils/checkDiscountConditions.js';
 export const getCart = async (req, res) => {
   const userId = req.user.id;
 
@@ -155,32 +156,42 @@ export const setCart = async (req, res) => {
 export const applyDiscountToCart = async (req, res) => {
   try {
     const { code } = req.body;
-
     const userId = req.user.id;
 
+    // Tìm discount theo code
     const discount = await Discount.findOne({ code });
 
     if (!discount || !discount.isActive) {
       return res.status(400).json({ message: 'Mã giảm giá không tồn tại hoặc đã tắt.' });
     }
 
+    // Kiểm tra thời gian hiệu lực
     const now = new Date();
     if (discount.validFrom > now || discount.validTo < now) {
       return res.status(400).json({ message: 'Mã giảm giá đã hết hạn.' });
     }
 
+    // Kiểm tra số lượng còn lại
     if (discount.quantity <= 0) {
       return res.status(400).json({ message: 'Mã giảm giá đã hết lượt sử dụng.' });
     }
 
+    // Lấy giỏ hàng
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
-    cart.appliedDiscount = discount._id;
-
-
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'Giỏ hàng trống.' });
     }
+
+    // Kiểm tra điều kiện áp dụng discount
+    const validation = await validateDiscountForCart(discount, cart, userId);
+    if (!validation.isValid) {
+      return res.status(400).json({ message: validation.message });
+    }
+
+    // Áp dụng discount
+    cart.appliedDiscount = discount._id;
     await cart.save();
+    
     cart = await Cart.findById(cart._id).populate('appliedDiscount');
 
     return res.json({
@@ -208,6 +219,28 @@ export const removeDiscountFromCart = async (req, res) => {
     return res.json({ message: 'Đã gỡ mã giảm giá.' });
   } catch (error) {
     console.error('Lỗi khi gỡ mã giảm giá:', error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// Lấy danh sách discount phù hợp với giỏ hàng hiện tại
+export const getAvailableDiscounts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+    if (!cart || cart.items.length === 0) {
+      return res.json({ discounts: [] });
+    }
+
+    const applicableDiscounts = await getApplicableDiscounts(cart, userId);
+    
+    res.json({ 
+      discounts: applicableDiscounts,
+      message: `Tìm thấy ${applicableDiscounts.length} mã giảm giá phù hợp`
+    });
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách discount:', error);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };

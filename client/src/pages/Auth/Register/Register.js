@@ -297,7 +297,7 @@ function Register() {
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn btn-outline-primary btn-sm"
+                                                className="btn btn-outline-info btn-sm"
                                                 onClick={handleResendOTP}
                                                 disabled={loading}
                                             >
