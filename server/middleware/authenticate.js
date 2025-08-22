@@ -16,6 +16,6 @@ export const authenticate = (req, res, next) => {
     }
     
     catch (err) {
-        return res.status(403).json({ message: 'Bạn không đủ quyền !' });
+        return res.status(403).json({ message: 'Access token không hợp lệ hoặc đã hết hạn' });
     }
 };
