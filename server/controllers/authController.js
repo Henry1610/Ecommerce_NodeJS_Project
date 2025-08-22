@@ -138,7 +138,7 @@ export const verifyOTPAndRegister = async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1 * 24 * 60 * 60 * 1000 // 1 day
     });
 
@@ -183,7 +183,7 @@ export const login = async function (req, res) {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: (rememberMe ? 30 : 1) * 24 * 60 * 60 * 1000 // 30 days or 1 day
     });
 
@@ -273,7 +273,7 @@ export const logout = async (req, res) => {
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     });
 
     res.json({ message: 'Đăng xuất thành công' });
