@@ -142,7 +142,7 @@ export const deleteShippingAddress = createAsyncThunk(
             if (!response.ok) {
                 return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xóa địa chỉ giao hàng');
             }
-            return { id, ...data };
+            return { id: addressId, ...data };
         } catch (error) {
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
