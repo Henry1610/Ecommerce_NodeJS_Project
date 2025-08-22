@@ -319,7 +319,7 @@ function Product() {
         <div className="col-md-9 col-lg-10  mt-2">
           {/* Results Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="mb-0">
+            <h5 className="mb-0 mt-2">
               {loading ? 'Đang tải...' : `Hiển thị ${products?.length || 0} sản phẩm`}
             </h5>
             {!loading && products?.length > 0 && (

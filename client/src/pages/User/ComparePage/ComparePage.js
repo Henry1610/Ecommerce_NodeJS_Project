@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCompare, clearCompare } from '../../redux/public/compareSlice';
+import { removeFromCompare, clearCompare } from '../../../redux/public/compareSlice';
 import { Link } from 'react-router-dom';
-
+import './ComparePage.css';
 const ComparePage = () => {
   const compareList = useSelector(state => state.public.compare.compareList);
   const dispatch = useDispatch();
@@ -41,16 +41,18 @@ const ComparePage = () => {
       </ol>
       <h2 className="fw-bold mb-5 text-center" style={{ fontSize: 28 }}>So sánh sản phẩm</h2>
       <div className="table-responsive shadow-sm rounded-4 overflow-hidden">
-        <table className="table align-middle text-center mb-0" style={{ background: '#fff' }}>
+        <table className="table align-middle text-center mb-0 compare-table"   style={{ background: '#fff', tableLayout: 'fixed', width: '100%' }}
+        >
           <thead style={{ background: '#f1f5f9' }}>
             <tr>
-              <th style={{ width: 200 }}></th>
-              {compareList.map((product, idx) => (
-                <th key={product._id} style={{ minWidth: 220 }} className="border-start">
+            <th className="d-none d-md-table-cell" style={{ width: 200 }}></th>
+            {compareList.map((product, idx) => (
+                <th key={product._id} style={{ minWidth: 220 }} className="border-start ">
                   <div className="d-flex flex-column align-items-center gap-2 py-3">
                     <img
                       src={product.images?.[0] || '/placeholder-image.jpg'}
                       alt={product.name}
+                      className="compare-product-img"
                       style={{
                         width: 120,
                         height: 120,
@@ -60,6 +62,7 @@ const ComparePage = () => {
                         boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
                       }}
                     />
+
                     <div className="fw-semibold text-dark" style={{ fontSize: 17 }}>{product.name}</div>
                     <button
                       className="btn btn-sm btn-outline-danger px-3"
@@ -121,7 +124,7 @@ const ComparePage = () => {
               },
             ].map((row, rowIdx) => (
               <tr key={row.label}>
-                <th className="bg-light text-start px-3 py-3">{row.label}</th>
+                <th className="bg-light text-start px-3 py-3 d-none d-md-table-cell">{row.label}</th>
                 {compareList.map((product, idx) => (
                   <td key={product._id} className="border-start px-3 py-3">
                     {row.render(product)}

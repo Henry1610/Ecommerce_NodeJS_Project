@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/discounts';
 
@@ -7,13 +8,12 @@ export const fetchDiscounts = createAsyncThunk(
     'discounts/fetchDiscounts',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetchWithAuth(API_BASE, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -34,14 +34,13 @@ export const createDiscount = createAsyncThunk(
     'discounts/createDiscount',
     async (discountData, thunkAPI) => {
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetchWithAuth(API_BASE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify(discountData),
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -63,13 +62,12 @@ export const fetchDiscountById = createAsyncThunk(
     'discounts/fetchDiscountById',
     async (discountId, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${discountId}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${discountId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -89,13 +87,12 @@ export const deleteDiscount = createAsyncThunk(
     'discounts/deleteDiscount',
     async (discountId, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${discountId}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${discountId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -115,14 +112,13 @@ export const updateDiscount = createAsyncThunk(
     'discounts/updateDiscount',
     async ({ id, updatedData }, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${id}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify(updatedData),
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 

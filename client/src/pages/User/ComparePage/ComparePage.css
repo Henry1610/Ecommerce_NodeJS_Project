@@ -1,0 +1,22 @@
+/* file ComparePage.css hoặc global */
+@media (max-width: 768px) {
+    table.compare-table th,
+    table.compare-table td {
+      font-size: 14px;
+      padding: 8px;
+    }
+  
+    table.compare-table th:first-child {
+      position: sticky;
+      left: 0;
+      background: #f8f9fa;
+      z-index: 2;
+      min-width: 100px;
+    }
+  
+    .compare-product-img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+  }
+  

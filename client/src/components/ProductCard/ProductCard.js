@@ -10,19 +10,20 @@ import { MAX_STRIPE_AMOUNT } from '../../config/constants';
 import { selectCartTotalPrice } from '../../redux/user/cartSlice';
 import { addToCompare, removeFromCompare } from '../../redux/public/compareSlice';
 import { fetchWishlist } from '../../redux/user/wishlistSlice';
+import './ProductCard.css';
 
 function ProductCard({ product, compareEnabled }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const totalPrice = useSelector(selectCartTotalPrice);
     const { wishlist } = useSelector(state => state.user.userWishlist);
-    const { token } = useSelector(state => state.auth);
+    const token = useSelector((state) => state.auth.accessToken);
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const compareList = useSelector(state => state.public.compare.compareList);
 
     useEffect(() => {
-        if(token){
+        if (token) {
             dispatch(fetchCart());
             dispatch(fetchWishlist());
         }
@@ -30,7 +31,7 @@ function ProductCard({ product, compareEnabled }) {
 
     const originalPrice = product.price;
     const discountPrice = originalPrice - ((originalPrice * product.discountPercent) / 100);
-    
+
     const handleShowDetail = (slug) => {
         navigate(`/product/${slug}`);
     };
@@ -38,7 +39,7 @@ function ProductCard({ product, compareEnabled }) {
     const handleAddToCart = async ({ productId, quantity }) => {
         setIsLoading(true);
         const newTotal = totalPrice + discountPrice * quantity;
-        
+
         if (newTotal > MAX_STRIPE_AMOUNT) {
             toast.warning('Tổng giá trị đơn hàng không được vượt quá 100 triệu!');
             setIsLoading(false);
@@ -69,7 +70,7 @@ function ProductCard({ product, compareEnabled }) {
         }
 
         const isInWishlist = wishlist.some(item => item._id === product._id);
-        
+
         if (isInWishlist) {
             dispatch(removeFromWishlist(product._id))
                 .unwrap()
@@ -92,7 +93,7 @@ function ProductCard({ product, compareEnabled }) {
     };
 
     return (
-        <div 
+        <div
             className="product-card-container"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -101,12 +102,12 @@ function ProductCard({ product, compareEnabled }) {
                 padding: '2px',
                 transition: 'all 0.3s ease',
                 transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
-                boxShadow: isHovered 
-                    ? '0 20px 40px rgba(102, 126, 234, 0.3)' 
+                boxShadow: isHovered
+                    ? '0 20px 40px rgba(102, 126, 234, 0.3)'
                     : '0 8px 25px rgba(0, 0, 0, 0.1)',
             }}
         >
-            <div 
+            <div
                 className="card border-0 h-100"
                 style={{
                     borderRadius: '18px',
@@ -116,9 +117,9 @@ function ProductCard({ product, compareEnabled }) {
                 }}
             >
                 {/* Discount Badge - Fixed height container */}
-                <div 
+                <div
                     className="position-absolute top-0 start-0 m-2"
-                    style={{ 
+                    style={{
                         zIndex: 2,
                         height: '24px', // Fixed height
                         minWidth: '40px' // Minimum width to maintain space
@@ -140,7 +141,7 @@ function ProductCard({ product, compareEnabled }) {
                 </div>
 
                 {/* Heart Icon */}
-                <div 
+                <div
                     className="position-absolute top-0 end-0 m-2"
                     style={{ zIndex: 2 }}
                 >
@@ -174,7 +175,7 @@ function ProductCard({ product, compareEnabled }) {
                 </div>
 
                 {/* Product Image */}
-                <div 
+                <div
                     className="position-relative overflow-hidden"
                     style={{ aspectRatio: '1/1', height: 'auto', minHeight: 0, background: '#fff', borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     onClick={() => handleShowDetail(product.slug)}
@@ -196,12 +197,12 @@ function ProductCard({ product, compareEnabled }) {
                             margin: '0 auto'
                         }}
                     />
-                    
+
                     {/* Overlay gradient on hover */}
                     <div
                         className="position-absolute top-0 start-0 w-100 h-100"
                         style={{
-                            background: isHovered 
+                            background: isHovered
                                 ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%)'
                                 : 'transparent',
                             transition: 'background 0.3s ease',
@@ -212,9 +213,9 @@ function ProductCard({ product, compareEnabled }) {
                 {/* Card Body */}
                 <div className="card-body p-3">
                     {/* Product Name - Fixed height */}
-                    <h6 
+                    <h6
                         className="card-title fw-bold mb-2"
-                        style={{ 
+                        style={{
                             fontSize: '0.95rem',
                             color: '#2d3748',
                             cursor: 'pointer',
@@ -238,22 +239,22 @@ function ProductCard({ product, compareEnabled }) {
                                     const full = index + 1 <= product.ratings;
                                     const half = !full && index + 0.5 <= product.ratings;
                                     return (
-                                        <i 
-                                            key={index} 
+                                        <i
+                                            key={index}
                                             className={`fas ${full ? 'fa-star' : half ? 'fa-star-half-alt' : 'far fa-star'}`}
                                             style={{ color: '#fbbf24' }}
                                         />
                                     );
                                 })}
                             </div>
-                            <span 
+                            <span
                                 className="text-muted fw-medium"
                                 style={{ fontSize: '0.75rem' }}
                             >
                                 ({product.numReviews})
                             </span>
                         </div>
-                        
+
                         {/* Stock indicator */}
                         <div className="d-flex align-items-center">
                             <div
@@ -264,9 +265,9 @@ function ProductCard({ product, compareEnabled }) {
                                     backgroundColor: product.stock > 0 ? '#10b981' : '#ef4444',
                                 }}
                             />
-                            <span 
+                            <span
                                 className="small"
-                                style={{ 
+                                style={{
                                     fontSize: '0.7rem',
                                     color: product.stock > 0 ? '#10b981' : '#ef4444',
                                 }}
@@ -280,7 +281,7 @@ function ProductCard({ product, compareEnabled }) {
                     <div className="mb-3" style={{ minHeight: '45px' }}>
                         <div className="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 
+                                <h6
                                     className="text-danger fw-bold mb-0"
                                     style={{ fontSize: '1.1rem' }}
                                 >
@@ -289,7 +290,7 @@ function ProductCard({ product, compareEnabled }) {
                                 {/* Fixed height container for original price */}
                                 <div style={{ height: '16px', marginTop: '2px' }}>
                                     {product.discountPercent > 0 && (
-                                        <span 
+                                        <span
                                             className="text-decoration-line-through text-muted small"
                                             style={{ fontSize: '0.8rem' }}
                                         >
@@ -298,7 +299,7 @@ function ProductCard({ product, compareEnabled }) {
                                     )}
                                 </div>
                             </div>
-                            
+
                             {/* Installment badge */}
                             <div
                                 className="badge text-white px-2 py-1"
@@ -331,8 +332,8 @@ function ProductCard({ product, compareEnabled }) {
                     )}
                     {/* Action Buttons */}
                     <div className="d-flex gap-2">
-                        <button 
-                            className="btn flex-1 fw-bold"
+                        <button
+                            className="btn flex-1 fw-bold btn-add-to-cart"
                             style={{
                                 background: 'linear-gradient(45deg, #667eea, #764ba2)',
                                 border: 'none',
@@ -358,7 +359,7 @@ function ProductCard({ product, compareEnabled }) {
                         >
                             {isLoading ? (
                                 <div className="d-flex align-items-center justify-content-center">
-                                    <div 
+                                    <div
                                         className="spinner-border spinner-border-sm me-1"
                                         style={{ width: '12px', height: '12px' }}
                                     />
@@ -366,12 +367,12 @@ function ProductCard({ product, compareEnabled }) {
                                 </div>
                             ) : (
                                 <>
-                                    <i className="fas fa-shopping-cart me-1"></i>
-                                    Thêm vào giỏ
+                                    <i className="fas fa-shopping-cart"></i>
+                                    <span className="ms-1">Thêm vào giỏ</span>
                                 </>
                             )}
                         </button>
-                        
+
                         <button
                             className="btn btn-outline-primary fw-bold"
                             style={{

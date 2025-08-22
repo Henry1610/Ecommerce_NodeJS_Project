@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/payments';
 
@@ -7,13 +8,12 @@ export const approveRefund = createAsyncThunk(
   'orders/approveRefund',
   async (orderId, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/approve-refund/${orderId}`, {
+      const res = await fetchWithAuth(`${API_BASE}/approve-refund/${orderId}`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
 
@@ -33,13 +33,12 @@ export const rejectRefund = createAsyncThunk(
   'orders/rejectRefund',
   async (orderId, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/reject-refund/${orderId}`, {
+      const res = await fetchWithAuth(`${API_BASE}/reject-refund/${orderId}`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
 

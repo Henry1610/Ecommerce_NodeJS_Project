@@ -1,57 +1,58 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/payments';
+
 // THUNK: Gọi API tạo Stripe Checkout Session
 export const createCheckoutSession = createAsyncThunk(
   'payment/createCheckoutSession',
   async (orderData, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/checkout-session`, {
+      const res = await fetchWithAuth(`${API_BASE}/checkout-session`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(orderData),
-      });
+        body: JSON.stringify(orderData)
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Không thể tạo phiên thanh toán');
       }
-
       return data; // data.url (Stripe Checkout URL)
     } catch (error) {
       return thunkAPI.rejectWithValue('Lỗi kết nối máy chủ');
     }
   }
 );
+
 export const requestRefund = createAsyncThunk(
   'payment/requestRefund',
   async ( orderNumber , thunkAPI) => {
     try {
-      
-      const res = await fetch(`${API_BASE}/refund/${orderNumber}`, {
+      const res = await fetchWithAuth(`${API_BASE}/refund/${orderNumber}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Không thể gửi yêu cầu hoàn tiền');
       }
-
       return data; 
     } catch (error) {
       return thunkAPI.rejectWithValue('Lỗi kết nối máy chủ');
     }
   }
 );
+
+
+
+
+
 // Initial state
 const initialState = {
   loading: false,

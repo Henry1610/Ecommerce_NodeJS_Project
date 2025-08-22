@@ -39,8 +39,8 @@ function ProductDetail() {
     const { reviews, product, loading, error } = useSelector((state) => state.public.publicProduct);
     const { stats, total } = useSelector(state => state.public.publicReview);
     const { wishlist } = useSelector(state => state.user.userWishlist);
-    const { token } = useSelector(state => state.auth);
-    
+    const token = useSelector((state) => state.auth.accessToken);
+
     // Computed values
     const averageRating = (product?.ratings || 0).toFixed(1);
     const originalPrice = product?.price ?? 0;
@@ -160,19 +160,31 @@ function ProductDetail() {
     return (
         <div className="container py-5">
             <div className="row">
-                <ProductImages />
-                <ProductInfo
-                    product={product}
-                    quantity={quantity}
-                    originalPrice={originalPrice}
-                    discountPrice={discountPrice}
-                    onIncreaseQuantity={increaseQuantity}
-                    onDecreaseQuantity={decreaseQuantity}
-                    onQuantityChange={handleQuantityChange}
-                    onAddToCart={handleAddToCart}
-                    onWishlistToggle={handleWishlistToggle}
-                    isInWishlist={wishlist.some(item => item._id === product._id)}
-                />
+                {/* Header mobile only */}
+                <div className="col-12 d-lg-none order-1">
+                    <ProductHeader product={product} />
+                </div>
+
+                {/* Cột hình ảnh */}
+                <div className="col-12 col-lg-7 order-2 order-lg-1">
+                    <ProductImages />
+                </div>
+
+                {/* Cột thông tin sản phẩm */}
+                <div className="col-12 col-lg-5 order-3 order-lg-2">
+                    <ProductInfo
+                        product={product}
+                        quantity={quantity}
+                        originalPrice={originalPrice}
+                        discountPrice={discountPrice}
+                        onIncreaseQuantity={increaseQuantity}
+                        onDecreaseQuantity={decreaseQuantity}
+                        onQuantityChange={handleQuantityChange}
+                        onAddToCart={handleAddToCart}
+                        onWishlistToggle={handleWishlistToggle}
+                        isInWishlist={wishlist.some(item => item._id === product._id)}
+                    />
+                </div>
             </div>
 
             <ProductReviews
@@ -196,9 +208,15 @@ function ProductImages() {
         '/default-product.jpg'
     ];
     return (
-        <div className="col-lg-7">
+        <div >
             <Swiper
-                style={{ width: 540, height: 440, borderRadius: 16, marginBottom: 16, background: '#f8f9fa', maxWidth: '100%' }}
+                style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: 16,
+                    marginBottom: 16,
+                    background: '#f8f9fa',
+                }}
                 modules={[Navigation, Thumbs]}
                 navigation
                 thumbs={{ swiper: thumbsSwiper }}
@@ -211,32 +229,65 @@ function ProductImages() {
                             src={img}
                             alt={`Ảnh sản phẩm ${idx + 1}`}
                             className="img-fluid"
-                            style={{ width: '100%', height: 440, objectFit: 'contain', background: '#f8f9fa', borderRadius: 16, maxWidth: 540, maxHeight: 440 }}
+                            style={{
+                                width: '100%',
+                                maxHeight: 440,
+                                objectFit: 'contain',
+                                background: '#f8f9fa',
+                                borderRadius: 16,
+                            }}
                         />
                     </SwiperSlide>
                 ))}
             </Swiper>
+
             <Swiper
                 onSwiper={setThumbsSwiper}
                 modules={[Thumbs]}
                 spaceBetween={4}
-                slidesPerView={Math.min(images.length, 7)}
-                style={{ marginTop: 4, maxWidth: 360 }}
+                centerInsufficientSlides={true}
+                breakpoints={{
+                    320: { slidesPerView: 3 },
+                    480: { slidesPerView: 4 },
+                    768: { slidesPerView: 5 },
+                    1024: { slidesPerView: 7 },
+                }}
+                style={{ marginTop: 4, width: '100%' }}
             >
                 {images.map((img, idx) => (
-                    <SwiperSlide key={idx} style={{ width: 48, height: 48, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <SwiperSlide
+                        key={idx}
+                        style={{
+                            width: 48,
+                            height: 48,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
                         <img
                             src={img}
                             alt={`Thumbnail ${idx + 1}`}
                             className="img-thumbnail"
-                            style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, padding: 0, background: '#fff' }}
+                            style={{
+                                width: 48,
+                                height: 48,
+                                objectFit: 'cover',
+                                borderRadius: 8,
+                                padding: 0,
+                                background: '#fff',
+                            }}
                         />
                     </SwiperSlide>
                 ))}
             </Swiper>
+
             <ServiceSlider doubled={[...SERVICES, ...SERVICES]} />
-            <CommitmentSection />
-            <AttributesSection />
+            <div className='d-none d-lg-block'>
+                <CommitmentSection />
+                <AttributesSection />
+            </div>
         </div>
     );
 }
@@ -365,23 +416,52 @@ function ProductInfo({
         }
     }, [product]);
     return (
-        <div className="col-lg-4 mx-5">
-            <ProductHeader product={product} />
-            <ProductOptions />
-            <QuantitySelector
-                quantity={quantity}
-                onIncrease={onIncreaseQuantity}
-                onDecrease={onDecreaseQuantity}
-                onChange={onQuantityChange}
-            />
-            <PurchaseBox
-                originalPrice={originalPrice}
-                discountPrice={discountPrice}
-                discountPercent={product.discountPercent}
-                onAddToCart={onAddToCart}
-                onWishlistToggle={onWishlistToggle}
-                isInWishlist={isInWishlist}
-            />
+        <div className=" mx-5">
+
+            {/* Header desktop only (ẩn trên mobile để tránh trùng với header phía trên ảnh) */}
+            <div className="d-none d-lg-block">
+                <ProductHeader product={product} />
+            </div>
+
+            <div >
+                {/* PurchaseBox mobile: đặt lên đầu phần thông tin, ngay dưới ảnh */}
+                <div className="d-block d-lg-none mb-3 d-flex justify-content-center">
+                    <PurchaseBox
+                        originalPrice={originalPrice}
+                        discountPrice={discountPrice}
+                        discountPercent={product.discountPercent}
+                        onAddToCart={onAddToCart}
+                        onWishlistToggle={onWishlistToggle}
+                        isInWishlist={isInWishlist}
+                    />
+
+                </div>
+
+                <ProductOptions />
+                <QuantitySelector
+                    quantity={quantity}
+                    onIncrease={onIncreaseQuantity}
+                    onDecrease={onDecreaseQuantity}
+                    onChange={onQuantityChange}
+                />
+                <div className="d-block d-lg-none ">
+                    <CommitmentSection />
+                    <AttributesSection />
+                </div >
+
+                {/* PurchaseBox desktop only (giữ nguyên thiết kế desktop) */}
+                <div className="d-none d-lg-block">
+                    <PurchaseBox
+                        originalPrice={originalPrice}
+                        discountPrice={discountPrice}
+                        discountPercent={product.discountPercent}
+                        onAddToCart={onAddToCart}
+                        onWishlistToggle={onWishlistToggle}
+                        isInWishlist={isInWishlist}
+                    />
+                </div>
+            </div>
+
             {/* Sản phẩm cùng danh mục */}
             {relatedProducts.length > 0 && (
                 <div className="mt-5">
@@ -508,16 +588,27 @@ function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCar
                 </div>
                 <div className="d-flex gap-2 justify-content-center">
                     <button
-                        className="btn fw-bold text-white d-flex align-items-center justify-content-center gap-2"
-                        style={{ background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)', borderRadius: '22px', minWidth: 90, height: 44, fontSize: 15, boxShadow: '0 2px 8px rgba(0,229,255,0.10)', transition: 'all 0.2s', padding: '0 10px' }}
+                        className="fw-bold text-white d-flex align-items-center justify-content-center gap-2"
+                        style={{
+                            background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)',
+                            borderRadius: '22px',
+                            minWidth: 90,
+                            height: 44,
+                            fontSize: 15,
+                            boxShadow: '0 2px 8px rgba(0,229,255,0.10)',
+                            transition: 'all 0.2s',
+                            padding: '0 11px',
+                            border: 'none'   // thêm dòng này để chắc chắn không có viền
+                        }}
                         onClick={onAddToCart}
                         title="Thêm vào giỏ"
-                        onMouseEnter={e => e.target.style.filter = 'brightness(1.08)'}
-                        onMouseLeave={e => e.target.style.filter = 'none'}
+                        onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.08)'}
+                        onMouseLeave={e => e.currentTarget.style.filter = 'none'}
                     >
                         <i className="fas fa-shopping-bag"></i>
                         Thêm vào giỏ
                     </button>
+
                     <button
                         className={`btn d-flex align-items-center justify-content-center ${isInWishlist ? 'btn-danger' : 'btn-outline-danger'}`}
                         style={{ borderRadius: '22px', width: 44, height: 44, fontSize: 15, transition: 'all 0.2s' }}
@@ -593,7 +684,7 @@ function ReviewStats({ averageRating, stats, selectedRating, onRatingFilter }) {
 
 function ReviewList({ reviews }) {
     return (
-        <section className="border-top border-light-subtle">
+        <section className=" border-light-subtle">
             {reviews.map((review) => (
                 <ReviewItem key={review._id} review={review} />
             ))}

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/shipping-zones';
 
@@ -7,12 +8,11 @@ export const fetchShippingZones = createAsyncThunk(
   'shippingZones/fetchAll',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch(API_BASE, {
+      const res = await fetchWithAuth(API_BASE, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
       const data = await res.json();
       if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return data;
@@ -27,12 +27,11 @@ export const fetchShippingZoneById = createAsyncThunk(
   'shippingZones/fetchById',
   async (id, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${id}`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
       const data = await res.json();
       if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return data; // 
@@ -47,14 +46,13 @@ export const createShippingZone = createAsyncThunk(
   'shippingZones/create',
   async (zoneData, thunkAPI) => {
     try {
-      const res = await fetch(API_BASE, {
+      const res = await fetchWithAuth(API_BASE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(zoneData),
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
       const data = await res.json();
       if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return data; //
@@ -69,14 +67,13 @@ export const updateShippingZone = createAsyncThunk(
   'shippingZones/update',
   async ({ id, city, fee }, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ city, fee }),
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
       const data = await res.json();
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật vùng vận chuyển');
@@ -93,12 +90,11 @@ export const deleteShippingZone = createAsyncThunk(
   'shippingZones/delete',
   async (id, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
       const data = await res.json();
       if (!res.ok) return thunkAPI.rejectWithValue(data.message);
       return id;

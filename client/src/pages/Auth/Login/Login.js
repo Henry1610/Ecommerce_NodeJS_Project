@@ -1,43 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../../redux/auth/authSlice';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { token } = useSelector((state) => state.auth);
-    // Lấy email và password đã nhớ (nếu có)
+    const { accessToken, user } = useSelector((state) => state.auth);
+    // Lấy email đã nhớ (nếu có) - không lưu password nữa
     const rememberedEmail = localStorage.getItem('rememberedEmail') || '';
-    const rememberedPassword = localStorage.getItem('rememberedPassword') || '';
     const [email, setEmail] = useState(rememberedEmail);
-    const [password, setPassword] = useState(rememberedPassword);
-    const [rememberMe, setRememberMe] = useState(!!rememberedPassword);
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const result = await dispatch(login({ email, password })).unwrap();
+            const result = await dispatch(login({ email, password, rememberMe: false })).unwrap();
             if (result) {
-                const user = JSON.parse(localStorage.getItem("user"));
-                // Nếu tick ghi nhớ thì lưu cả email và password, không thì chỉ lưu email
+                // Lưu email
                 localStorage.setItem('rememberedEmail', email);
-                if (rememberMe) {
-                    localStorage.setItem('rememberedPassword', password);
-                } else {
-                    localStorage.removeItem('rememberedPassword');
-                }
                 Swal.fire({
                     icon: 'success',
                     title: 'Đăng nhập thành công!',
                 });
-                if (user?.role === "admin") {
-                    navigate('/admin/dashboard');
+                if (result.user?.role === "admin") {
+                    navigate('/admin/dashboard', { replace: true });
                 } else {
-                    navigate('/');
+                    navigate('/', { replace: true });
                 }
             }
         } catch (error) {
@@ -51,10 +45,18 @@ function Login() {
     };
 
     useEffect(() => {
-        if (token) {
-            navigate('/');
+        if (accessToken && user) {
+            if (user.role === "admin") {
+                navigate('/admin/dashboard', { replace: true });
+            } else {
+                navigate('/', { replace: true });
+            }
         }
-    }, [token, navigate]);
+    }, [accessToken, user, navigate]);
+
+    if (accessToken && user) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <div className="login-bg" style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -100,7 +102,7 @@ function Login() {
                         <div style={{ position: 'relative' }}>
                             <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 className="form-control"
                                 id="password"
                                 placeholder="Nhập mật khẩu"
@@ -113,16 +115,20 @@ function Login() {
                                     borderRadius: 10,
                                     fontSize: 16,
                                     border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
+                                    background: '#f9fafb',
+                                    paddingRight: 38
                                 }}
                             />
+                            <span
+                                onClick={() => setShowPassword((v) => !v)}
+                                style={{ position: 'absolute', right: 14, top: 10, cursor: 'pointer', color: '#a0aec0', fontSize: 18 }}
+                                title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
                         </div>
                     </div>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <div className="form-check">
-                            <input type="checkbox" className="form-check-input" id="remember_me" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
-                            <label className="form-check-label" htmlFor="remember_me">Ghi nhớ đăng nhập</label>
-                        </div>
+                    <div className="d-flex justify-content-end mb-3">
                         <Link to="/reset-password" style={{ color: '#3b82f6', fontWeight: 500, fontSize: 15 }}>Quên mật khẩu?</Link>
                     </div>
                     <button type="submit" className="btn btn-primary w-100 fw-bold btn-info text-white" style={{

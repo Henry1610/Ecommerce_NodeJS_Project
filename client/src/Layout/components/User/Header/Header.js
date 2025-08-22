@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../../../redux/auth/authSlice';
+import { logout, clearAuth } from '../../../../redux/auth/authSlice';
 import { Link } from 'react-router-dom';
 import './Header.css'
 import { fetchCart } from '../../../../redux/user/cartSlice';
@@ -9,9 +9,10 @@ import { toast } from 'react-toastify';
 import { fetchProducts, resetSuggestions } from '../../../../redux/public/productsSlice';
 import { getProductSuggestions } from '../../../../redux/public/productsSlice';
 import useDebounce from '../../../../hooks/useDebounce';
-import { fetchUserProfile } from '../../../../redux/user/userSlice';
+import { fetchUserProfile, clearUserProfile } from '../../../../redux/user/userSlice';
+import { clearCompare } from '../../../../redux/public/compareSlice';
 function Header() {
-    const token = useSelector((state) => state.auth.token);
+    const token = useSelector((state) => state.auth.accessToken);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { productSuggestions } = useSelector(state => state.public.publicProduct);
@@ -60,6 +61,11 @@ function Header() {
     const isAuthenticated = !!token;
 
     const handleLogout = () => {
+        // Clear state ngay lập tức
+        dispatch(clearAuth());
+        dispatch(clearUserProfile());
+        dispatch(clearCompare());
+        // Gọi API logout (không cần đợi)
         dispatch(logout());
         navigate('/login');
     };
@@ -160,10 +166,9 @@ function Header() {
             </div>
 
             <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
-                <div className="d-flex align-items-center gap-4">
+                <div className="d-flex align-items-center gap-2">
                     <Link to='/' className=" fw-bold text-decoration-none text-reset" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
                         <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
-                        pro
                     </Link>
                     <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
                         <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
@@ -312,24 +317,25 @@ function Header() {
                             <Link to='/profile' className="text-decoration-none text-reset">
                                 <span className="d-flex align-items-center gap-2">
                                     {avatar ? (
-                                        <img
-                                            src={profile?.user?.avatar}
-                                            alt="avatar"
+                                        <img src={avatar} alt="avatar"
                                             style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }}
                                         />
                                     ) : (
                                         <i className="far fa-user-circle fs-4"></i>
                                     )}
-                                    <span className="fw-bold fs-5">{username}</span>
+                                    <span className="fw-bold fs-5 header-username">{username}</span>
                                 </span>
                             </Link>
+
                             <button
-                                className="btn btn-logout  d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
+                                className="btn btn-logout d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm d-none d-md-flex"
                                 type="button"
                                 onClick={handleLogout}
                             >
-                                <i class="fa-solid fa-right-from-bracket"></i>  <span className="fw-semibold">Đăng xuất</span>
+                                <i className="fa-solid fa-right-from-bracket"></i>
+                                <span className="fw-semibold">Đăng xuất</span>
                             </button>
+
                         </>
                     ) : (
                         <Link to="/login" className="text-decoration-none">

@@ -4,8 +4,8 @@ import { FaBell, FaUserCircle, FaFlagUsa, FaSearch, FaSignOutAlt, FaCog, FaUser,
 import './Header.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchAdminProfile } from '../../../../redux/admin/adminSlice';
-import { logout } from '../../../../redux/auth/authSlice';
+import { fetchAdminProfile, resetAdminProfile } from '../../../../redux/admin/adminSlice';
+import { logout, clearAuth } from '../../../../redux/auth/authSlice';
 import Swal from 'sweetalert2';
 
 const getAdminInfo = () => {
@@ -47,6 +47,10 @@ const Header = () => {
       cancelButtonText: 'Huỷ'
     });
     if (result.isConfirmed) {
+      // Clear state ngay lập tức
+      dispatch(clearAuth());
+      dispatch(resetAdminProfile());
+      // Gọi API logout (không cần đợi)
       dispatch(logout());
       navigate('/login');
     }

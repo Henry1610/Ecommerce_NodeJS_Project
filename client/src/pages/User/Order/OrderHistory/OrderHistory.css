@@ -1,0 +1,8 @@
+.btn-outline-info:hover {
+  background-color: var(--bs-info) !important; /* nền xanh */
+  color: #fff !important;                     /* chữ trắng */
+}
+
+.btn-outline-info:hover i {
+  color: #fff !important;                     /* icon trắng */
+}

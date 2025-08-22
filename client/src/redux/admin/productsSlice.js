@@ -1,22 +1,25 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/products';
 
 // Async thunks
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts',
-    async () => {
-        const res = await fetch(API_BASE, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-
-            }
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không thể lấy danh sách sản phẩm');
-        return data;
+    async (_, thunkAPI) => {
+        try {
+            const res = await fetchWithAuth(API_BASE, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Không thể lấy danh sách sản phẩm');
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
     }
 );
 
@@ -24,15 +27,12 @@ export const fetchProductById = createAsyncThunk(
     'products/fetchProductById',
     async (productId, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${productId}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
+            const res = await fetchWithAuth(`${API_BASE}/${productId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            );
+            }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             
             if (!res.ok) {
@@ -49,56 +49,58 @@ export const fetchProductById = createAsyncThunk(
 
 export const addProduct = createAsyncThunk(
     'products/addProduct',
-    async (productData) => {
-        for (const [key, value] of productData.entries()) {
-            console.log(`${key}:`, value);
-          }
-          
-        const res = await fetch(API_BASE, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: productData,
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không thể thêm sản phẩm');
-        return data;
+    async (productData, thunkAPI) => {
+        try {
+            for (const [key, value] of productData.entries()) {
+                console.log(`${key}:`, value);
+            }
+            
+            const res = await fetchWithAuth(API_BASE, {
+                method: 'POST',
+                body: productData,
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Không thể thêm sản phẩm');
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
     }
 );
 
 export const updateProduct = createAsyncThunk(
     'products/updateProduct',
-    async ({ productId, productData }) => {
-
-        const res = await fetch(`${API_BASE}/${productId}`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: productData,
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không thể cập nhật sản phẩm');
-        return data;
+    async ({ productId, productData }, thunkAPI) => {
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/${productId}`, {
+                method: 'PUT',
+                body: productData,
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Không thể cập nhật sản phẩm');
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
     }
 );
 
 export const deleteProduct = createAsyncThunk(
     'products/deleteProduct',
-    async (id) => {
-
-        const res = await fetch(`${API_BASE}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không thể xóa sản phẩm');
-        return id; // trả về id đã xóa để cập nhật state
+    async (id, thunkAPI) => {
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Không thể xóa sản phẩm');
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
     }
 );
 

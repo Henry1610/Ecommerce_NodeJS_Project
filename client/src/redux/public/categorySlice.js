@@ -4,27 +4,21 @@ const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/categories';
 
 // Fetch all public categories
 export const fetchCategories = createAsyncThunk(
-    'categories/fetchCategories', 
+    'category/fetchCategories',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                console.error('Error fetching categories:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách category');
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải danh mục');
             }
-
             return data;
         } catch (error) {
-            console.error('Network error fetching categories:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
@@ -35,24 +29,21 @@ export const fetchCategoryBySlug = createAsyncThunk(
     'categories/fetchCategoryBySlug', 
     async (slug, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${slug}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}/${slug}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
 
-            const data = await res.json();
+            const data = await response.json();
 
-            if (!res.ok) {
-                console.error('Error fetching category:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy category');
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải danh mục');
             }
 
             return data;
         } catch (error) {
-            console.error('Network error fetching category:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }

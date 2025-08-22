@@ -12,9 +12,9 @@ export const fetchProducts = createAsyncThunk(
             const res = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include'
             });
 
             const data = await res.json();
@@ -42,10 +42,9 @@ export const fetchProductBySlug = createAsyncThunk(
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                        , Authorization: `Bearer ${localStorage.getItem('token')}`
 
                     },
-
+                    credentials: 'include'
                 }
             )
             const data = await res.json();
@@ -70,9 +69,9 @@ export const getProductSuggestions = createAsyncThunk(
             const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/products/suggestions?${query}`, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include'
             });
 
             const data = await res.json();
@@ -95,9 +94,9 @@ export const likeOrUnlikeReview = createAsyncThunk(
             const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/users/reviews/like/${reviewId}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
             const data = await res.json();
             if (!res.ok) {

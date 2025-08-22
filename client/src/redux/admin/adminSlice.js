@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 // Sử dụng biến môi trường thay cho URL cứng
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin';
 
 export const fetchAdminProfile = createAsyncThunk('admin/fetchAdminProfile', async (_, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/me`, {
+    const res = await fetchWithAuth(`${API_BASE}/me`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
+      }
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi lấy profile admin');
     return data.user;
@@ -21,13 +21,10 @@ export const fetchAdminProfile = createAsyncThunk('admin/fetchAdminProfile', asy
 
 export const updateAdminProfile = createAsyncThunk('admin/updateAdminProfile', async (formData, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/me`, {
+    const res = await fetchWithAuth(`${API_BASE}/me`, {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
       body: formData,
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật profile admin');
     return data;
@@ -38,14 +35,13 @@ export const updateAdminProfile = createAsyncThunk('admin/updateAdminProfile', a
 
 export const changeAdminPassword = createAsyncThunk('admin/changeAdminPassword', async (passwordData, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/change-password`, {
+    const res = await fetchWithAuth(`${API_BASE}/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(passwordData),
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi đổi mật khẩu admin');
     return data;

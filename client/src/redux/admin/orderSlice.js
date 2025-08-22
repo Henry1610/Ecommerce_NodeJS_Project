@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/orders';
 
@@ -7,12 +8,11 @@ export const fetchOrders = createAsyncThunk(
     'orders/fetchOrders',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetchWithAuth(API_BASE, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -32,12 +32,11 @@ export const fetchOrderByOrderNumber = createAsyncThunk(
     'orders/fetchOrderByOrderNumber',
     async (orderNumber, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${orderNumber}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${orderNumber}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -57,12 +56,11 @@ export const fetchRefundRequests = createAsyncThunk(
     'orders/fetchRefundRequests',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/orders/admin/refund-requests`, {
+            const res = await fetchWithAuth(`${process.env.REACT_APP_SERVER_URL}/api/orders/admin/refund-requests`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 
@@ -83,14 +81,13 @@ export const updateOrderStatus = createAsyncThunk(
     async ({ orderNumber, statusData }, thunkAPI) => {
 
         try {
-            const res = await fetch(`${API_BASE}/${orderNumber}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${orderNumber}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ statusData })
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
 
             const data = await res.json();
 

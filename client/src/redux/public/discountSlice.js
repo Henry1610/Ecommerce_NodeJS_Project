@@ -7,24 +7,18 @@ export const fetchDiscounts = createAsyncThunk(
     'discounts/fetchDiscounts', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                console.error('Error fetching discounts:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách giảm giá');
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải mã giảm giá');
             }
-
             return data;
         } catch (error) {
-            console.error('Network error fetching discounts:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
@@ -35,24 +29,18 @@ export const fetchAvailableDiscounts = createAsyncThunk(
     'discounts/fetchAvailableDiscounts',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/users/cart/available-discounts`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}/api/users/cart/available-discounts`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                console.error('Error fetching available discounts:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách mã giảm giá phù hợp');
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải mã giảm giá khả dụng');
             }
-
             return data;
         } catch (error) {
-            console.error('Network error fetching available discounts:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }

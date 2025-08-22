@@ -438,7 +438,7 @@ function Cart() {
                             <i className="fa-solid fa-cart-shopping fs-3"></i>
                             <h4 className="fw-bold mb-2">Giỏ hàng trống</h4>
                             <p className="text-muted mb-4">Hãy thoải mái lựa chọn sản phẩm bạn nhé</p>
-                            <button className="text-dark px-4 py-2 rounded fw-bold bg-info border-0">
+                            <button className="text-white px-4 py-2 rounded fw-bold bg-info border-0 ">
                                 Khám phá ngay
                             </button>
                         </div>

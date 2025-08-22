@@ -4,6 +4,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
+import './News.css'; // thêm file css riêng cho responsive
 
 function News() {
     const articles = [
@@ -99,18 +100,23 @@ function News() {
                 Tin tức công nghệ
             </h1>
 
+            {/* Swiper Tabs */}
             <div className="tab-swiper-container text-center d-flex justify-content-center m-2">
                 <Swiper
                     spaceBetween={10}
                     slidesPerView="auto"
                     freeMode={true}
+                    breakpoints={{
+                        640: { slidesPerView: 3 },
+                        768: { slidesPerView: 4 },
+                        1024: { slidesPerView: 5 }
+                    }}
                     className="tab-swiper bg-light rounded-pill p-2"
                 >
                     {news.map((cat) => (
                         <SwiperSlide key={cat} className="w-auto">
                             <button
-                                className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeTabNews === cat ? "active" : ""
-                                    }`}
+                                className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeTabNews === cat ? "active" : ""}`}
                                 onClick={() => setActiveTabNews(cat)}
                             >
                                 {cat}
@@ -121,11 +127,12 @@ function News() {
             </div>
 
             <div className="row g-4">
+                {/* Left: big news */}
                 <div className="col-md-6">
                     <div className="card border-0" style={{ backgroundColor: currentContent.backgroundColor }}>
                         <div className="card-body position-relative">
                             <p className="text-uppercase text-muted small fw-bold mb-2">{currentContent.category}</p>
-                            <h2 className="card-title fw-bold fs-4">
+                            <h2 className="card-title fw-bold fs-5 fs-md-4">
                                 {currentContent.title}
                             </h2>
                             <div className="d-flex text-muted small mb-3">
@@ -133,27 +140,19 @@ function News() {
                                 <span className="mx-2">/</span>
                                 <time dateTime={currentContent.date}>{currentContent.date}</time>
                             </div>
-                            <div style={{ height: '379px', overflow: 'hidden', background: '#f8f9fa' }}>
-  <img
-    src={currentContent.image}
-    alt={currentContent.title}
-    className="img-fluid rounded mb-3"
-    style={{ objectFit: 'contain', height: '100%', width: '100%', background: '#f8f9fa' }}
-  />
-</div>
-
-                            <p className="text-muted small mt-2">
-                                {currentContent.description}
-                            </p>
+                            <div className="news-image">
+                                <img
+                                    src={currentContent.image}
+                                    alt={currentContent.title}
+                                    className="img-fluid rounded mb-3 h-100 w-100 object-fit-contain bg-light"
+                                />
+                            </div>
+                            <p className="text-muted small mt-2">{currentContent.description}</p>
                             <div
                                 className="position-absolute top-0 end-0 bottom-0 text-nowrap overflow-hidden text-center fs-1 fw-bold text-light opacity-25"
                                 style={{
                                     writingMode: "vertical-rl",
                                     textOrientation: "mixed",
-                                    color: currentContent.backgroundColor === "#E5D7FF" ? "#C9B8F9" :
-                                        currentContent.backgroundColor === "#FFE5E5" ? "#FFB8B8" :
-                                            currentContent.backgroundColor === "#E5F7FF" ? "#B8E6FF" :
-                                                currentContent.backgroundColor === "#FFF5E5" ? "#FFE0B8" : "#B8FFB8",
                                 }}
                             >
                                 {currentContent.watermark}
@@ -162,26 +161,23 @@ function News() {
                     </div>
                 </div>
 
+                {/* Right: list news */}
                 <div className="col-md-6 d-flex flex-column gap-3">
                     {articles.map((article, idx) => (
                         <div key={idx} className="d-flex border-bottom pb-3 gap-3">
-                            <div style={{ width: '120px', height: '80px', overflow: 'hidden' }}>
+                            <div className="news-thumb">
                                 <img
                                     src={article.img}
                                     alt={article.title}
                                     className="img-fluid rounded"
-                                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                                 />
                             </div>
-
                             <div className="flex-grow-1 small">
                                 <div className="fw-semibold">{article.title}</div>
                                 <div className="d-flex align-items-center mt-1 text-success fw-semibold small">
                                     <span>{article.author}</span>
                                     <span className="text-secondary mx-1">/</span>
-                                    <time className="text-muted" dateTime="2025-05-26">
-                                        26/05/2025
-                                    </time>
+                                    <time className="text-muted" dateTime="2025-05-26">26/05/2025</time>
                                 </div>
                             </div>
                         </div>

@@ -8,73 +8,76 @@ import AdminLayout from './Layout/AdminLayout';
 import ProtectedRoute from './routes/components/ProtectedRoute';
 import ErrorPage from './components/ErrorPage';
 import ForbiddenPage from './components/ForbiddenPage';
+import AppInitializer from './components/AppInitializer';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        {publicRoutes.map((route, index) => {
-          const Page = route.component;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={<UserLayout><Page /></UserLayout>}
-            />
-          );
-        })}
-
-        {/* User Routes */}
-        {userRoutes.map((route, index) => {
-          const Page = route.component;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <ProtectedRoute role="user">
-                  <UserLayout><Page /></UserLayout>
-                </ProtectedRoute>
-              }
-            />
-          );
-        })}
-
-        {/* Admin Routes - Sử dụng cấu trúc nested routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminLayout>
-                <Outlet />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        >
-          {/* Route mặc định cho /admin */}
-          <Route index element={<div>Chào mừng đến với trang quản trị</div>} />
-
-          {/* Các route con của admin */}
-          {adminRoutes.map((route, index) => {
+    <AppInitializer>
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          {publicRoutes.map((route, index) => {
             const Page = route.component;
             return (
               <Route
                 key={index}
                 path={route.path}
-                element={<Page />}
+                element={<UserLayout><Page /></UserLayout>}
               />
             );
           })}
-        </Route>
 
-        {/* Route bắt lỗi 404 */}
-        <Route path="*" element={<UserLayout><ErrorPage/></UserLayout>} />
+          {/* User Routes */}
+          {userRoutes.map((route, index) => {
+            const Page = route.component;
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <ProtectedRoute role="user">
+                    <UserLayout><Page /></UserLayout>
+                  </ProtectedRoute>
+                }
+              />
+            );
+          })}
 
-        {/* Route cấm truy cập 403 */}
-        <Route path="/forbidden" element={<UserLayout><ForbiddenPage/></UserLayout>} />
-      </Routes>
-    </Router>
+          {/* Admin Routes - Sử dụng cấu trúc nested routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminLayout>
+                  <Outlet />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          >
+            {/* Route mặc định cho /admin */}
+            <Route index element={<div>Chào mừng đến với trang quản trị</div>} />
+
+            {/* Các route con của admin */}
+            {adminRoutes.map((route, index) => {
+              const Page = route.component;
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={<Page />}
+                />
+              );
+            })}
+          </Route>
+
+          {/* Route bắt lỗi 404 */}
+          <Route path="*" element={<UserLayout><ErrorPage/></UserLayout>} />
+
+          {/* Route cấm truy cập 403 */}
+          <Route path="/forbidden" element={<UserLayout><ForbiddenPage/></UserLayout>} />
+        </Routes>
+      </Router>
+    </AppInitializer>
   );
 }
 

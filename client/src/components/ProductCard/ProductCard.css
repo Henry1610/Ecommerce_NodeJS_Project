@@ -1,0 +1,44 @@
+/* ProductCard.css */
+
+/* Responsive cho mobile */
+@media (max-width: 576px) {
+    /* Cho các nút chiếm toàn bộ chiều ngang */
+    .product-card-container .btn {
+      width: 100% !important;
+      font-size: 0.8rem !important;
+      padding: 6px 10px !important;
+    }
+  
+    /* Ảnh sản phẩm tự co theo chiều ngang */
+    .product-card-container img {
+      max-width: 100% !important;
+      max-height: 180px !important;
+      object-fit: contain;
+    }
+  
+    /* Giảm size chữ tiêu đề */
+    .product-card-container .card-title {
+      font-size: 0.85rem !important;
+    }
+  
+    /* Nút so sánh chuyển nhỏ gọn */
+    .product-card-container .btn-outline-info {
+      font-size: 0.75rem !important;
+      padding: 4px 8px !important;
+    }
+  }
+  
+  /* Tablet */
+  @media (min-width: 577px) and (max-width: 768px) {
+    .product-card-container .btn {
+      font-size: 0.85rem !important;
+      padding: 6px 12px !important;
+    }
+  }
+  @media (max-width: 576px) {
+    .btn-add-to-cart span {
+      display: none; /* ẩn text */
+    }
+  }
+  
+  

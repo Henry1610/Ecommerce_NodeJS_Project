@@ -1,8 +1,4 @@
-/* OrderDetail.css */
-body {
-    font-family: 'Inter', sans-serif;
-    background: #f9fafb;
-  }
+
   
   .order-detail-wrapper {
     min-height: 100vh;
@@ -111,4 +107,131 @@ body {
     background: #0d6efd;
     color: #fff;
   }
+  
+
+@media (max-width: 767.98px) {
+	/* Container paddings */
+	.container-lg {
+		padding-left: 1rem !important;
+		padding-right: 1rem !important;
+	}
+
+	/* Header */
+	header .d-flex.justify-content-between {
+		flex-direction: column;
+		gap: 0.75rem;
+		align-items: flex-start !important;
+	}
+
+	header .btn.rounded-pill {
+		margin-right: 0.75rem !important;
+	}
+
+	/* Status steps */
+	.status-steps .col-6 {
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	/* Cards spacing */
+	.bg-white.rounded-4.shadow-lg,
+	.rounded-4.shadow-lg,
+	.bg-white.rounded-4.shadow {
+		padding: 1rem !important;
+	}
+
+	/* Product list items */
+	.order-item {
+		padding: 0.75rem !important;
+	}
+
+	.order-item .me-3 {
+		margin-right: 0.75rem !important;
+	}
+
+	/* Sidebar moves below content */
+	.row.g-4 > .col-lg-8 {
+		order: 1;
+	}
+	.row.g-4 > .col-lg-4 {
+		order: 2;
+		margin-top: 1rem;
+	}
+
+	/* Modal sizing */
+	.modal-dialog.modal-md {
+		max-width: 92% !important;
+		margin: 1rem auto !important;
+	}
+	.modal-content {
+		height: auto !important;
+		max-height: 86vh !important;
+	}
+
+	/* Review images grid */
+	.review-upload-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 8px;
+	}
+	.review-upload-grid .slot,
+	.review-upload-grid .thumb {
+		width: 100% !important;
+		height: 80px !important;
+	}
+}
+
+/* Tablets */
+@media (min-width: 768px) and (max-width: 991.98px) {
+	.container-lg {
+		padding-left: 1.5rem !important;
+		padding-right: 1.5rem !important;
+	}
+
+	.modal-dialog.modal-md {
+		max-width: 640px !important;
+	}
+}
+
+/* Desktop enhancements */
+@media (min-width: 1200px) {
+	.container-lg {
+		max-width: 1140px;
+	}
+}
+
+/* Utilities tying to existing markup */
+.order-item {
+	transition: all 0.3s ease;
+}
+
+.order-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* Improve badge readability on small screens */
+@media (max-width: 575.98px) {
+	.badge.fs-6 {
+		font-size: 0.9rem !important;
+		padding: 0.35rem 0.6rem !important;
+	}
+}
+
+/* Make progress bar easier to tap/view */
+@media (hover: none) and (pointer: coarse) {
+	.progress {
+		height: 10px !important;
+	}
+}
+
+/* Scrollable modal body on small screens */
+.modal-content .modal-body {
+	overflow-y: auto;
+}
+
+/* Use these hooks in JSX (already present or minimal changes required) */
+.status-steps {}
+.review-upload-grid {}
+.order-item {}
   

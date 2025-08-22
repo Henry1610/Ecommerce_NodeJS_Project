@@ -18,177 +18,344 @@ const OrderHistoryTab = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'pending': {
-        text: 'Mới tạo',
-        className: 'badge bg-primary'
+      'pending': { 
+        text: 'Mới tạo', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#6366f1', color: '#ffffff' }
       },
-      'processing': {
-        text: 'Đang xử lý',
-        className: 'badge bg-warning'
+      'processing': { 
+        text: 'Đang xử lý', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#f59e0b', color: '#ffffff' }
       },
-      'shipped': {
-        text: 'Đã giao cho đơn vị vận chuyển',
-        className: 'badge bg-info'
+      'shipped': { 
+        text: 'Đang vận chuyển', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#0ea5e9', color: '#ffffff' }
       },
-      'delivered': {
-        text: 'Đã giao thành công',
-        className: 'badge bg-success'
+      'delivered': { 
+        text: 'Hoàn thành', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#10b981', color: '#ffffff' }
       },
-      'cancel_requested': {
-        text: 'Người dùng yêu cầu hủy',
-        className: 'badge bg-warning'
+      'cancel_requested': { 
+        text: 'Yêu cầu hủy', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#f97316', color: '#ffffff' }
       },
-      'cancelled': {
-        text: 'Đã hủy thành công',
-        className: 'badge bg-danger'
+      'cancelled': { 
+        text: 'Đã hủy', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#ef4444', color: '#ffffff' }
       },
-      'cancel_rejected': {
-        text: 'Từ chối hủy đơn',
-        className: 'badge bg-secondary'
-      }
+      'cancel_rejected': { 
+        text: 'Từ chối hủy', 
+        className: 'badge rounded-pill',
+        style: { backgroundColor: '#6b7280', color: '#ffffff' }
+      },
     };
-
-    const config = statusConfig[status] || {
-      text: status,
-      className: 'badge bg-secondary'
+    const config = statusConfig[status] || { 
+      text: status, 
+      className: 'badge rounded-pill',
+      style: { backgroundColor: '#6b7280', color: '#ffffff' }
     };
-
     return (
-      <span className={config.className}>
+      <span className={config.className} style={config.style}>
         {config.text}
       </span>
     );
   };
 
-  if (loading) return <p className="text-center">Đang tải dữ liệu...</p>;
-  if (error) return <p className="text-danger text-center">Lỗi: {error}</p>;
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center py-5">
+        <div className="text-center">
+          <div className="spinner-border text-info mb-3" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Đang tải...</span>
+          </div>
+          <p className="text-muted fw-medium">Đang tải lịch sử đơn hàng...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-5">
+        <div className="alert alert-danger border-0 shadow-sm" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          Có lỗi xảy ra: {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container py-4">
-      <div className="row">
+    <div className="container-fluid px-3 px-md-4 py-4" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      {/* Modern Header */}
+      <div className="row mb-4">
         <div className="col-12">
-          {/* Header */}
-          <div className="mb-4">
-            <h2 className="fw-bold">Lịch Sử Đơn Hàng</h2>
-            <p className="text-muted">Theo dõi tất cả đơn hàng của bạn tại đây</p>
-          </div>
-
-          {orders.length === 0 ? (
-            <div className="text-center py-5">
-              <div className="mb-3">
-                <i className="bi bi-inbox fs-1 text-muted"></i>
-              </div>
-              <h4 className="text-muted mb-3">Chưa có đơn hàng nào</h4>
-              <p className="text-secondary">Bạn chưa thực hiện đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
-              <Link to="/products" className="btn btn-info text-white">
-                <i className="bi bi-shop me-2"></i>
-                Mua sắm ngay
-              </Link>
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+              <h1 className="fw-bold mb-1" style={{ 
+                fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
+                color: '#1e293b',
+                letterSpacing: '-0.025em'
+              }}>
+                Lịch sử đơn hàng
+              </h1>
+              <p className="text-muted mb-0 fs-6" style={{ color: '#64748b' }}>
+                Theo dõi và quản lý tất cả đơn hàng của bạn
+              </p>
             </div>
-          ) : (
-            <div className="bg-white rounded shadow ">
-              {/* Table for larger screens */}
-              <div className="d-none d-lg-block">
-                <div className="table-responsive rounded">
-                  <table className="table table-hover mb-0">
-                    <thead className="table-dark">
-                      <tr>
-                        <th>Mã đơn</th>
-                        <th>Ngày đặt</th>
-                        <th>Địa chỉ giao hàng</th>
-                        <th>Trạng thái</th>
-                        <th>Tổng tiền</th>
-                        <th>Chi tiết</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order) => (
-                        <tr key={order._id}>
-                          <td>
-                            <span className="fw-bold text-primary">#{order.orderNumber}</span>
-                          </td>
-                          <td>
-                            <span className="text-muted">{formatDateTime(order.createdAt)}</span>
-                          </td>
-                          <td>
-                            <div>
-                              <div className="fw-medium">{order.shippingAddress?.city?.city}</div>
-                              <small className="text-muted">{order.shippingAddress?.address}</small>
-                            </div>
-                          </td>
-                          <td>
-                            {getStatusBadge(order.status)}
-                          </td>
-                          <td>
-                            <span className="fw-bold">{formatVND(order.totalPrice)}</span>
-                          </td>
-                          <td>
-                            <Link 
-                              to={`/order-detail/${order.orderNumber}`} 
-                              className="btn btn-outline-primary btn-sm"
-                            >
-                              <i className="bi bi-eye me-1"></i>
-                              Xem
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            {orders.length > 0 && (
+              <div className="d-flex align-items-center gap-3">
+                <div className="badge bg-light text-dark fs-6 px-3 py-2">
+                  <i className="bi bi-box-seam me-2"></i>
+                  {orders.length} đơn hàng
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-              {/* Card layout for mobile screens */}
-              <div className="d-lg-none p-3">
-                <div className="row g-3">
-                  {orders.map((order) => (
-                    <div key={order._id} className="col-12">
-                      <div className="card">
-                        <div className="card-header bg-light">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="fw-bold text-primary">#{order.orderNumber}</span>
-                            {getStatusBadge(order.status)}
+      {orders.length === 0 ? (
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-8 col-lg-6">
+            <div className="text-center py-5">
+              <div className="mb-4">
+                <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                     style={{ 
+                       width: '80px', 
+                       height: '80px', 
+                       backgroundColor: '#f1f5f9' 
+                     }}>
+                  <i className="bi bi-inbox" style={{ fontSize: '2rem', color: '#0ea5e9' }}></i>
+                </div>
+              </div>
+              <h3 className="fw-bold mb-3" style={{ color: '#1e293b' }}>Chưa có đơn hàng nào</h3>
+              <p className="text-muted mb-4 fs-6" style={{ color: '#64748b', lineHeight: '1.6' }}>
+                Bạn chưa thực hiện đơn hàng nào. Khám phá các sản phẩm tuyệt vời và bắt đầu mua sắm ngay hôm nay!
+              </p>
+              <Link 
+                to="/products" 
+                className="btn text-white px-4 py-3 fw-semibold rounded-3 shadow-sm"
+                style={{
+                  backgroundColor: '#0ea5e9',
+                  border: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => e.target.style.backgroundColor = '#0284c7'}
+                onMouseLeave={e => e.target.style.backgroundColor = '#0ea5e9'}
+              >
+                <i className="bi bi-shop me-2"></i>
+                Khám phá sản phẩm
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View */}
+          <div className="d-none d-xl-block">
+            <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.925rem' }}>
+                  <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <tr>
+                      <th className="fw-semibold py-3 px-4 border-0" style={{ color: '#475569' }}>
+                        Mã đơn hàng
+                      </th>
+                      <th className="fw-semibold py-3 px-4 border-0" style={{ color: '#475569' }}>
+                        Ngày đặt hàng
+                      </th>
+                      <th className="fw-semibold py-3 px-4 border-0" style={{ color: '#475569' }}>
+                        Địa chỉ giao hàng
+                      </th>
+                      <th className="fw-semibold py-3 px-4 border-0 text-center" style={{ color: '#475569' }}>
+                        Trạng thái
+                      </th>
+                      <th className="fw-semibold py-3 px-4 border-0 text-end" style={{ color: '#475569' }}>
+                        Tổng tiền
+                      </th>
+                      <th className="fw-semibold py-3 px-4 border-0 text-center" style={{ color: '#475569' }}>
+                        Thao tác
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((order, index) => (
+                      <tr key={order._id} style={{ borderBottom: index === orders.length - 1 ? 'none' : '1px solid #f1f5f9' }}>
+                        <td className="py-4 px-4">
+                          <div className="fw-bold" style={{ color: '#0ea5e9' }}>
+                            #{order.orderNumber}
                           </div>
-                        </div>
-                        <div className="card-body">
-                          <div className="row g-3">
-                            <div className="col-6">
-                              <small className="text-muted d-block">Ngày đặt</small>
-                              <span className="fw-medium">{formatDateTime(order.createdAt)}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-muted fw-medium">
+                            {formatDateTime(order.createdAt)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div>
+                            <div className="fw-semibold mb-1" style={{ color: '#334155' }}>
+                              {order.shippingAddress?.city?.city}
                             </div>
-                            <div className="col-6">
-                              <small className="text-muted d-block">Tổng tiền</small>
-                              <span className="fw-bold">{formatVND(order.totalPrice)}</span>
-                            </div>
-                            <div className="col-12">
-                              <small className="text-muted d-block">Địa chỉ giao hàng</small>
-                              <div>
-                                <div className="fw-medium">{order.shippingAddress?.city?.city}</div>
-                                <small className="text-muted">{order.shippingAddress?.address}</small>
-                              </div>
+                            <div className="text-muted small" style={{ color: '#64748b' }}>
+                              {order.shippingAddress?.address}
                             </div>
                           </div>
-                        </div>
-                        <div className="card-footer bg-transparent">
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {getStatusBadge(order.status)}
+                        </td>
+                        <td className="py-4 px-4 text-end">
+                          <div className="fw-bold fs-6" style={{ color: '#1e293b' }}>
+                            {formatVND(order.totalPrice)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-center">
                           <Link 
                             to={`/order-detail/${order.orderNumber}`} 
-                            className="btn btn-primary w-100"
+                            className="btn text-white btn-sm px-3 py-2 fw-medium rounded-3"
+                            style={{
+                              backgroundColor: '#0ea5e9',
+                              border: 'none',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={e => e.target.style.backgroundColor = '#0284c7'}
+                            onMouseLeave={e => e.target.style.backgroundColor = '#0ea5e9'}
                           >
-                            <i className="bi bi-eye me-2"></i>
-                            Xem chi tiết
+                            <i class="fa-solid fa-eye"></i>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Tablet View */}
+          <div className="d-none d-lg-block d-xl-none">
+            <div className="row g-3">
+              {orders.map((order) => (
+                <div key={order._id} className="col-12">
+                  <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div className="card-body p-4">
+                      <div className="row align-items-center g-3">
+                        <div className="col-8">
+                          <div className="d-flex align-items-center gap-3 mb-2">
+                            <div className="fw-bold fs-5" style={{ color: '#0ea5e9' }}>
+                              #{order.orderNumber}
+                            </div>
+                            {getStatusBadge(order.status)}
+                          </div>
+                          <div className="text-muted small mb-2">
+                            {formatDateTime(order.createdAt)}
+                          </div>
+                          <div className="fw-semibold" style={{ color: '#334155' }}>
+                            {order.shippingAddress?.city?.city}
+                          </div>
+                          <div className="text-muted small">
+                            {order.shippingAddress?.address}
+                          </div>
+                        </div>
+                        <div className="col-4 text-end">
+                          <div className="fw-bold fs-5 mb-3" style={{ color: '#1e293b' }}>
+                            {formatVND(order.totalPrice)}
+                          </div>
+                          <Link 
+                            to={`/order-detail/${order.orderNumber}`} 
+                            className="btn text-white px-3 py-2 fw-medium rounded-3"
+                            style={{
+                              backgroundColor: '#0ea5e9',
+                              border: 'none',
+                              fontSize: '0.875rem'
+                            }}
+                          >
+                            <i className="bi bi-eye me-1"></i>
+                            Chi tiết
                           </Link>
                         </div>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+
+          {/* Mobile View */}
+          <div className="d-lg-none">
+            <div className="row g-3">
+              {orders.map((order) => (
+                <div key={order._id} className="col-12">
+                  <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div className="card-header border-0 py-3 px-4" style={{ backgroundColor: '#f8fafc' }}>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div className="fw-bold" style={{ color: '#0ea5e9' }}>
+                          #{order.orderNumber}
+                        </div>
+                        {getStatusBadge(order.status)}
+                      </div>
+                    </div>
+                    <div className="card-body p-4">
+                      <div className="row g-3">
+                        <div className="col-6">
+                          <div className="small text-muted mb-1" style={{ color: '#64748b' }}>
+                            Ngày đặt
+                          </div>
+                          <div className="fw-medium" style={{ color: '#334155', fontSize: '0.875rem' }}>
+                            {formatDateTime(order.createdAt)}
+                          </div>
+                        </div>
+                        <div className="col-6">
+                          <div className="small text-muted mb-1" style={{ color: '#64748b' }}>
+                            Tổng tiền
+                          </div>
+                          <div className="fw-bold" style={{ color: '#1e293b', fontSize: '0.875rem' }}>
+                            {formatVND(order.totalPrice)}
+                          </div>
+                        </div>
+                        <div className="col-12">
+                          <div className="small text-muted mb-1" style={{ color: '#64748b' }}>
+                            Địa chỉ giao hàng
+                          </div>
+                          <div className="fw-semibold mb-1" style={{ color: '#334155', fontSize: '0.875rem' }}>
+                            {order.shippingAddress?.city?.city}
+                          </div>
+                          <div className="text-muted small" style={{ color: '#64748b' }}>
+                            {order.shippingAddress?.address}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card-footer border-0 p-4" style={{ backgroundColor: '#f8fafc' }}>
+                      <Link 
+                        to={`/order-detail/${order.orderNumber}`} 
+                        className="btn text-white w-100 py-3 fw-semibold rounded-3"
+                        style={{
+                          backgroundColor: '#0ea5e9',
+                          border: 'none',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <i className="bi bi-eye me-2"></i>
+                        Xem chi tiết đơn hàng
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-export default OrderHistoryTab; 
+export default OrderHistoryTab;

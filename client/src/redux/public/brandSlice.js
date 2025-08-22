@@ -7,24 +7,18 @@ export const fetchBrands = createAsyncThunk(
     'brands/fetchBrands', 
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                console.error('Error fetching brands:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách brand');
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải thương hiệu');
             }
-
             return data;
         } catch (error) {
-            console.error('Network error fetching brands:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
@@ -35,24 +29,21 @@ export const fetchBrandBySlug = createAsyncThunk(
     'brands/fetchBrandBySlug', 
     async (slug, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${slug}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE}/${slug}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
 
-            const data = await res.json();
+            const data = await response.json();
 
-            if (!res.ok) {
-                console.error('Error fetching brand:', data);
-                return thunkAPI.rejectWithValue(data.message || 'Không thể lấy brand');
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải thương hiệu');
             }
 
             return data;
         } catch (error) {
-            console.error('Network error fetching brand:', error);
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }

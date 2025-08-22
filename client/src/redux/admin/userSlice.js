@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/users';
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}`, {
+    const res = await fetchWithAuth(`${API_BASE}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi lấy users');
     return data;
@@ -20,12 +20,11 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAP
 
 export const getUserById = createAsyncThunk('users/getUserById', async (userId, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/${userId}`, {
+    const res = await fetchWithAuth(`${API_BASE}/${userId}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi lấy user');
     return data;
@@ -36,13 +35,12 @@ export const getUserById = createAsyncThunk('users/getUserById', async (userId, 
 
 export const deleteUser = createAsyncThunk('users/deleteUser', async (userId, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/${userId}`, {
+    const res = await fetchWithAuth(`${API_BASE}/${userId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Xóa user thất bại');
     return { id: userId };
@@ -53,14 +51,13 @@ export const deleteUser = createAsyncThunk('users/deleteUser', async (userId, th
 
 export const updateUserRole = createAsyncThunk('users/updateUserRole', async ({ userId, role }, thunkAPI) => {
   try {
-    const res = await fetch(`${API_BASE}/${userId}`, {
+    const res = await fetchWithAuth(`${API_BASE}/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({ role }),
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
     const data = await res.json();
     if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Cập nhật vai trò thất bại');
     return data;
@@ -72,8 +69,8 @@ export const updateUserRole = createAsyncThunk('users/updateUserRole', async ({ 
 const userSlice = createSlice({
   name: 'users',
   initialState: {
-    users: [],        // ✅ Danh sách người dùng
-    currentUser: null, // ✅ Người dùng hiện tại (lấy theo ID)
+    users: [],       
+    currentUser: null, 
     loading: false,
     error: null,
   },

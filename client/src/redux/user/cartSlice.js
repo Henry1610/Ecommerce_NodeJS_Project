@@ -1,38 +1,40 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { selectShippingFee } from "./shippingAddressSlice";
+import { fetchWithAuth } from "../../utils/tokenUtils";
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/cart';
 
-export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
-  try {
-    const res = await fetch(`${API_BASE}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    const data = await res.json();
-    if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi lấy giỏ hàng');
-    // console.log('Fetched cart data:', data); // Debug log
-
-    return data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || 'Không lấy được giỏ hàng');
-  }
-})
+export const fetchCart = createAsyncThunk(
+    'cart/fetchCart',
+    async (_, thunkAPI) => {
+        try {
+            const response = await fetchWithAuth(`${API_BASE}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải giỏ hàng');
+            }
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
 
 export const setCart = createAsyncThunk('cart/setCart', async ({ items, appliedDiscount ,shippingFee}, thunkAPI) => {
   try {
     
-    const res = await fetch(`${API_BASE}/set`, {
+    const res = await fetchWithAuth(`${API_BASE}/set`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ items, appliedDiscount,shippingFee })
-    });
+    }, thunkAPI.getState, thunkAPI.dispatch);
 
     const data = await res.json();
 
@@ -43,43 +45,43 @@ export const setCart = createAsyncThunk('cart/setCart', async ({ items, appliedD
   }
 })
 
-export const addToCart = createAsyncThunk('cart/addToCart', async ({ productId, quantity }, thunkAPI) => {
-  try {
-    const token = localStorage.getItem('token')
-    
-    const res = await fetch(`${API_BASE}/add`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ productId, quantity })
-    })
-    const data = await res.json();
+export const addToCart = createAsyncThunk(
+    'cart/addToCart',
+    async ({ productId, quantity = 1 }, thunkAPI) => {
+        try {
+            const response = await fetchWithAuth(`${API_BASE}/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId, quantity })
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi thêm vào giỏ hàng');
+            }
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
 
-    if (!res.ok) return thunkAPI.rejectWithValue(data.message || 'Lỗi cập nhật số lượng');
-    return data;
-  } catch (error) {
-    console.log(error);
-    return thunkAPI.rejectWithValue('Lỗi kết nối server');
-  }
-})
+
+
 
 export const applyDiscount = createAsyncThunk(
   'cart/applyDiscount',
   async (code, thunkAPI) => {
     try {
-
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${API_BASE}/apply-discount`, {
+      const res = await fetchWithAuth(`${API_BASE}/apply-discount`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ code })
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
 
@@ -99,15 +101,12 @@ export const removeDiscount = createAsyncThunk(
   'cart/removeDiscount',
   async (_, thunkAPI) => {
     try {
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${API_BASE}/remove-discount`, {
+      const res = await fetchWithAuth(`${API_BASE}/remove-discount`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
 

@@ -15,28 +15,49 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="reset-password-container" style={{ maxWidth: 400, margin: '40px auto', padding: 24, borderRadius: 12, boxShadow: '0 2px 16px #e0e7ef' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Quên mật khẩu</h2>
-      {resetSuccess && submitted ? (
-        <div style={{ color: 'green', textAlign: 'center' }}>Vui lòng kiểm tra email để đặt lại mật khẩu.</div>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 16 }}>
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
-            />
-          </div>
-          {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-          <button type="submit" disabled={loading} style={{ width: '100%', padding: 10, borderRadius: 6, background: '#3b82f6', color: '#fff', fontWeight: 600 }}>
-            {loading ? 'Đang gửi...' : 'Gửi link đặt lại mật khẩu'}
-          </button>
-        </form>
-      )}
+    <div className="container my-5" style={{ maxWidth: '400px' }}>
+      <div className="card shadow-sm rounded-4">
+        <div className="card-body p-4">
+          <h4 className="card-title text-center mb-4 fw-bold">Quên mật khẩu</h4>
+
+          {resetSuccess && submitted ? (
+            <div className="alert alert-success text-center">
+              Vui lòng kiểm tra email để đặt lại mật khẩu.
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-control rounded-3 focus-ring-info"
+                  style={{
+                    boxShadow: 'none',
+                    outline: 'none',
+                  }}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+           
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-info w-100 fw-semibold rounded-3 border-0 shadow-sm focus-ring-0 text-white"
+                style={{
+                  outline: 'none',
+                  boxShadow: 'none',
+                }}
+              >
+                {loading ? 'Đang gửi...' : 'Gửi link đặt lại mật khẩu'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

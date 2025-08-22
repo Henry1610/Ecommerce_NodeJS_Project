@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/shipping-addresses';
 // Async thunk
@@ -6,174 +7,147 @@ export const getSavedShippingAddresses = createAsyncThunk(
     'shippingAddress/getSavedShippingAddresses',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}`, {
-                method: 'GET',
+            const response = await fetchWithAuth(`${API_BASE}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi lấy danh sách địa chỉ giao hàng');
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải địa chỉ giao hàng');
             }
-
             return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
+
 export const getShippingAddressById = createAsyncThunk(
     'shippingAddress/getShippingAddressById',
     async (addressId, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${addressId}`, {
-                method: 'GET',
+            const response = await fetchWithAuth(`${API_BASE}/${addressId}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi lấy địa chỉ');
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải địa chỉ giao hàng');
             }
-
-            return data; // Trả về 1 address object
+            return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
 
-// shippingAddressSlice.js
+export const createShippingAddress = createAsyncThunk(
+    'shippingAddress/createShippingAddress',
+    async (addressData, thunkAPI) => {
+        try {
+            const response = await fetchWithAuth(`${API_BASE}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(addressData)
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tạo địa chỉ giao hàng');
+            }
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
+
 export const updateShippingAddress = createAsyncThunk(
     'shippingAddress/updateShippingAddress',
     async ({ addressId, updates }, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${addressId}`, {
-                method: 'PATCH',
+            const response = await fetchWithAuth(`${API_BASE}/${addressId}`, {
+                method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(updates),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật địa chỉ');
+                body: JSON.stringify(updates)
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật địa chỉ giao hàng');
             }
-
             return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
-export const createShippingAddress = createAsyncThunk(
-    'shippingAddress/createShippingAddress',
-    async (newAddress, thunkAPI) => {
-        try {
-            const res = await fetch(`${API_BASE}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-                body: JSON.stringify(newAddress),
-            });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tạo địa chỉ');
-            }
-
-            return data;
-        } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
-        }
-    }
-);
 export const getDefaultShippingAddress = createAsyncThunk(
     'shippingAddress/getDefaultShippingAddress',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/default`, {
-                method: 'GET',
+            const response = await fetchWithAuth(`${API_BASE}/default`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Không tìm thấy địa chỉ mặc định');
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải địa chỉ mặc định');
             }
-
-            return data; // Trả về object địa chỉ mặc định
+            return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
+
 export const setDefaultShippingAddress = createAsyncThunk(
     'shippingAddress/setDefaultShippingAddress',
     async (addressId, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${addressId}/default`, {
+            const response = await fetchWithAuth(`${API_BASE}/${addressId}/default`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi đặt mặc định địa chỉ');
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi đặt địa chỉ mặc định');
             }
-
-            return data; // Trả về address đã được cập nhật
+            return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
+
 export const deleteShippingAddress = createAsyncThunk(
     'shippingAddress/deleteShippingAddress',
     async (addressId, thunkAPI) => {
-      try {
-        const res = await fetch(`${API_BASE}/${addressId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-  
-        const data = await res.json();
-  
-        if (!res.ok) {
-          return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xóa địa chỉ');
+        try {
+            const response = await fetchWithAuth(`${API_BASE}/${addressId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xóa địa chỉ giao hàng');
+            }
+            return { id, ...data };
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
-  
-        return addressId; // Trả về ID đã xóa để cập nhật store
-      } catch (error) {
-        return thunkAPI.rejectWithValue('Lỗi kết nối đến server');
-      }
     }
-  );
+);
 // Slice
 const shippingAddressSlice = createSlice({
     name: 'shippingAddress',
@@ -184,7 +158,14 @@ const shippingAddressSlice = createSlice({
         error: null,
     },
     reducers: {
-
+        setSelectedAddress: (state, action) => {
+            state.selectedAddress = action.payload;
+        },
+        clearShippingAddresses: (state) => {
+            state.AddressSave = [];
+            state.defaultAddress = null;
+            state.selectedAddress = null;
+        }
 
     },
     extraReducers: (builder) => {
@@ -282,7 +263,7 @@ const shippingAddressSlice = createSlice({
             })
             // delete
             .addCase(deleteShippingAddress.fulfilled, (state, action) => {
-                state.AddressSave = state.AddressSave.filter(addr => addr._id !== action.payload);
+                state.AddressSave = state.AddressSave.filter(addr => addr._id !== action.payload.id);
               })
               
 

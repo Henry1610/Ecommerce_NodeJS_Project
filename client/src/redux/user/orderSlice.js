@@ -1,29 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/orders';
+
 // Lấy danh sách đơn hàng của người dùng
 export const fetchMyOrders = createAsyncThunk(
   'orders/fetchMyOrders',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}`, {
-        method: 'GET',
+      const response = await fetchWithAuth(`${API_BASE}`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error('Error fetching orders:', data);
-        return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách đơn hàng');
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
+      const data = await response.json();
+      
+      
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải đơn hàng');
       }
-
-      return data.orders;
+      
+      // Trả về orders array thay vì toàn bộ response object
+      return data.orders || [];
     } catch (error) {
-      console.error('Network error fetching orders:', error);
+      console.error('Orders API error:', error);
       return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
@@ -33,26 +34,19 @@ export const fetchMyOrders = createAsyncThunk(
 export const fetchOrderByOrderNumber = createAsyncThunk(
   'orders/fetchOrderByOrderNumber',
   async (orderNumber, thunkAPI) => {
-    
     try {
-      const res = await fetch(`${API_BASE}/${orderNumber}`, {
-        method: 'GET',
+      const response = await fetchWithAuth(`${API_BASE}/${orderNumber}`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
         
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error('Error fetching order:', data);
-        return thunkAPI.rejectWithValue(data.message || 'Không thể lấy đơn hàng');
+      const data = await response.json();
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải chi tiết đơn hàng');
       }
-
-      return data.order;
+      return data;
     } catch (error) {
-      console.error('Network error fetching order:', error);
       return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
@@ -96,7 +90,7 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchOrderByOrderNumber.fulfilled, (state, action) => {
         state.loading = false;
-        state.orderDetail = action.payload;
+        state.orderDetail = action.payload.order; // Lấy order từ response
       })
       .addCase(fetchOrderByOrderNumber.rejected, (state, action) => {
         state.loading = false;

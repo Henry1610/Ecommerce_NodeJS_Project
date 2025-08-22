@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/reviews';
 
@@ -11,20 +12,17 @@ export const createReview = createAsyncThunk(
         console.log(`${pair[0]}:`, pair[1]);
       }
 
-      const res = await fetch(`${API_BASE}/${slug}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${slug}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: formData // Dạng multipart/form-data, không set Content-Type
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Không thể tạo đánh giá');
       }
-
       return data;
     } catch (error) {
       console.error('Lỗi kết nối server khi tạo đánh giá:', error);
@@ -38,20 +36,17 @@ export const fetchMyReviews = createAsyncThunk(
   'reviews/fetchMyReviews',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}`, {
+      const res = await fetchWithAuth(`${API_BASE}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || "Không thể lấy review");
       }
-
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue("Lỗi kết nối server");
@@ -64,22 +59,17 @@ export const getReviewByOrderNumberAndProduct = createAsyncThunk(
   'reviews/getReviewByOrderNumberAndProduct',
   async ({ orderNumber, productId }, thunkAPI) => {
     try {
-
-
-      const res = await fetch(`${API_BASE}/${orderNumber}/${productId}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${orderNumber}/${productId}`, {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Không thể lấy đánh giá');
       }
-
       return data;
-
     } catch (error) {
       console.error('Lỗi lấy đánh giá theo đơn hàng và sản phẩm:', error);
       return thunkAPI.rejectWithValue('Lỗi kết nối server');
@@ -87,31 +77,25 @@ export const getReviewByOrderNumberAndProduct = createAsyncThunk(
   }
 );
 
-
 // Cập nhật review
 export const updateReviewByOrderNumberAndProduct = createAsyncThunk(
   'reviews/updateReview',
   async ({ orderNumber, productId, formData }, thunkAPI) => {
     try {
-      for (const pair of formData.entries()) {
-        console.log(`${pair[0]}:`, pair[1]);
-      }
+     
 
-      const res = await fetch(`${API_BASE}/${orderNumber}/${productId}`, {
+      const res = await fetchWithAuth(`${API_BASE}/${orderNumber}/${productId}`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-          // Không set Content-Type cho FormData
+        // Không set Content-Type cho FormData
         },
         body: formData
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
-
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Không thể cập nhật đánh giá');
       }
-
       return data;
     } catch (error) {
       console.error('Lỗi kết nối server khi cập nhật đánh giá:', error);

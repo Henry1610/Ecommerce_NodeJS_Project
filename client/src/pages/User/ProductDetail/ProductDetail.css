@@ -14,7 +14,10 @@
     border-radius: 50%;
     font-size: 16px;
   }
-   
+  .product-main-img {
+    max-height: clamp(220px, 50vw, 440px); 
+  }
+  
   @keyframes scroll-left {
     0% {
       transform: translateX(0);

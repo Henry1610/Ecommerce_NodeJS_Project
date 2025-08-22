@@ -1,49 +1,70 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users/wishlist';
 // Async thunks
 export const fetchWishlist = createAsyncThunk(
     'wishlist/fetchWishlist',
-    async (_, { rejectWithValue }) => {
+    async (_, thunkAPI) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
+            const response = await fetchWithAuth(`${API_BASE}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải wishlist');
+            }
+            return data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Lỗi khi tải danh sách yêu thích');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
 
 export const addToWishlist = createAsyncThunk(
     'wishlist/addToWishlist',
-    async (productId, { rejectWithValue }) => {
+    async (productId, thunkAPI) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_BASE}`, { productId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
+            const response = await fetchWithAuth(`${API_BASE}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi thêm vào wishlist');
+            }
+            return { productId, ...data };
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Lỗi khi thêm vào danh sách yêu thích');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
 
 export const removeFromWishlist = createAsyncThunk(
     'wishlist/removeFromWishlist',
-    async (productId, { rejectWithValue }) => {
+    async (productId, thunkAPI) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_BASE}/${productId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return { productId, ...response.data };
+            const response = await fetchWithAuth(`${API_BASE}/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }, thunkAPI.getState, thunkAPI.dispatch);
+            
+            const data = await response.json();
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Lỗi khi xóa khỏi wishlist');
+            }
+            return { productId, ...data };
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Lỗi khi xóa khỏi danh sách yêu thích');
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );

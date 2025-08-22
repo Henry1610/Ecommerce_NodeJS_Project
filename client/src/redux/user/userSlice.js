@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/users';
 
@@ -7,12 +8,11 @@ export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
   async (_, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/me`, {
+      const res = await fetchWithAuth(`${API_BASE}/me`, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
 
       const data = await res.json();
       
@@ -31,11 +31,11 @@ export const fetchUserProfile = createAsyncThunk(
 export const updateUserProfile = createAsyncThunk(
   'user/updateProfile',
   async (updatedData, thunkAPI) => {
+    // console.log('Updating user profile with data:', updatedData);
     try {
       let options = {
         method: 'PUT',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: updatedData
       };
@@ -43,11 +43,14 @@ export const updateUserProfile = createAsyncThunk(
         options.headers['Content-Type'] = 'application/json';
         options.body = JSON.stringify(updatedData);
       }
-      const res = await fetch(`${API_BASE}/me`, options);
+      
+      const res = await fetchWithAuth(`${API_BASE}/me`, options, thunkAPI.getState, thunkAPI.dispatch);
+      
       const data = await res.json();
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Failed to update user');
       }
+     
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue('Server error');
@@ -60,14 +63,14 @@ export const changePassword = createAsyncThunk(
   'user/changePassword',
   async (passwordData, thunkAPI) => {
     try {
-      const res = await fetch(`${API_BASE}/change-password`, {
+      const res = await fetchWithAuth(`${API_BASE}/change-password`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(passwordData)
-      });
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
       const data = await res.json();
       if (!res.ok) {
         return thunkAPI.rejectWithValue(data.message || 'Failed to change password');
@@ -88,6 +91,11 @@ const userProfileSlice = createSlice({
   },
   reducers: {
     resetUserProfileError: (state) => {
+      state.error = null;
+    },
+    clearUserProfile: (state) => {
+      state.profile = null;
+      state.loading = false;
       state.error = null;
     }
   },
@@ -137,5 +145,5 @@ const userProfileSlice = createSlice({
   }
 });
 
-export const { resetUserProfileError } = userProfileSlice.actions;
+export const { resetUserProfileError, clearUserProfile } = userProfileSlice.actions;
 export default userProfileSlice.reducer;

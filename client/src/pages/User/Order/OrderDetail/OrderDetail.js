@@ -7,6 +7,7 @@ import { requestRefund } from '../../../../redux/user/paymentSlice';
 import formatDateTime from '../../../../untils/dateUtils';
 import Swal from 'sweetalert2';
 import { createReview, getReviewByOrderNumberAndProduct, updateReviewByOrderNumberAndProduct } from '../../../../redux/user/reviewSlice';
+import './OrderDetail.css';
 const MAX_IMAGES = 3;
 const MAX_REVIEW_LENGTH = 500;
 const OrderDetail = () => {
@@ -80,11 +81,11 @@ const OrderDetail = () => {
   useEffect(() => {
     if (showViewReviewModal && selectedProduct) {
       dispatch(getReviewByOrderNumberAndProduct({
-        orderNumber: orderDetail.orderNumber,
+        orderNumber: orderNumber,
         productId: selectedProduct.product._id
       }));
     }
-  }, [showViewReviewModal, selectedProduct, dispatch, orderDetail?.orderNumber]);
+  }, [showViewReviewModal, selectedProduct, dispatch, orderNumber]);
 
 
   const handleCloseReviewModal = () => {
@@ -101,8 +102,14 @@ const OrderDetail = () => {
     return <div>Có lỗi xảy ra: {error}</div>;
   }
 
-  if (!orderDetail) {
-    return <div>Không tìm thấy đơn hàng.</div>;
+  // Debug: log ra để xem cấu trúc data
+  console.log('orderDetail:', orderDetail);
+  console.log('orderDetail?.statusHistory:', orderDetail?.statusHistory);
+  console.log('orderDetail?.items:', orderDetail?.items);
+
+  // Chỉ render khi có đầy đủ data
+  if (!orderDetail || !orderDetail.statusHistory || !orderDetail.items) {
+    return <div>Đang tải thông tin đơn hàng...</div>;
   }
 
   // Calculate progress
@@ -421,7 +428,7 @@ const OrderDetail = () => {
           formData.append('product', product._id);
           formData.append('rating', rating);
           formData.append('comment', comment);
-          formData.append('orderNumber', orderDetail.orderNumber);
+          formData.append('orderNumber', orderNumber);
 
           imageFiles.slice(0, 3).forEach((file) => {
             formData.append('images', file);

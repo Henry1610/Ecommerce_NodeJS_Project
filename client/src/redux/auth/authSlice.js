@@ -35,53 +35,22 @@ export const registerWithOTP = createAsyncThunk(
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ username, email, password, otp }),
+                credentials: 'include'
             });
             const data = await res.json();
             if (!res.ok) {
                 return thunkAPI.rejectWithValue(data.message || 'Đăng ký thất bại');
             }
-            localStorage.setItem('token', data.token);
-            const { _id: regId, ...regUserWithRole } = data.user || {};
-            localStorage.setItem('user', JSON.stringify(regUserWithRole));
-            return { token: data.token, user: regUserWithRole };
+            const { id: regId, ...regUserWithRole } = data.user || {};
+            return { accessToken: data.accessToken, user: regUserWithRole };
         } catch (error) {
             return thunkAPI.rejectWithValue('Lỗi kết nối server');
         }
     }
 );
 
-export const register = createAsyncThunk(
-    'auth/register'
-    , async ({ username, password, email }, thunkAPI) => {
-        try {
-            const res = await fetch(`${API_BASE}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                    
-                }
-                ,
-                body: JSON.stringify({ username, email, password }),
-            })
-            const data = await res.json();
-            if (!res.ok) {
-                return thunkAPI.rejectWithValue(data.message || 'Đăng ký thất bại');
-
-            }
-            localStorage.setItem('token', data.token);
-            const { _id: regId, ...regUserWithRole } = data.user || {};
-            localStorage.setItem('user',  JSON.stringify(regUserWithRole));
-
-            return {token:data.token,user:regUserWithRole};
-        }
-        catch (error) {
-            return thunkAPI.rejectWithValue('Lỗi kết nối server'); 
-
-        }
-    }
-)
 export const login = createAsyncThunk(
-    'auth/login', async ({ email, password }, thunkAPI) => {
+    'auth/login', async ({ email, password, rememberMe }, thunkAPI) => {
         try {
             const res = await fetch(`${API_BASE}/login`, {
                 method: 'POST',
@@ -89,18 +58,16 @@ export const login = createAsyncThunk(
                     'Content-Type': 'application/json'
 
                 }
-                , body: JSON.stringify({ email, password })
+                , body: JSON.stringify({ email, password, rememberMe }),
+                credentials: 'include'
             })
             const data = await res.json();
 
             if (!res.ok) {
                 return thunkAPI.rejectWithValue(data.message || 'Đăng nhập thất bại');
             }
-            localStorage.setItem('token', data.token);
-            const { _id, ...userWithRole } = data.user || {};
-            localStorage.setItem('user', JSON.stringify(userWithRole));
-
-            return {token:data.token,user:userWithRole};
+            const { id, ...userWithRole } = data.user || {};
+            return {accessToken:data.accessToken,user:userWithRole};
 
 
         } catch (error) {
@@ -108,6 +75,47 @@ export const login = createAsyncThunk(
         }
 
     })
+
+// Refresh token
+export const refreshToken = createAsyncThunk(
+    'auth/refreshToken',
+    async (_, thunkAPI) => {
+        try {
+            const res = await fetch(`${API_BASE}/refresh-token`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Refresh token thất bại');
+            }
+            const { id, ...userWithRole } = data.user || {};
+            return { accessToken: data.accessToken, user: userWithRole };
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
+
+// Logout
+export const logout = createAsyncThunk(
+    'auth/logout',
+    async (_, thunkAPI) => {
+        try {
+            const res = await fetch(`${API_BASE}/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return thunkAPI.rejectWithValue(data.message || 'Đăng xuất thất bại');
+            }
+            return data.message;
+        } catch (error) {
+            return thunkAPI.rejectWithValue('Lỗi kết nối server');
+        }
+    }
+);
 
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
@@ -152,20 +160,17 @@ export const resetPasswordConfirm = createAsyncThunk(
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
-        token: localStorage.getItem('token') || null,
+        user: null,
+        accessToken: null,
         loading: false,
         error: null,
         resetSuccess: false,
         otpSent: false,
-        otpEmail: null,
     },
     reducers: {
-        logout: (state) => {
+        clearAuth: (state) => {
             state.user = null;
-            state.token = null;
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
+            state.accessToken = null;
         },
         clearResetState: (state) => {
             state.resetSuccess = false;
@@ -173,9 +178,12 @@ const authSlice = createSlice({
         },
         clearOTPState: (state) => {
             state.otpSent = false;
-            state.otpEmail = null;
             state.error = null;
         },
+        setAuth: (state, action) => {
+            state.accessToken = action.payload?.accessToken || null;
+            state.user = action.payload?.user || null;
+        }
     }
     , extraReducers: (builder) => {
         builder
@@ -187,7 +195,6 @@ const authSlice = createSlice({
             .addCase(sendOTP.fulfilled, (state, action) => {
                 state.loading = false;
                 state.otpSent = true;
-                state.otpEmail = action.payload.email;
             })
             .addCase(sendOTP.rejected, (state, action) => {
                 state.loading = false;
@@ -202,25 +209,10 @@ const authSlice = createSlice({
             .addCase(registerWithOTP.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload.user;
-                state.token = action.payload.token;
+                state.accessToken = action.payload.accessToken;
                 state.otpSent = false;
-                state.otpEmail = null;
             })
             .addCase(registerWithOTP.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-            
-            .addCase(register.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(register.fulfilled, (state, action) => {
-                state.loading = false;
-                state.token = action.payload.token;
-                state.user=action.payload.user
-            })
-            .addCase(register.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
@@ -230,11 +222,37 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.token = action.payload.token;
+                state.accessToken = action.payload.accessToken;
                 state.user=action.payload.user
 
             })
             .addCase(login.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(refreshToken.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(refreshToken.fulfilled, (state, action) => {
+                state.loading = false;
+                state.accessToken = action.payload.accessToken;
+                state.user = action.payload.user;
+            })
+            .addCase(refreshToken.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(logout.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logout.fulfilled, (state) => {
+                state.loading = false;
+                state.user = null;
+                state.accessToken = null;
+            })
+            .addCase(logout.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
@@ -267,10 +285,7 @@ const authSlice = createSlice({
                 state.resetSuccess = false;
             });
     }
-}
+})
 
-
-
-)
-export const { logout, clearResetState, clearOTPState } = authSlice.actions;
+export const { clearAuth, clearResetState, clearOTPState, setAuth } = authSlice.actions;
 export default authSlice.reducer;

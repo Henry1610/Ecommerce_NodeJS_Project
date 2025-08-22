@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/categories';
 
@@ -7,14 +8,12 @@ export const fetchCategories = createAsyncThunk(
     'categories/fetchCategories',
     async (_, thunkAPI) => {
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetchWithAuth(API_BASE, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-
+                    'Content-Type': 'application/json'
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy danh sách danh mục');
@@ -32,14 +31,12 @@ export const fetchCategoryById = createAsyncThunk(
     'categories/fetchCategoryById',
     async (id, thunkAPI) => {
         try {
-            const res = await fetch(`${API_BASE}/${id}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${id}`, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-
+                    'Content-Type': 'application/json'
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
                 console.error('Error fetching category:', data);
@@ -58,15 +55,13 @@ export const addCategory = createAsyncThunk(
     'categories/addCategory',
     async ({ name, description }, thunkAPI) => {
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetchWithAuth(API_BASE, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ name, description })
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
                 console.error('Error adding category:', data);
@@ -86,15 +81,13 @@ export const addCategory = createAsyncThunk(
         async ({ categoryId, formData }, thunkAPI) => {
             
             try {
-                const res = await fetch(`${API_BASE}/${categoryId}`, {
+                const res = await fetchWithAuth(`${API_BASE}/${categoryId}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData )
-                });
+                }, thunkAPI.getState, thunkAPI.dispatch);
                 const data = await res.json();
                 if (!res.ok) {
                     console.error('Error updating category:', data);
@@ -114,13 +107,12 @@ export const deleteCategory = createAsyncThunk(
     async (id, thunkAPI) => {
         
         try {
-            const res = await fetch(`${API_BASE}/${id}`, {
+            const res = await fetchWithAuth(`${API_BASE}/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
                 }
-            });
+            }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
                 console.error('Error deleting category:', data);

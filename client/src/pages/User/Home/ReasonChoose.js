@@ -80,7 +80,7 @@ function ReasonChoose() {
                                 <h5 className="card-title mb-3 fs-3 text-dark fw-bold">
                                     {current.title}
                                 </h5>
-                                <p className="card-text text-muted fs-6">{current.text}</p>
+                                <p className="card-text text-muted fs-6 small">{current.text}</p>
                             </div>
                         </div>
                     </div>

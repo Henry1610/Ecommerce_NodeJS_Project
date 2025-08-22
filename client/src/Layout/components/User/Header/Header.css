@@ -27,3 +27,18 @@ body {
       font-size: 14px;
     }
   }
+@media (max-width: 768px) {
+  .header-username {
+    display: none; /* Ẩn chữ username, chỉ để avatar */
+  }
+  .header-cart-icons {
+    gap: 0.75rem !important; /* Thu hẹp khoảng cách */
+  }
+  .header-cart-icons i {
+    font-size: 1.25rem !important; /* Thu nhỏ icon */
+  }
+  .btn-login, .btn-logout {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+}

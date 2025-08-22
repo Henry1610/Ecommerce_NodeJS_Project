@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { fetchWithAuth } from '../../utils/tokenUtils';
 
 // Định nghĩa API_BASE một lần
 const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/reviews';
@@ -7,74 +7,88 @@ const API_BASE = process.env.REACT_APP_SERVER_URL + '/api/admin/reviews';
 // Async Thunks
 export const getAllReviewsAdmin = createAsyncThunk(
   'reviews/getAllReviewsAdmin',
-  async (_, { rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
-      const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
-      const config = {
+      const response = await fetchWithAuth(`${API_BASE}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const response = await axios.get(`${API_BASE}`, config);
-      return response.data;
+          'Content-Type': 'application/json',
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
+      const data = await response.json();
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải reviews');
+      }
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
 
 export const createAdminReviewResponse = createAsyncThunk(
   'reviews/createAdminReviewResponse',
-  async ({ reviewId, responseContent }, { rejectWithValue }) => {
+  async ({ reviewId, responseContent }, thunkAPI) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
+      const response = await fetchWithAuth(`${API_BASE}/response`, {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      };
-      const response = await axios.post(`${API_BASE}/response`, { reviewId, responseContent }, config);
-      return response.data;
+        body: JSON.stringify({ reviewId, responseContent })
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
+      const data = await response.json();
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tạo phản hồi');
+      }
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
 
 export const updateAdminReviewResponse = createAsyncThunk(
   'reviews/updateAdminReviewResponse',
-  async ({ responseId, responseContent }, { rejectWithValue }) => {
+  async ({ responseId, responseContent }, thunkAPI) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
+      const response = await fetchWithAuth(`${API_BASE}/response/${responseId}`, {
+        method: 'PUT',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      };
-      const response = await axios.put(`${API_BASE}/response/${responseId}`, { responseContent }, config);
-      return response.data;
+        body: JSON.stringify({ responseContent })
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
+      const data = await response.json();
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi cập nhật phản hồi');
+      }
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
 
 export const getAdminReviewResponseByReviewId = createAsyncThunk(
   'reviews/getAdminReviewResponseByReviewId',
-  async (reviewId, { rejectWithValue }) => {
+  async (reviewId, thunkAPI) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
+      const response = await fetchWithAuth(`${API_BASE}/${reviewId}/response`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const response = await axios.get(`${API_BASE}/${reviewId}/response`, config);
-      return response.data;
+          'Content-Type': 'application/json',
+        }
+      }, thunkAPI.getState, thunkAPI.dispatch);
+      
+      const data = await response.json();
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(data.message || 'Lỗi khi tải phản hồi');
+      }
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue('Lỗi kết nối server');
     }
   }
 );
