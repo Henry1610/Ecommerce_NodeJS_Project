@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendOTP, registerWithOTP, clearOTPState } from '../../../redux/auth/authSlice';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FaEnvelope, FaLock, FaUser, FaKey } from 'react-icons/fa';
 
 function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, otpSent } = useSelector(state => state.auth);
-  const { accessToken, user } = useSelector(state => state.auth);
+  const { loading, otpSent  } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -34,10 +33,6 @@ function Register() {
       } catch {}
     }
   }, []);
-
-  if (accessToken && user) {
-    return <Navigate to="/" replace />;
-  }
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -93,8 +88,7 @@ function Register() {
       }
     }
 
-    // Debug: In ra console để kiểm tra dữ liệu
-    console.log('Registration Data:', { username, email, password, otp: formData.otp });
+    
 
     try {
       const result = await dispatch(registerWithOTP({
@@ -115,7 +109,7 @@ function Register() {
           confirmPassword: '',
           otp: ''
         });
-        navigate('/', { replace: true });
+        navigate('/');
       }
     } catch (error) {
       Swal.fire({ icon: 'error', title: 'Lỗi!', text: error || 'Đăng ký thất bại' });
