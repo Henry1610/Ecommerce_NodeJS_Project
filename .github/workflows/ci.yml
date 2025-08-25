@@ -2,14 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop] # chạy khi push vào main hoặc develop
+    branches: [main, develop]
   pull_request:
-    branches: [main]          # chạy CI khi mở PR vào main
+    branches: [main]
 
 jobs:
-  # ===== Frontend CI & Deploy =====
-  frontend:
-    name: Frontend Build & Deploy
+  backend:
+    name: Backend Install & Deploy (Render)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,41 +19,57 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: ./server/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./server
+        run: npm ci
+
+      # - name: Run backend tests (optional)
+      #   working-directory: ./server
+      #   run: npm test
+
+      - name: Trigger Render deploy on main
+        if: github.ref == 'refs/heads/main'
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+  frontend:
+    name: Frontend Build & Deploy (Vercel)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ./client/package-lock.json
 
       - name: Install dependencies & Build
-  working-directory: client
-  run: |
-    npm ci
-    npm run build
-    # npm test -- --watchAll=false
+        working-directory: ./client
+        run: |
+          npm ci
+          npm run build
+          # npm test -- --watchAll=false
 
-
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel (preview on non-main)
+        if: github.ref != 'refs/heads/main'
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: client
-          prod: ${{ github.ref == 'refs/heads/main' }} # main = production, develop = preview
+          working-directory: ./client
 
-  # ===== Backend CI =====
-  backend:
-    name: Backend Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy to Vercel (production on main)
+        if: github.ref == 'refs/heads/main'
+        uses: amondnet/vercel-action@v25
         with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      #- name: Run Backend Tests
-      # run: npm test
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./client
+          vercel-args: '--prod'
