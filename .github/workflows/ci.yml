@@ -52,7 +52,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-project-path: ./client
+          working-directory: ./client
 
       - name: Deploy to Vercel (production on main)
         if: github.ref == 'refs/heads/main'
@@ -62,4 +62,4 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-          vercel-project-path: ./client
+          working-directory: ./client
