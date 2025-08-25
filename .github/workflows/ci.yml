@@ -45,21 +45,25 @@ jobs:
           npm ci --no-audit --no-fund
           CI=false npm run build
 
+      # Deploy Preview for non-main branches using official Vercel action
       - name: Deploy to Vercel (preview on non-main)
         if: github.ref != 'refs/heads/main'
-        uses: amondnet/vercel-action@v25
+        uses: vercel/actions/deploy@v2
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./client
+          prebuilt: true
 
+      # Deploy Production for main branch using official Vercel action
       - name: Deploy to Vercel (production on main)
         if: github.ref == 'refs/heads/main'
-        uses: amondnet/vercel-action@v25
+        uses: vercel/actions/deploy@v2
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+          token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./client
+          prebuilt: true
+          prod: true
