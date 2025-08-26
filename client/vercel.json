@@ -4,6 +4,8 @@
     { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "build" } }
   ],
   "routes": [
+    { "src": "/(.*)\\.(js|css|png|jpg|jpeg|svg|ico|webp|json)", "dest": "/$1.$2" },
+    { "src": "/static/(.*)", "dest": "/static/$1" },
     { "src": "/manifest.json", "dest": "/manifest.json" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
     { "src": "/(.*)", "dest": "/index.html" }
