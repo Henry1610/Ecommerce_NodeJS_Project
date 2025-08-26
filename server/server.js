@@ -21,21 +21,21 @@ app.set('trust proxy', true);
 
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-const allowedRegex = process.env.ALLOWED_ORIGIN_REGEX ? new RegExp(process.env.ALLOWED_ORIGIN_REGEX) : null;
-
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:3000'
+];
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true);
-    if (allowedOrigins.includes(origin) || (allowedRegex && allowedRegex.test(origin))) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+    origin: function (origin, callback) {
+        // Cho phép cả call từ Postman (origin === undefined)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }));
-
-app.options('*', cors());
 app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json());
