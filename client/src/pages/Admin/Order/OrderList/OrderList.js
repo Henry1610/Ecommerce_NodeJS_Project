@@ -51,16 +51,14 @@ const OrderList = () => {
       padding: "32px 32px"
     }}>
       <div style={{
-        background: "#fff",
         borderRadius: 16,
         padding: 28,
         marginBottom: 28,
         boxShadow: "0 2px 12px rgba(59,130,246,0.08)"
       }}>
-        <h2 style={{ 
+        <h2  style={{ 
           fontWeight: 700, 
           marginBottom: 24, 
-          color: "#3b82f6", 
           fontSize: 24,
           display: "flex",
           alignItems: "center",
@@ -79,8 +77,8 @@ const OrderList = () => {
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
-              <button className="btn btn-searchset btn-primary" type="button">
-                <i className="fas fa-search"></i>
+              <button className="btn btn-searchset btn-info" type="button">
+                <i className="fas fa-search text-white"></i>
               </button>
             </div>
           </div>
@@ -140,7 +138,7 @@ const OrderList = () => {
                   onMouseOver={e => e.currentTarget.style.background = "#f6f8fa"}
                   onMouseOut={e => e.currentTarget.style.background = ""}
                 >
-                  <td style={{ padding: "12px 16px", fontWeight: 600, color: "#3b82f6" }}>
+                  <td className='fw-bold' style={{ padding: "12px 16px", fontWeight: 60 }}>
                     #{order.orderNumber}
                   </td>
                   <td style={{ padding: "12px 16px", fontWeight: 500 }}>
@@ -171,13 +169,13 @@ const OrderList = () => {
                   </td>
                   <td style={{ padding: "12px 16px", textAlign: "center" }}>
                     <Link
+                    className='bg-info'
                       to={`${order.orderNumber}`}
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 6,
                         padding: "8px 16px",
-                        background: "#3b82f6",
                         color: "#fff",
                         textDecoration: "none",
                         borderRadius: 8,

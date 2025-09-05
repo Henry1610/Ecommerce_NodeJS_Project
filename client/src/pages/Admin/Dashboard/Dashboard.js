@@ -116,7 +116,7 @@ const Dashboard = () => {
   };
 
   const pieDataAll = createPieData(topProductsAll, "sold");
-  
+
 
   const totalSoldAll = topProductsAll.reduce((sum, p) => sum + (p.sold || 0), 0);
 
@@ -211,54 +211,54 @@ const Dashboard = () => {
       padding: "32px 32px"
     }}>
       {/* Box tổng quan */}
-      <div style={{
-        display: "flex",
-        gap: 16,
-        justifyContent: "center",
-        marginBottom: 24,
-        flexWrap: "wrap"
-      }}>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: 16, display: 'flex', alignItems: 'center', boxShadow: '0 1px 6px rgba(59,130,246,0.06)', minWidth: 180, margin: 2 }}>
-          <FaBoxOpen size={28} color="#3b82f6" style={{ marginRight: 12 }} />
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#3b82f6' }}>{products?.length || 0}</div>
-            <div style={{ color: '#555', fontWeight: 500, fontSize: 14 }}>Sản phẩm</div>
+      <div className="row g-3 mb-4">
+        <div className="col-12 col-sm-6 col-md-3">
+          <div className="d-flex align-items-center bg-white p-3 rounded shadow-sm">
+            <FaBoxOpen size={28} className="text-primary me-2" />
+            <div>
+              <div className="fw-bold fs-5 text-primary">{products?.length || 0}</div>
+              <div className="text-muted small">Sản phẩm</div>
+            </div>
           </div>
         </div>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: 16, display: 'flex', alignItems: 'center', boxShadow: '0 1px 6px rgba(245,158,66,0.06)', minWidth: 180, margin: 2 }}>
-          <FaTags size={28} color="#f59e42" style={{ marginRight: 12 }} />
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#f59e42' }}>{brands?.length || 0}</div>
-            <div style={{ color: '#555', fontWeight: 500, fontSize: 14 }}>Thương hiệu</div>
+        <div className="col-12 col-sm-6 col-md-3">
+          <div className="d-flex align-items-center bg-white p-3 rounded shadow-sm">
+            <FaTags size={28} className="text-warning me-2" />
+            <div>
+              <div className="fw-bold fs-5 text-warning">{brands?.length || 0}</div>
+              <div className="text-muted small">Thương hiệu</div>
+            </div>
           </div>
         </div>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: 16, display: 'flex', alignItems: 'center', boxShadow: '0 1px 6px rgba(168,85,247,0.06)', minWidth: 180, margin: 2 }}>
-          <FaThLarge size={28} color="#a855f7" style={{ marginRight: 12 }} />
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#a855f7' }}>{categories?.length || 0}</div>
-            <div style={{ color: '#555', fontWeight: 500, fontSize: 14 }}>Danh mục</div>
+        <div className="col-12 col-sm-6 col-md-3">
+          <div className="d-flex align-items-center bg-white p-3 rounded shadow-sm">
+            <FaThLarge size={28} className="text-purple me-2" />
+            <div>
+              <div className="fw-bold fs-5 text-purple">{categories?.length || 0}</div>
+              <div className="text-muted small">Danh mục</div>
+            </div>
           </div>
         </div>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: 16, display: 'flex', alignItems: 'center', boxShadow: '0 1px 6px rgba(16,185,129,0.06)', minWidth: 180, margin: 2 }}>
-          <FaUserFriends size={28} color="#10b981" style={{ marginRight: 12 }} />
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#10b981' }}>{users?.length || 0}</div>
-            <div style={{ color: '#555', fontWeight: 500, fontSize: 14 }}>Người dùng</div>
+        <div className="col-12 col-sm-6 col-md-3">
+          <div className="d-flex align-items-center bg-white p-3 rounded shadow-sm">
+            <FaUserFriends size={28} className="text-success me-2" />
+            <div>
+              <div className="fw-bold fs-5 text-success">{users?.length || 0}</div>
+              <div className="text-muted small">Người dùng</div>
+            </div>
           </div>
         </div>
       </div>
 
+
       {/* Biểu đồ doanh thu */}
-      <div style={{
-        background: "#fff",
-        borderRadius: 16,
-        padding: 28,
-        marginBottom: 28,
-        boxShadow: "0 2px 12px rgba(59,130,246,0.08)"
-      }}>
-        <h3 style={{ fontWeight: 700, marginBottom: 18, color: "#3b82f6", fontSize: 20 }}>Doanh thu theo ngày</h3>
-        <Line data={lineData} options={lineOptions} height={60} />
+      <div className="card mb-4 shadow-sm">
+        <div className="card-body">
+          <h5 className="card-title text-primary fw-bold mb-3">Doanh thu theo ngày</h5>
+          <Line data={lineData} options={lineOptions} height={60} />
+        </div>
       </div>
+
 
       {/* Pie Chart dạng tab */}
       <div style={{ background: "#fff", borderRadius: 16, padding: 28, marginBottom: 28, boxShadow: "0 2px 12px rgba(59,130,246,0.08)", maxWidth: 700, margin: "32px auto" }}>

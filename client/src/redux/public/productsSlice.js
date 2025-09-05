@@ -6,6 +6,7 @@ export const fetchProducts = createAsyncThunk(
         try {
             const query = new URLSearchParams(params).toString();
             console.log(query);
+            console.log("API_BASE:", process.env.REACT_APP_SERVER_URL);
 
             const url = `${process.env.REACT_APP_SERVER_URL}/api/products/filter?${query}`;
 

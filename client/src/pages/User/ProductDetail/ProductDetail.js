@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs } from 'swiper/modules';
 import { useState, useEffect } from 'react';
@@ -33,6 +33,7 @@ function ProductDetail() {
 
     // Hooks
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { slug } = useParams();
 
     // Selectors
@@ -86,6 +87,12 @@ function ProductDetail() {
     };
 
     const handleAddToCart = () => {
+        // Kiểm tra đăng nhập trước
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+            navigate('/login');
+            return;
+        }
 
         if (product && quantity > 0) {
             dispatch(addToCart({ productId: product._id, quantity }))
@@ -102,6 +109,7 @@ function ProductDetail() {
     const handleWishlistToggle = () => {
         if (!token) {
             toast.error('Vui lòng đăng nhập để sử dụng tính năng này');
+            navigate('/login');
             return;
         }
 
@@ -158,8 +166,8 @@ function ProductDetail() {
     }
 
     return (
-        <div className="container py-5">
-            <div className="row">
+        <div className="container-fluid px-3 px-lg-5 py-5">
+            <div className="row g-4">
                 {/* Header mobile only */}
                 <div className="col-12 d-lg-none order-1">
                     <ProductHeader product={product} />
@@ -415,15 +423,16 @@ function ProductInfo({
                 .catch(() => setRelatedProducts([]));
         }
     }, [product]);
+    
     return (
-        <div className=" mx-5">
+        <div className="px-3 px-lg-5"> 
 
             {/* Header desktop only (ẩn trên mobile để tránh trùng với header phía trên ảnh) */}
             <div className="d-none d-lg-block">
                 <ProductHeader product={product} />
             </div>
 
-            <div >
+            <div>
                 {/* PurchaseBox mobile: đặt lên đầu phần thông tin, ngay dưới ảnh */}
                 <div className="d-block d-lg-none mb-3 d-flex justify-content-center">
                     <PurchaseBox
@@ -434,7 +443,6 @@ function ProductInfo({
                         onWishlistToggle={onWishlistToggle}
                         isInWishlist={isInWishlist}
                     />
-
                 </div>
 
                 <ProductOptions />
@@ -444,10 +452,11 @@ function ProductInfo({
                     onDecrease={onDecreaseQuantity}
                     onChange={onQuantityChange}
                 />
-                <div className="d-block d-lg-none ">
+                
+                <div className="d-block d-lg-none">
                     <CommitmentSection />
                     <AttributesSection />
-                </div >
+                </div>
 
                 {/* PurchaseBox desktop only (giữ nguyên thiết kế desktop) */}
                 <div className="d-none d-lg-block">
@@ -466,9 +475,13 @@ function ProductInfo({
             {relatedProducts.length > 0 && (
                 <div className="mt-5">
                     <h3 className="fw-bold mb-3">Sản phẩm cùng danh mục</h3>
-                    {relatedProducts.map(product => (
-                        <RelatedProductItem product={product} key={product._id} />
-                    ))}
+                    <div className="row g-3"> 
+                        {relatedProducts.map(product => (
+                            <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-6 col-xl-4">
+                                <RelatedProductItem product={product} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
@@ -694,6 +707,7 @@ function ReviewList({ reviews }) {
 
 function ReviewItem({ review }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user } = useSelector(state => state.auth);
 
     const currentUserId = user?.id;
@@ -703,17 +717,18 @@ function ReviewItem({ review }) {
 
     const handleLike = () => {
         if (!currentUserId) {
-            toast.info(' Bạn cần đăng nhập để thích bình luận này!');
+            toast.info('Bạn cần đăng nhập để thích bình luận này!');
+            navigate('/login');
             return;
         }
 
         dispatch(likeOrUnlikeReview(review._id))
             .unwrap()
             .then(() => {
-                toast.success(' Đã cập nhật lượt thích!');
+                toast.success('Đã cập nhật lượt thích!');
             })
             .catch((error) => {
-                toast.error(` ${error || 'Có lỗi xảy ra khi thích bình luận'}`);
+                toast.error(`${error || 'Có lỗi xảy ra khi thích bình luận'}`);
             });
     };
 

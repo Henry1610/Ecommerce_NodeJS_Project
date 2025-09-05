@@ -21,7 +21,7 @@ function ReviewList() {
     if (reviews.length > 0) {
       reviews.forEach(review => {
         if (!reviewResponses[review._id]) { // Only fetch if not already in state
-            dispatch(getAdminReviewResponseByReviewId(review._id));
+          dispatch(getAdminReviewResponseByReviewId(review._id));
         }
       });
     }
@@ -91,8 +91,15 @@ function ReviewList() {
                   <div className="d-flex align-items-center flex-wrap gap-3 small text-muted">
                     <span>
                       <i className="fa-solid fa-user me-1"></i>
-                      <strong>{review.user?.username}</strong> ({review.user?.email})
+                      {review.user?.username && review.user?.email ? (
+                        <>
+                          <strong>{review.user.username}</strong> ({review.user.email})
+                        </>
+                      ) : (
+                        <span className="text-muted">Tài khoản không tồn tại</span>
+                      )}
                     </span>
+
                     <span className="text-warning">
                       <i className="fa-solid fa-star me-1"></i>
                       {review.rating} sao

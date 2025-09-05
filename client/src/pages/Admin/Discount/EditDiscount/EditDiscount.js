@@ -22,7 +22,6 @@ const EditDiscount = () => {
 
     useEffect(() => {
         dispatch(fetchDiscountById(id));
-
         return () => {
             dispatch(resetDiscountDetail());
         };
@@ -54,7 +53,7 @@ const EditDiscount = () => {
         e.preventDefault();
 
         const now = new Date();
-        now.setHours(0,0,0,0); // So sánh chỉ theo ngày
+        now.setHours(0, 0, 0, 0);
         const from = new Date(formData.validFrom);
         const to = new Date(formData.validTo);
 
@@ -66,7 +65,6 @@ const EditDiscount = () => {
             toast.error('Ngày kết thúc không được ở quá khứ!');
             return;
         }
-        // Cho phép validFrom ở quá khứ khi cập nhật
 
         try {
             await dispatch(updateDiscount({ id, updatedData: formData })).unwrap();
@@ -78,7 +76,12 @@ const EditDiscount = () => {
     };
 
     if (loading || !discount) {
-        return <div className="text-center p-5"><div className="spinner-border text-primary" /><p>Đang tải thông tin mã giảm giá...</p></div>;
+        return (
+            <div className="text-center p-5">
+                <div className="spinner-border text-primary" />
+                <p>Đang tải thông tin mã giảm giá...</p>
+            </div>
+        );
     }
 
     if (error) {
@@ -87,48 +90,50 @@ const EditDiscount = () => {
 
     return (
         <div className="container mt-4">
-            <div className="card shadow-sm">
-                <div className="card-header">
-                    <h4>Chỉnh sửa mã giảm giá</h4>
+            <div className="card shadow-sm border-0" style={{ borderRadius: 16 }}>
+                <div className="card-header d-flex align-items-center" style={{ background: '#f3f6fa', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+                    <i className="fa-solid fa-ticket-alt text-primary me-2" style={{ fontSize: 20 }}></i>
+                    <h5 className="mb-0 fw-bold text-primary">Chỉnh sửa mã giảm giá</h5>
                 </div>
                 <div className="card-body">
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label className="form-label">Mã giảm giá</label>
+                    <form onSubmit={handleSubmit} className="row g-3">
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Mã giảm giá</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-control rounded-3"
                                 name="code"
                                 value={formData.code}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Mô tả</label>
-                            <textarea
-                                className="form-control"
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Mô tả</label>
+                            <input
+                                type="text"
+                                className="form-control rounded-3"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Phần trăm giảm</label>
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Phần trăm giảm</label>
                             <input
                                 type="number"
-                                className="form-control"
+                                className="form-control rounded-3"
                                 name="discountPercent"
                                 value={formData.discountPercent}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Giá trị giảm tối đa (VNĐ)</label>
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Giảm tối đa (VNĐ)</label>
                             <input
                                 type="number"
-                                className="form-control"
+                                className="form-control rounded-3"
                                 name="maxDiscount"
                                 value={formData.maxDiscount}
                                 onChange={handleChange}
@@ -136,43 +141,51 @@ const EditDiscount = () => {
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Từ ngày</label>
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Từ ngày</label>
                             <input
                                 type="date"
-                                className="form-control"
+                                className="form-control rounded-3"
                                 name="validFrom"
                                 value={formData.validFrom}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Đến ngày</label>
+                        <div className="col-md-6">
+                            <label className="form-label fw-semibold">Đến ngày</label>
                             <input
                                 type="date"
-                                className="form-control"
+                                className="form-control rounded-3"
                                 name="validTo"
                                 value={formData.validTo}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <div className="form-check mb-3">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="isActive"
-                                name="isActive"
-                                checked={formData.isActive}
-                                onChange={handleChange}
-                            />
-                            <label className="form-check-label" htmlFor="isActive">
-                                Kích hoạt
-                            </label>
+                        <div className="col-12">
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="isActive"
+                                    name="isActive"
+                                    checked={formData.isActive}
+                                    onChange={handleChange}
+                                />
+                                <label className="form-check-label fw-semibold" htmlFor="isActive">
+                                    Kích hoạt
+                                </label>
+                            </div>
                         </div>
-                        <button type="submit" className="btn btn-success">Cập nhật</button>
-                        <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate(-1)}>Hủy</button>
+                        <div className="col-12 d-flex justify-content-end">
+                            <button type="submit" className="btn btn-primary px-4 me-2">
+                                <i className="fa-solid fa-save me-1"></i> Cập nhật
+                            </button>
+                            <button type="button" className="btn btn-secondary px-4" onClick={() => navigate(-1)}>
+                                Hủy
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

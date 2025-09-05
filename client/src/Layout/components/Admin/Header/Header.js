@@ -8,17 +8,9 @@ import { fetchAdminProfile, resetAdminProfile } from '../../../../redux/admin/ad
 import { logout, clearAuth } from '../../../../redux/auth/authSlice';
 import Swal from 'sweetalert2';
 
-const getAdminInfo = () => {
-  // Simulate getting admin info from localStorage
-  try {
-    const admin = JSON.parse(localStorage.getItem('admin'));
-    return admin || { name: 'Admin', avatar: '' };
-  } catch {
-    return { name: 'Admin', avatar: '' };
-  }
-};
 
-const Header = () => {
+
+const Header = ({ onToggleSidebar }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -62,7 +54,7 @@ const Header = () => {
       style={{
         background: '#fff',
         boxShadow: '0 2px 12px rgba(59,130,246,0.08)',
-        padding: '0 32px',
+        padding: '0 16px',
         minHeight: 64,
         display: 'flex',
         alignItems: 'center',
@@ -74,17 +66,31 @@ const Header = () => {
     >
       {/* Logo & Dashboard */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        {/* Hamburger button for mobile */}
+        <button
+          onClick={onToggleSidebar}
+          className="d-lg-none btn btn-link p-2"
+          style={{ 
+            border: 'none', 
+            background: 'none',
+            color: '#3b82f6',
+            fontSize: '20px'
+          }}
+        >
+          <FaBars />
+        </button>
+        
         <Link to="/admin/dashboard" style={{
           display: 'flex',
           alignItems: 'center',
           fontWeight: 700,
-          fontSize: 22,
+          fontSize: 'clamp(16px, 4vw, 22px)',
           color: '#3b82f6',
           textDecoration: 'none',
           letterSpacing: 1
         }}>
-          <FaBars style={{ marginRight: 10, fontSize: 22 }} />
-          Dashboard
+          <FaBars className="d-none d-lg-inline" style={{ marginRight: 10, fontSize: 22 }} />
+          <span className="d-none d-sm-inline">Dashboard</span>
         </Link>
       </div>
 
@@ -200,26 +206,70 @@ const Header = () => {
           <button
             onClick={() => toggleDropdown('user')}
             className={`admin-header-btn${activeDropdown === 'user' ? ' active' : ''}`}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center' }}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer', 
+              padding: 8, 
+              borderRadius: 8, 
+              display: 'flex', 
+              alignItems: 'center' 
+            }}
             aria-label="User menu"
           >
             {profile?.avatar ? (
-              <img src={profile.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+              <img 
+                src={profile.avatar} 
+                alt="avatar" 
+                style={{ 
+                  width: 32, 
+                  height: 32, 
+                  borderRadius: '50%', 
+                  objectFit: 'cover', 
+                  marginRight: 8 
+                }} 
+              />
             ) : (
               <FaUserCircle size={28} style={{ marginRight: 8, color: '#3b82f6' }} />
             )}
-            <span style={{ fontWeight: 600, color: '#222', fontSize: 15 }}>{profile?.username || 'Admin'}</span>
-            {activeDropdown === 'user' ? <FaChevronUp size={12} style={{ marginLeft: 6 }} /> : <FaChevronDown size={12} style={{ marginLeft: 6 }} />}
+            <span 
+              className="d-none d-md-inline"
+              style={{ 
+                fontWeight: 600, 
+                color: '#222', 
+                fontSize: 15 
+              }}
+            >
+              {profile?.username || 'Admin'}
+            </span>
+            {activeDropdown === 'user' ? 
+              <FaChevronUp size={12} style={{ marginLeft: 6 }} /> : 
+              <FaChevronDown size={12} style={{ marginLeft: 6 }} />
+            }
           </button>
+          
           {activeDropdown === 'user' && (
             <ul className="admin-header-dropdown" style={{ minWidth: 180 }}>
               <li className="px-3 py-2 d-flex align-items-center">
                 {profile?.avatar ? (
-                  <img src={profile.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+                  <img 
+                    src={profile.avatar} 
+                    alt="avatar" 
+                    style={{ 
+                      width: 36, 
+                      height: 36, 
+                      borderRadius: '50%', 
+                      objectFit: 'cover', 
+                      marginRight: 10 
+                    }} 
+                  />
                 ) : (
                   <FaUserCircle size={32} style={{ marginRight: 10, color: '#3b82f6' }} />
                 )}
-                <div><h6 className="mb-0">{profile?.username || 'Admin'}</h6><small className="text-muted">Admin</small></div>
+                <div>
+                  <h6 className="mb-0">{profile?.username || 'Admin'}</h6>
+                  <small className="text-muted">Admin</small>
+                </div>
               </li>
               <li><hr className="dropdown-divider" /></li>
               <li>
@@ -227,15 +277,37 @@ const Header = () => {
                   <FaUser className="me-2" /> My Profile
                 </Link>
               </li>
-              
               <li><hr className="dropdown-divider" /></li>
-              <li><button className="dropdown-item" onClick={handleLogout} style={{ color: '#fff', background: '#f43f5e', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '10px 18px', border: 'none', margin: 8, boxShadow: '0 2px 8px rgba(244,63,94,0.08)', transition: 'background 0.15s' }} onMouseOver={e => e.target.style.background = '#dc2626'} onMouseOut={e => e.target.style.background = '#f43f5e'}><FaSignOutAlt /> Đăng xuất</button></li>
+              <li>
+                <button 
+                  className="dropdown-item" 
+                  onClick={handleLogout} 
+                  style={{ 
+                    color: '#fff', 
+                    background: '#f43f5e', 
+                    fontWeight: 700, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 8, 
+                    borderRadius: 8, 
+                    padding: '10px 18px', 
+                    border: 'none', 
+                    margin: 8, 
+                    boxShadow: '0 2px 8px rgba(244,63,94,0.08)', 
+                    transition: 'background 0.15s' 
+                  }} 
+                  onMouseOver={e => e.target.style.background = '#dc2626'} 
+                  onMouseOut={e => e.target.style.background = '#f43f5e'}
+                >
+                  <FaSignOutAlt /> Đăng xuất
+                </button>
+              </li>
             </ul>
           )}
         </div>
       </div>
 
-      {/* Custom styles for dropdown */}
+      {/* Custom styles */}
       <style>{`
         .admin-header-btn:hover, .admin-header-btn.active {
           background: #f3f6fa;
@@ -267,15 +339,14 @@ const Header = () => {
           gap: 10px;
           padding: 10px 18px;
         }
-        @media (max-width: 700px) {
-          nav.admin-header-nav {
-            flex-direction: column;
-            padding: 0 8px;
-            min-height: unset;
+        @media (max-width: 768px) {
+          .admin-header-nav {
+            padding: 0 12px;
           }
           .admin-header-dropdown {
-            right: unset;
-            left: 0;
+            right: 0;
+            left: auto;
+            min-width: 200px;
           }
         }
         @keyframes fadeIn {

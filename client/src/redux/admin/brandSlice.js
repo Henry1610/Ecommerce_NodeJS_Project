@@ -53,14 +53,11 @@ export const fetchBrandById = createAsyncThunk(
 // Add new brand
 export const addBrand = createAsyncThunk(
     'brands/addBrand',
-    async ({ name, description }, thunkAPI) => {
+    async (formData, thunkAPI) => {
         try {
             const res = await fetchWithAuth(API_BASE, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name, description })
+                body: formData
             }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
@@ -82,10 +79,7 @@ export const updateBrand = createAsyncThunk(
         try {
             const res = await fetchWithAuth(`${API_BASE}/${brandId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
+                body: formData
             }, thunkAPI.getState, thunkAPI.dispatch);
             const data = await res.json();
             if (!res.ok) {
@@ -179,7 +173,9 @@ const brandSlice = createSlice({
             })
             .addCase(addBrand.fulfilled, (state, action) => {
                 state.loading = false;
-                state.brands.push(action.payload);
+                if (action.payload?.brand) {
+                    state.brands.push(action.payload.brand);
+                }
             })
             .addCase(addBrand.rejected, (state, action) => {
                 state.loading = false;
@@ -193,12 +189,13 @@ const brandSlice = createSlice({
             })
             .addCase(updateBrand.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.brands.findIndex(brand => brand._id === action.payload._id);
+                const updated = action.payload?.brand || action.payload;
+                const index = state.brands.findIndex(brand => brand._id === updated._id);
                 if (index !== -1) {
-                    state.brands[index] = action.payload;
+                    state.brands[index] = updated;
                 }
-                if (state.brand && state.brand._id === action.payload._id) {
-                    state.brand = action.payload;
+                if (state.brand && state.brand._id === updated._id) {
+                    state.brand = updated;
                 }
             })
             .addCase(updateBrand.rejected, (state, action) => {

@@ -173,7 +173,7 @@ const AddProduct = () => {
     return (
         <div className="container-fluid py-4">
             <div className="row justify-content-center">
-                <div className="col-12 col-lg-10 col-xl-9">
+                <div className="col-12 ">
                     <div className="mb-4">
                         <h4 className="fw-bold mb-1 text-white" style={{ fontSize: 24 }}>Thêm sản phẩm mới</h4>
                         <h6 className="text-muted mb-0">Tạo sản phẩm cho cửa hàng</h6>

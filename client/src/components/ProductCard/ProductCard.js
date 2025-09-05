@@ -1,3 +1,4 @@
+
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux"
@@ -37,6 +38,13 @@ function ProductCard({ product, compareEnabled }) {
     };
 
     const handleAddToCart = async ({ productId, quantity }) => {
+        // Kiểm tra đăng nhập trước
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+            navigate('/login');
+            return;
+        }
+
         setIsLoading(true);
         const newTotal = totalPrice + discountPrice * quantity;
 
@@ -57,6 +65,13 @@ function ProductCard({ product, compareEnabled }) {
     };
 
     const handleQuickBuy = () => {
+        // Kiểm tra đăng nhập trước
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để mua hàng!');
+            navigate('/login');
+            return;
+        }
+        
         handleAddToCart({ productId: product._id, quantity: 1 });
         setTimeout(() => {
             navigate('/cart');
@@ -66,6 +81,7 @@ function ProductCard({ product, compareEnabled }) {
     const handleWishlistToggle = () => {
         if (!token) {
             toast.error('Vui lòng đăng nhập để sử dụng tính năng này');
+            navigate('/login');
             return;
         }
 

@@ -1,5 +1,6 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import publicRoutes from './routes/PublicRoutes';
 import userRoutes from './routes/UserRoutes';
 import adminRoutes from './routes/AdminRoutes';
@@ -10,10 +11,27 @@ import ErrorPage from './components/ErrorPage';
 import ForbiddenPage from './components/ForbiddenPage';
 import AppInitializer from './components/AppInitializer';
 
+
+// Component để handle scroll to top
+function ScrollToTop() {
+  const location = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' // Scroll ngay lập tức
+    });
+  }, [location.pathname]);
+  
+  return null;
+}
+
 function App() {
   return (
     <AppInitializer>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public Routes */}
           {publicRoutes.map((route, index) => {

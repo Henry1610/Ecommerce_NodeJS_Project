@@ -9,17 +9,17 @@ const API_BASE = process.env.REACT_APP_SERVER_URL;
 
 function AdminLayout({ children }) {
     const [dashboardData, setDashboardData] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const state = useSelector(state => state); // Lấy Redux state
+    const state = useSelector(state => state);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Sử dụng fetchWithAuth với getState function
                 const res = await fetchWithAuth(`${API_BASE}/api/admin/dashboard`, {
                     method: 'GET'
-                }, () => state, dispatch); // Truyền function trả về state
+                }, () => state, dispatch);
                 
                 if (!res.ok) {
                     const errorData = await res.json();
@@ -43,21 +43,21 @@ function AdminLayout({ children }) {
     
     return (
         <div className="container-fluid">
-            <div className="row">
-                <div className="col-md-12 ms-sm-auto ">
-                    <Header />
+            <div className="row g-0">
+                <div className="col-md-12 ms-sm-auto">
+                    <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                 </div>
                 <div className="row">
-                    <div className="col-md-3 ">
-                        <Sidebar />
+                    <div className="col-md-3">
+                        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
                     </div>
                     <div className="col-md-9">
                         {children}
                     </div>
-                </div >
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default AdminLayout;
