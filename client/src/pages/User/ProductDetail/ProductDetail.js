@@ -423,9 +423,9 @@ function ProductInfo({
                 .catch(() => setRelatedProducts([]));
         }
     }, [product]);
-    
+
     return (
-        <div className="px-3 px-lg-5"> 
+        <div className="px-3 px-lg-5">
 
             {/* Header desktop only (ẩn trên mobile để tránh trùng với header phía trên ảnh) */}
             <div className="d-none d-lg-block">
@@ -452,7 +452,7 @@ function ProductInfo({
                     onDecrease={onDecreaseQuantity}
                     onChange={onQuantityChange}
                 />
-                
+
                 <div className="d-block d-lg-none">
                     <CommitmentSection />
                     <AttributesSection />
@@ -475,13 +475,14 @@ function ProductInfo({
             {relatedProducts.length > 0 && (
                 <div className="mt-5">
                     <h3 className="fw-bold mb-3">Sản phẩm cùng danh mục</h3>
-                    <div className="row g-3"> 
+                    <div className="row g-3">
                         {relatedProducts.map(product => (
-                            <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-6 col-xl-4">
+                            <div key={product._id} className="col-12 related-product-item">
                                 <RelatedProductItem product={product} />
                             </div>
                         ))}
                     </div>
+
                 </div>
             )}
         </div>

@@ -17,6 +17,14 @@
   .product-main-img {
     max-height: clamp(220px, 50vw, 440px); 
   }
+  .related-product-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .related-product-item:hover {
+    transform: translateY(-5px) scale(1.02);
+  }
   
   @keyframes scroll-left {
     0% {
