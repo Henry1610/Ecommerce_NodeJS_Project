@@ -16,6 +16,9 @@ body {
     color: #4b5563;
     line-height: 1.2;
   }
+  .hover-bg-light:hover {
+    background-color: var(--bs-light);
+  }
   
   @media (min-width: 576px) {
     .category-text {

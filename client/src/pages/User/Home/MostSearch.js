@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import './MostSearch.css';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -19,11 +20,11 @@ function MostSearch() {
     }, []);
 
     return (
-        <div className="py-5 text-center">
-            <h1 className="h3 fw-bold mb-4 d-flex justify-content-center align-items-center gap-2">
+        <div className="most-search-container text-center">
+            <h1 className="most-search-title fw-bold d-flex justify-content-center align-items-center gap-2">
                 <span>Tìm kiếm nhiều nhất</span>
             </h1>
-            <div className="d-flex flex-wrap justify-content-center gap-3">
+            <div className="d-flex flex-wrap justify-content-center most-search-buttons">
                 {loading ? (
                     <span>Đang tải...</span>
                 ) : products.length > 0 ? (
@@ -31,7 +32,7 @@ function MostSearch() {
                         <Link
                             key={index}
                             to={`/product/${product.slug}`}
-                            className="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-decoration-none"
+                            className="most-search-button btn rounded-pill fw-semibold text-decoration-none"
                             style={{
                                 backgroundColor: '#f3f4f6',
                                 color: '#1f2937',

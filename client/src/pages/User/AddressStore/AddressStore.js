@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './AddressStore.css';
 const stores = [
   {
     city: 'Thành phố Hồ Chí Minh',
@@ -12,7 +13,7 @@ const stores = [
         map: '#',
       },
       {
-        image: 'https://pendecor.vn/uploads/files/2024/01/28/thiet-ke-showroom-dien-may-5.jpg',
+        image: 'https://imagor.owtg.one/unsafe/fit-in/832x468/https://thinkpro.vn/stores/tran-thien-chanh-1.jpg',
         address: '18 Nguyễn Thị Minh Khai, Phường Đa Kao, Quận 1',
         time: '09:00 - 21:00',
         status: 'Đóng cửa',
@@ -65,11 +66,12 @@ const AddressStore = () => {
                     </div>
                     <a
                       href={loc.map}
-                      className="btn btn-outline-dark w-100 mt-2 d-flex align-items-center justify-content-center gap-2"
+                      className="btn btn-outline-dark w-100 mt-2 d-flex align-items-center justify-content-center gap-2 custom-hover"
                       style={{ borderRadius: 16, fontWeight: 600 }}
                     >
                       <i className="fas fa-map-marker-alt"></i> Chỉ đường
                     </a>
+
                   </div>
                 </div>
               </div>

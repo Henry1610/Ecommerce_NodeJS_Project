@@ -166,7 +166,7 @@ function ProductDetail() {
     }
 
     return (
-        <div className="container-fluid px-3 px-lg-5 py-5">
+        <div className="container-fluid px-3 px-lg-5 pb-5">
             <div className="row g-4">
                 {/* Header mobile only */}
                 <div className="col-12 d-lg-none order-1">
@@ -425,7 +425,7 @@ function ProductInfo({
     }, [product]);
 
     return (
-        <div className="px-3 px-lg-5">
+        <div className=" px-lg-5">
 
             {/* Header desktop only (ẩn trên mobile để tránh trùng với header phía trên ảnh) */}
             <div className="d-none d-lg-block">
@@ -436,22 +436,19 @@ function ProductInfo({
                 {/* PurchaseBox mobile: đặt lên đầu phần thông tin, ngay dưới ảnh */}
                 <div className="d-block d-lg-none mb-3 d-flex justify-content-center">
                     <PurchaseBox
+                        product={product}
                         originalPrice={originalPrice}
                         discountPrice={discountPrice}
                         discountPercent={product.discountPercent}
                         onAddToCart={onAddToCart}
                         onWishlistToggle={onWishlistToggle}
                         isInWishlist={isInWishlist}
+                        quantity={quantity}
+                        onIncreaseQuantity={onIncreaseQuantity}
+                        onDecreaseQuantity={onDecreaseQuantity}
+                        onQuantityChange={onQuantityChange}
                     />
                 </div>
-
-                <ProductOptions />
-                <QuantitySelector
-                    quantity={quantity}
-                    onIncrease={onIncreaseQuantity}
-                    onDecrease={onDecreaseQuantity}
-                    onChange={onQuantityChange}
-                />
 
                 <div className="d-block d-lg-none">
                     <CommitmentSection />
@@ -461,12 +458,17 @@ function ProductInfo({
                 {/* PurchaseBox desktop only (giữ nguyên thiết kế desktop) */}
                 <div className="d-none d-lg-block">
                     <PurchaseBox
+                        product={product}
                         originalPrice={originalPrice}
                         discountPrice={discountPrice}
                         discountPercent={product.discountPercent}
                         onAddToCart={onAddToCart}
                         onWishlistToggle={onWishlistToggle}
                         isInWishlist={isInWishlist}
+                        quantity={quantity}
+                        onIncreaseQuantity={onIncreaseQuantity}
+                        onDecreaseQuantity={onDecreaseQuantity}
+                        onQuantityChange={onQuantityChange}
                     />
                 </div>
             </div>
@@ -520,37 +522,13 @@ function ProductHeader({ product }) {
     );
 }
 
-function ProductOptions() {
-    return (
-        <>
-            <div className="mb-3">
-                <p className="fw-semibold mb-2">Màu</p>
-                <button className="btn btn-outline-info btn-sm rounded-pill px-3 py-1 fw-semibold shadow-sm">
-                    Lunar Gray
-                </button>
-            </div>
-            <div className="mb-3">
-                <p className="fw-semibold mb-2">Loại hàng</p>
-                <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-outline-info btn-sm rounded-pill px-3 py-1 fw-semibold shadow-sm">
-                        Mới, Sealed, Nhập khẩu
-                    </button>
-                    <button className="btn btn-outline-info btn-sm rounded-pill px-3 py-1 fw-semibold shadow-sm">
-                        Mới, Full box, Nhập khẩu
-                    </button>
-                </div>
-            </div>
-        </>
-    );
-}
-
 function QuantitySelector({ quantity, onIncrease, onDecrease, onChange }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e7ef', borderRadius: 20, background: '#fff', height: 36, width: 120, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: 36, width: 150, overflow: 'hidden', gap: 1 }}>
             <button
                 className="btn btn-outline-info rounded-0 border-0 p-0 d-flex align-items-center justify-content-center"
                 type="button"
-                style={{ width: 36, height: 36, fontSize: 18, borderRadius: 0, background: 'transparent', transition: 'background 0.2s' }}
+                style={{ width: 25, height: 25, fontSize: 18, borderRadius: 12, background: 'transparent', transition: 'background 0.2s' }}
                 onClick={onDecrease}
                 onMouseEnter={e => e.currentTarget.style.background = '#e0f7fa'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -563,12 +541,12 @@ function QuantitySelector({ quantity, onIncrease, onDecrease, onChange }) {
                 value={quantity}
                 min="1"
                 onChange={onChange}
-                style={{ width: 48, height: 36, fontSize: 16, padding: 0, border: 'none', boxShadow: 'none', outline: 'none' }}
+                style={{ width: 54, height: 32, fontSize: 16, padding: 0, border: 'none', boxShadow: 'none', outline: 'none' }}
             />
             <button
                 className="btn btn-outline-info rounded-0 border-0 p-0 d-flex align-items-center justify-content-center"
                 type="button"
-                style={{ width: 36, height: 36, fontSize: 18, borderRadius: 0, background: 'transparent', transition: 'background 0.2s' }}
+                style={{ width: 25, height: 25, fontSize: 18, borderRadius: 12, background: 'transparent', transition: 'background 0.2s' }}
                 onClick={onIncrease}
                 onMouseEnter={e => e.currentTarget.style.background = '#e0f7fa'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -579,59 +557,103 @@ function QuantitySelector({ quantity, onIncrease, onDecrease, onChange }) {
     );
 }
 
-function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCart, onWishlistToggle, isInWishlist }) {
-    return (
-        <div className="d-flex flex-column align-items-center shadow rounded-4 overflow-hidden p-2"
-            style={{ maxWidth: '320px', backgroundColor: '#fff', marginTop: 16 }}>
-            <div className="flex-grow-1 w-100 text-center">
-                <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
-                    <span className="fw-bold fs-3" style={{ color: '#e91e63' }}>
-                        {discountPrice?.toLocaleString('vi-VN')}đ
-                    </span>
-                    {discountPercent > 0 && (
-                        <span className="text-muted text-decoration-line-through small" style={{ fontSize: '1rem' }}>
-                            {originalPrice?.toLocaleString('vi-VN')}đ
-                        </span>
-                    )}
-                    {discountPercent > 0 && (
-                        <span className="badge rounded-pill text-white px-2 py-1"
-                            style={{ backgroundColor: '#e91e63', fontSize: 12 }}>
-                            -{discountPercent}%
-                        </span>
-                    )}
-                </div>
-                <div className="d-flex gap-2 justify-content-center">
-                    <button
-                        className="fw-bold text-white d-flex align-items-center justify-content-center gap-2"
-                        style={{
-                            background: 'linear-gradient(90deg, #00e5ff 0%, #2563eb 100%)',
-                            borderRadius: '22px',
-                            minWidth: 90,
-                            height: 44,
-                            fontSize: 15,
-                            boxShadow: '0 2px 8px rgba(0,229,255,0.10)',
-                            transition: 'all 0.2s',
-                            padding: '0 11px',
-                            border: 'none'   // thêm dòng này để chắc chắn không có viền
-                        }}
-                        onClick={onAddToCart}
-                        title="Thêm vào giỏ"
-                        onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.08)'}
-                        onMouseLeave={e => e.currentTarget.style.filter = 'none'}
-                    >
-                        <i className="fas fa-shopping-bag"></i>
-                        Thêm vào giỏ
-                    </button>
+function PurchaseBox({
+    product,
+    originalPrice,
+    discountPrice,
+    discountPercent,
+    onAddToCart,
+    onWishlistToggle,
+    isInWishlist,
+    quantity,
+    onIncreaseQuantity,
+    onDecreaseQuantity,
+    onQuantityChange
+}) {
+    const stockLabel = product?.stock > 0 ? 'Còn hàng tại kho' : 'Tạm hết hàng';
+    const stockColor = product?.stock > 0 ? '#dark' : '#ef4444';
 
-                    <button
-                        className={`btn d-flex align-items-center justify-content-center ${isInWishlist ? 'btn-danger' : 'btn-outline-danger'}`}
-                        style={{ borderRadius: '22px', width: 44, height: 44, fontSize: 15, transition: 'all 0.2s' }}
-                        onClick={onWishlistToggle}
-                        title={isInWishlist ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
-                    >
-                        <i className={`fas fa-heart ${isInWishlist ? 'text-white' : ''}`}></i>
-                    </button>
+    const infoHighlights = [
+        { icon: 'fa-truck-fast', label: 'Giao nhanh 2h nội thành' },
+        { icon: 'fa-shield-heart', label: 'Bảo hành chính hãng 12T' },
+        { icon: 'fa-rotate-left', label: 'Đổi trả trong 7 ngày' },
+    ];
+
+    return (
+        <div className="w-100" style={{ maxWidth: 360 }}>
+            <div
+                className="rounded-4 p-3 text-white text-center"
+                style={{
+                    background: 'linear-gradient(120deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)',
+                    boxShadow: '0 15px 30px rgba(26,42,108,0.25)'
+                }}
+            >
+                <div className="d-flex flex-column">
+                    <span className="text-uppercase small fw-semibold opacity-75">Giá ưu đãi</span>
+                    <span className="fw-bold display-6 mb-1">{discountPrice?.toLocaleString('vi-VN')}đ</span>
+                    {discountPercent > 0 && (
+                        <div className="d-flex flex-wrap gap-2 justify-content-center align-items-center">
+                            <span className="text-white-50 text-decoration-line-through">
+                                {originalPrice?.toLocaleString('vi-VN')}đ
+                            </span>
+                            <span className="badge bg-white text-danger rounded-pill px-3 py-2">
+                                -{discountPercent}%
+                            </span>
+                        </div>
+                    )}
                 </div>
+            </div>
+
+            <div className="bg-white rounded-4 shadow-sm p-3 mt-n3 position-relative" style={{ zIndex: 1 }}>
+                <div className="d-flex align-items-center justify-content-between border rounded-4 px-3 py-2 mb-3">
+                    <div className="d-flex flex-column text-start">
+                        <span className="fw-semibold" style={{ color: stockColor }}>{stockLabel}</span>
+                        <small className="text-muted">
+                            {product?.stock > 0 ? 'Sẵn sàng giao ngay' : 'Liên hệ để nhận thông báo'}
+                        </small>
+                    </div>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center"
+                        style={{ width: 42, height: 42, backgroundColor: '#f0fdf4', color: stockColor }}>
+                        <i className="fas fa-box-open"></i>
+                    </div>
+                </div>
+
+                <div className="rounded-4 border mb-3 p-2 bg-light">
+                    <div className="d-flex flex-column flex-sm-row align-items-center gap-2">
+                        <QuantitySelector
+                            quantity={quantity}
+                            onIncrease={onIncreaseQuantity}
+                            onDecrease={onDecreaseQuantity}
+                            onChange={onQuantityChange}
+                        />
+                        <button
+                            className="btn btn-info text-white fw-bold w-100 w-sm-auto py-2 d-flex align-items-center justify-content-center gap-2"
+                            style={{ borderRadius: 12, fontSize: '0.95rem' }}
+                            onClick={onAddToCart}
+                        >
+                            <i className="fas fa-cart-plus"></i>
+                            Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+
+                <div className="d-flex gap-2 flex-wrap mb-3">
+                    {infoHighlights.map((item, index) => (
+                        <div key={index} className="d-flex align-items-center gap-2 px-2 py-1 rounded-3 bg-light flex-grow-1">
+                            <i className={`fas ${item.icon} text-info`}></i>
+                            <span className="small text-muted">{item.label}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <button
+                    className={`btn w-100 fw-semibold py-3 d-flex align-items-center justify-content-center gap-2 ${isInWishlist ? 'btn-outline-danger' : 'btn-outline-secondary'}`}
+                    style={{ borderRadius: 14 }}
+                    onClick={onWishlistToggle}
+                >
+                    <i className={`fas fa-heart ${isInWishlist ? 'text-danger' : ''}`}></i>
+                    {isInWishlist ? 'Đã trong danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+                </button>
             </div>
         </div>
     );
@@ -639,8 +661,8 @@ function PurchaseBox({ originalPrice, discountPrice, discountPercent, onAddToCar
 
 function ProductReviews({ reviews, averageRating, stats, selectedRating, onRatingFilter }) {
     return (
-        <div className="py-4">
-            <h2 className="fw-bold mb-4">Đánh giá sản phẩm</h2>
+        <div className="">
+            <h2 className="fw-bold">Đánh giá sản phẩm</h2>
             <ReviewStats
                 averageRating={averageRating}
                 stats={stats}
@@ -652,45 +674,83 @@ function ProductReviews({ reviews, averageRating, stats, selectedRating, onRatin
     );
 }
 
-function ReviewStats({ averageRating, stats, selectedRating, onRatingFilter }) {
-    return (
-        <section className="bg-light p-4 rounded mb-5">
-            <div className="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
-                <div className="d-flex align-items-center gap-2">
-                    <span className="fs-3 fw-semibold text-info">{averageRating}</span>
-                    <span className="text-info small">trên 5</span>
-                </div>
-                <div className="star-rating d-flex gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <i
-                            key={i}
-                            className={`fas ${i <= Math.floor(averageRating)
-                                ? 'fa-star'
-                                : i - averageRating <= 0.5
-                                    ? 'fa-star-half-alt'
-                                    : 'fa-star text-muted'
-                                } text-warning`}
-                        ></i>
-                    ))}
-                </div>
-            </div>
+function ReviewStats({ averageRating, stats = {}, selectedRating, onRatingFilter }) {
+    const totalReviews = Object.values(stats).reduce((sum, count) => sum + (count || 0), 0);
+    const ratingBars = [5, 4, 3, 2, 1];
 
-            <div className="d-flex flex-wrap gap-2 mt-4">
-                <button
-                    className={`btn btn-sm fw-semibold ${selectedRating === null ? 'btn-info' : 'btn-outline-info'}`}
-                    onClick={() => onRatingFilter(null)}
-                >
-                    Tất Cả
-                </button>
-                {[5, 4, 3, 2, 1].map((star) => (
-                    <button
-                        key={star}
-                        className={`btn btn-sm fw-semibold ${selectedRating === star ? 'btn-info' : 'btn-outline-secondary'}`}
-                        onClick={() => onRatingFilter(star)}
-                    >
-                        {star} Sao ({stats[star]})
-                    </button>
-                ))}
+    const renderProgressWidth = (star) => {
+        if (!totalReviews) return 0;
+        return Math.round(((stats[star] || 0) / totalReviews) * 100);
+    };
+
+    return (
+        <section className="bg-white border rounded-4 p-4 p-lg-5 shadow-sm">
+            <div className="row g-4 align-items-center text-center">
+                <div className="col-12 col-lg-4 d-flex flex-column align-items-center align-items-lg-start text-center text-lg-start gap-2">
+                    <span className="fw-semibold text-muted text-uppercase small">Điểm đánh giá</span>
+                    <div className="d-flex align-items-baseline gap-1">
+                        <span className="display-5 fw-bold text-dark">{averageRating}</span>
+                        <span className="fs-4 text-secondary">/5</span>
+                    </div>
+                    <p className="text-muted mb-1">{totalReviews} lượt đánh giá</p>
+                    <div className="d-flex gap-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <i
+                                key={i}
+                                className={`fas ${i <= Math.floor(averageRating)
+                                    ? 'fa-star'
+                                    : i - averageRating <= 0.5
+                                        ? 'fa-star-half-alt'
+                                        : 'fa-star'
+                                    } ${i - averageRating > 0.5 ? 'text-secondary' : 'text-warning'}`}
+                            ></i>
+                        ))}
+                    </div>
+                    <div className="d-flex flex-column flex-sm-row gap-2 w-100 mt-2">
+                        <button className="btn btn-info fw-semibold rounded-pill flex-fill text-white">
+                            Đánh giá sản phẩm
+                        </button>
+                     
+                    </div>
+                </div>
+
+                <div className="col-12 col-lg-8">
+                    {ratingBars.map((star) => (
+                        <div key={star} className="d-flex align-items-center gap-3 mb-2">
+                            <div className="d-flex align-items-center gap-1" style={{ width: 32 }}>
+                                <span className="fw-semibold">{star}</span>
+                                <i className="fas fa-star text-warning small"></i>
+                            </div>
+                            <div className="flex-grow-1 bg-light rounded-pill overflow-hidden" style={{ height: 12 }}>
+                                <div
+                                    className="h-100 bg-info rounded-pill"
+                                    style={{ width: `${renderProgressWidth(star)}%`, transition: 'width 0.3s ease' }}
+                                ></div>
+                            </div>
+                            <span className="text-muted" style={{ width: 24, textAlign: 'right' }}>
+                                {stats[star] || 0}
+                            </span>
+                        </div>
+                    ))}
+
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                        <button
+                            className={`btn btn-sm fw-semibold ${selectedRating === null ? 'btn-info text-white' : 'btn-outline-info'}`}
+                            onClick={() => onRatingFilter(null)}
+                        >
+                            Tất Cả
+                        </button>
+                        {ratingBars.map((star) => (
+                            <button
+                                key={`filter-${star}`}
+                                className={`btn btn-sm fw-semibold ${selectedRating === star ? 'btn-info text-white' : 'btn-outline-secondary'}`}
+                                onClick={() => onRatingFilter(star)}
+                            >
+                                {star} Sao ({stats[star] || 0})
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </section>
     );
@@ -735,7 +795,7 @@ function ReviewItem({ review }) {
 
 
     return (
-        <div className="position-relative ps-4 pb-4 mt-3">
+        <div className="position-relative ps-4 mt-3">
             {review.adminResponse?.responseContent && (
                 <>
                     {/* Đường thẳng dọc */}

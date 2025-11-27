@@ -143,7 +143,7 @@ function Header() {
                         </button>
                     </div>
 
-                    <div
+                    {/* <div
                         style={{
                             padding: '0.25rem 0.5rem',
                             borderRadius: '0.75rem',
@@ -160,78 +160,77 @@ function Header() {
                             <i className="far fa-newspaper small"></i>
                             <span>Tin tức</span>
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
             </div>
 
-            <header className="d-flex justify-content-between align-items-center px-4 py-3 ">
-                <div className="d-flex align-items-center gap-2">
+            <header className="d-flex justify-content-between align-items-center py-3 gap-2">
+                <div className="d-flex align-items-center gap-1">
                     <Link to='/' className=" fw-bold text-decoration-none text-reset" style={{ fontSize: "32px", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
-                        <img src="/assets/logo/Logo.png" alt="logo" style={{ width: '60px', height: 'auto' }} />
+                        <img src="/assets/logo/Logo.png" alt="logo" className="img-fluid" style={{ maxWidth: '60px' }} />
                     </Link>
-                    <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
+                    <Link to="/product" className="d-flex align-items-center text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
                         <button className="btn d-lg-none p-0 text-secondary" aria-label="Menu">
                             <i className="fas fa-bars fs-4"></i>
                         </button>
                     </Link>
 
-                    <nav className="d-none d-lg-flex align-items-center gap-4 text-secondary fw-semibold user-select-none" >
-                        <Link to="/product" className="d-flex align-items-center gap-1  text-secondary hover-black fs-5 gap-3 text-decoration-none text-reset">
+                    <nav className="d-none d-lg-flex align-items-center fw-semibold user-select-none mr-3">
+                        <Link
+                            to="/product"
+                            className="d-flex align-items-center gap-3 text-secondary fs-5 text-decoration-none text-reset p-2 rounded hover-bg-light"
+                        >
                             <i className="fas fa-bars"></i>
-                            <span>Sản phẩm</span>
                         </Link>
                     </nav>
-                    <div className="position-relative d-none d-md-block" style={{ width: "320px", maxWidth: "100%" }}>
-                        <form
-                            className="d-flex align-items-center border border-info bg-white rounded-pill px-3 py-1 shadow-sm"
-                            onSubmit={handleSearch}
-                        >
-                            <i className="fas fa-search text-info fs-5"></i>
-                            <input
-                                type="search"
-                                placeholder="Xin chào, bạn đang tìm gì?"
-                                className="form-control border-0 bg-transparent ms-2 p-0 py-2"
-                                style={{
-                                    color: "#0e7490",
-                                    fontSize: "0.875rem",
-                                    outline: "none",
-                                    boxShadow: "none",
-                                }}
-                                value={keyword}
-                                onChange={handleChangeKeyword}
-                            />
-                        </form>
-
-                        {productSuggestions.length > 0 && (
-                            <ul
-                                className="list-group position-absolute z-3 bg-white w-100 shadow rounded mt-1"
-                                style={{ top: "100%", left: 0, maxHeight: "300px", overflowY: "auto" }}
-                            >
-                                {productSuggestions.map(product => (
-                                    <li
-                                        key={product._id}
-                                        className="list-group-item list-group-item-action"
-                                        onClick={() => {
-                                            navigate(`/product/${product.slug}`);
-                                            dispatch(resetSuggestions());
-                                        }}
-                                        style={{
-                                            cursor: 'pointer',
-                                            fontSize: "0.875rem"
-                                        }}
-                                    >
-                                        {product.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-
-
-
                 </div>
-                <div className="d-flex align-items-center gap-3 text-secondary fw-semibold user-select-none">
+                <div className="position-relative w-100" style={{ maxWidth: "450px" }}>
+                    <form
+                        className="d-flex align-items-center border border-info bg-white rounded-pill px-3 py-1 shadow-sm"
+                        onSubmit={handleSearch}
+                    >
+                        <i className="fas fa-search text-info fs-5"></i>
+                        <input
+                            type="search"
+                            placeholder="Xin chào, bạn đang tìm gì?"
+                            className="form-control border-0 bg-transparent"
+                            style={{
+                                color: "#0e7490",
+                                fontSize: "0.875rem",
+                                outline: "none",
+                                boxShadow: "none",
+                            }}
+                            value={keyword}
+                            onChange={handleChangeKeyword}
+                        />
+                    </form>
+
+                    {productSuggestions.length > 0 && (
+                        <ul
+                            className="list-group position-absolute z-3 bg-white w-100 shadow rounded mt-1"
+                            style={{ top: "100%", left: 0, maxHeight: "300px", overflowY: "auto" }}
+                        >
+                            {productSuggestions.map(product => (
+                                <li
+                                    key={product._id}
+                                    className="list-group-item list-group-item-action"
+                                    onClick={() => {
+                                        navigate(`/product/${product.slug}`);
+                                        dispatch(resetSuggestions());
+                                    }}
+                                    style={{
+                                        cursor: 'pointer',
+                                        fontSize: "0.875rem"
+                                    }}
+                                >
+                                    {product.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+                <div className="d-flex align-items-center gap-3 text-secondary fw-semibold user-select-none ">
                     {isAuthenticated ? (
                         <>
                             <div className="bg-info d-flex align-items-center gap-4 px-3 py-2 rounded-4 shadow">
@@ -338,13 +337,12 @@ function Header() {
 
                         </>
                     ) : (
-                        <Link to="/login" className="text-decoration-none">
+                        <Link to="/login" className="text-decoration-none shadow-sm rounded-5">
                             <button
-                                className="btn btn-login d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm"
-                                type="button"
+                                className="btn btn-login d-flex align-items-center gap-2 rounded-pill px-3 py-2 "
                             >
                                 <i className="fa-solid fa-right-to-bracket"></i>
-                                <span className="fw-semibold">Đăng nhập</span>
+                                <span className="fw-semibold d-none d-sm-inline">Đăng nhập</span>
                             </button>
                         </Link>
 
