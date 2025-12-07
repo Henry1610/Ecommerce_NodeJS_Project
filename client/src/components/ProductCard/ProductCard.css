@@ -7,6 +7,17 @@
     transition: all 0.3s ease;
 }
 
+.product-card-container:hover {
+    transform: translateY(-8px);
+}
+
+.product-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: white;
+    position: relative;
+}
+
 /* Badge container */
 .discount-badge-container {
     z-index: 2;
@@ -83,7 +94,11 @@
 /* Price container */
 .price-container {
     min-height: 45px;
-    margin-bottom: 10px;
+}
+
+.original-price-container {
+    height: 16px;
+    margin-top: 2px;
 }
 
 /* Installment badge */
@@ -96,12 +111,15 @@
 /* Button styles */
 .btn-add-to-cart {
     background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
     color: white;
+    border-radius: 10px;
     transition: all 0.2s ease;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
 .btn-add-to-cart:hover:not(:disabled) {
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 

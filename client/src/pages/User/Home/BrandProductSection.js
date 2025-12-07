@@ -5,8 +5,6 @@ import ProductCard from '../../../components/ProductCard/ProductCard';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 import axios from 'axios';
 import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 
 const SWIPER_CONFIG = {
     spaceBetween: 10,

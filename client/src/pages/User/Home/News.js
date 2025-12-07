@@ -3,9 +3,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { fetchNews } from "../../../untils/fetchNews";
 import { NewsSection } from "./NewsSection";
 import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
 import './News.css'; // thêm file css riêng cho responsive
 
 function News() {
@@ -22,8 +19,6 @@ function News() {
     useEffect(() => {
         fetchNews(activeTabNews).then((data) => setNewsData(data.results || []));
     }, [activeTabNews]);
-    console.log(newsData);
-    
 
     return (
         <div className="py-3">

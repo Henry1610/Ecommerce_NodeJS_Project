@@ -7,8 +7,6 @@ import { fetchCategories } from '../../../redux/public/categorySlice';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 
 import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 
 const SWIPER_CONFIG = {
     spaceBetween: 10,

@@ -114,14 +114,13 @@ function ProductCard({ product, compareEnabled }) {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{
-                padding: '2px', transition: 'all 0.3s ease' ,
                 transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
                 boxShadow: isHovered
                     ? '0 20px 40px rgba(102, 126, 234, 0.3)'
                     : '0 8px 25px rgba(0, 0, 0, 0.1)',
             }}
         >
-            <div className="card border-0 h-100 overflow-hidden bg-white position-relative">
+            <div className="card border-0 h-100 product-card">
                 {/* Discount Badge - Fixed height container */}
                 <div className="position-absolute top-0 start-0 m-2 discount-badge-container">
                     {product.discountPercent > 0 && (
@@ -177,7 +176,7 @@ function ProductCard({ product, compareEnabled }) {
                 </div>
 
                 {/* Card Body */}
-                <div className="card-body p-2 p-md-3 space-y-1">
+                <div className="card-body p-2 p-md-3">
                     {/* Product Name - Fixed height */}
                     <h6
                         className="card-title fw-bold mb-1 mb-md-2 fs-6 product-name"
@@ -227,15 +226,15 @@ function ProductCard({ product, compareEnabled }) {
                     </div>
 
                     {/* Price - Fixed height container */}
-                    <div className=" mb-md-3 price-container">
+                    <div className="mb-2 mb-md-3 price-container">
                         <div className="d-flex align-items-center justify-content-between">
                             <div>
                                 <h6 className="text-danger fw-bold mb-0 fs-6">
                                     {discountPrice?.toLocaleString('vi-VN')}đ
                                 </h6>
                                 {/* Fixed height container for original price */}
-                                <div  style={{ height: '16px' }}>
-                                {product.discountPercent > 0 && (
+                                <div className="original-price-container">
+                                    {product.discountPercent > 0 && (
                                         <span className="text-decoration-line-through text-muted small">
                                             {originalPrice?.toLocaleString('vi-VN')}đ
                                         </span>
@@ -269,7 +268,7 @@ function ProductCard({ product, compareEnabled }) {
                     {/* Action Buttons */}
                     <div className="d-flex gap-1 gap-md-2">
                         <button
-                            className="btn flex-fill fw-bold btn-add-to-cart btn-sm small"
+                            className="btn flex-1 fw-bold btn-add-to-cart btn-sm small"
                             onClick={() => handleAddToCart({ productId: product._id, quantity: 1 })}
                             disabled={isLoading || product.stock === 0}
                         >
