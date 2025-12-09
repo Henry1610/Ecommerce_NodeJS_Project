@@ -35,7 +35,12 @@ const sendOTPEmail = async (email, otp) => {
     `
   };
 
-  return transporter.sendMail(mailOptions);
+  return Promise.race([
+    transporter.sendMail(mailOptions),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Email sending timeout after 10 seconds')), 10000)
+    )
+  ]);
 };
 
 // Gửi OTP cho đăng ký
@@ -72,8 +77,9 @@ export const sendRegisterOTP = async (req, res) => {
       expiresAt
     });
 
-    // Gửi email OTP
-    await sendOTPEmail(email, otp);
+    sendOTPEmail(email, otp).catch(err => {
+      console.error('Failed to send OTP email:', err);
+    });
 
     res.status(200).json({
       message: 'Mã OTP đã được gửi đến email của bạn',
