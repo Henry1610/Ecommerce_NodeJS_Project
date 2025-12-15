@@ -72,9 +72,7 @@ export const sendRegisterOTP = async (req, res) => {
       expiresAt
     });
 
-    sendOTPEmail(email, otp).catch(err => {
-      console.error('Failed to send OTP email:', err);
-    });
+    await sendOTPEmail(email, otp);
 
     res.status(200).json({
       message: 'Mã OTP đã được gửi đến email của bạn',
