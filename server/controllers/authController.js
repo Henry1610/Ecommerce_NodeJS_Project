@@ -35,12 +35,7 @@ const sendOTPEmail = async (email, otp) => {
     `
   };
 
-  return Promise.race([
-    transporter.sendMail(mailOptions),
-    new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Email sending timeout after 10 seconds')), 10000)
-    )
-  ]);
+  return await transporter.sendMail(mailOptions);
 };
 
 // Gửi OTP cho đăng ký
