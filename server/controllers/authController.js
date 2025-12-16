@@ -35,7 +35,12 @@ const sendOTPEmail = async (email, otp) => {
     `
   };
 
-  return await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+
+  } catch (error) {
+    console.error("Email sending error:", error);
+  }
 };
 
 // Gửi OTP cho đăng ký
@@ -213,7 +218,7 @@ export const refreshToken = async (req, res) => {
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    
+
     // Tìm user và kiểm tra refresh token có trong database không
     const user = await User.findById(decoded._id);
     if (!user) {
