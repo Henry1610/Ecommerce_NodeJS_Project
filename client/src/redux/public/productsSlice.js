@@ -29,29 +29,22 @@ export const fetchProducts = createAsyncThunk(
 );
 
 export const fetchProductBySlug = createAsyncThunk(
-    'products/fetchProductBySlug', async ({ slug, rating }, thunkAPI) => {
-
+    'products/fetchProductBySlug', async ( slug, thunkAPI) => {
         try {
-
-            const queryParams = new URLSearchParams();
-            if (rating) queryParams.append('rating', rating);
-            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/products/${slug}?${queryParams.toString()}`
+            const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/products/${slug}`
                 , {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-
                     },
                     credentials: 'include'
                 }
             )
             const data = await res.json();
-
             if (!res.ok) {
                 console.error('Error fetching product:', data);
                 return thunkAPI.rejectWithValue(data.message || 'Không thể lấy sản phẩm');
             }
-
             return data;
         } catch (error) {
             console.error('Network error fetching product:', error);

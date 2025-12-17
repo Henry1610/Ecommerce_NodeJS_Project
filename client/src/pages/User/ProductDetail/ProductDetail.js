@@ -48,24 +48,25 @@ function ProductDetail() {
     const discountPercent = product?.discountPercent ?? 0;
     const discountPrice = originalPrice - (originalPrice * discountPercent) / 100;
 
+    const filteredReviews = selectedRating 
+        ? reviews.filter(review => review.rating === selectedRating)
+        : reviews;
     // Effects
     useEffect(() => {
         const fetchProduct = () => {
             if (slug) {
-                dispatch(fetchProductBySlug({ slug, rating: selectedRating }))
+                dispatch(fetchProductBySlug(slug))
                     .unwrap()
                     .catch(error => {
                         toast.error(`Lỗi khi tải sản phẩm: ${error}`);
                     });
             }
         };
-
         fetchProduct();
-
         return () => {
             dispatch(resetProductDetail());
         };
-    }, [dispatch, slug, selectedRating]);
+    }, [dispatch, slug]);
 
     useEffect(() => {
         if (slug) dispatch(fetchReviewStats(slug));
@@ -196,7 +197,7 @@ function ProductDetail() {
             </div>
 
             <ProductReviews
-                reviews={reviews}
+                reviews={filteredReviews}
                 averageRating={averageRating}
                 stats={stats}
                 selectedRating={selectedRating}
@@ -710,7 +711,7 @@ function ReviewStats({ averageRating, stats = {}, selectedRating, onRatingFilter
                         <button className="btn btn-info fw-semibold rounded-pill flex-fill text-white">
                             Đánh giá sản phẩm
                         </button>
-                     
+
                     </div>
                 </div>
 

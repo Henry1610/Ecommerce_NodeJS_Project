@@ -28,7 +28,8 @@ function Register() {
           ...prev,
           username: prev.username || parsed.username || '',
           email: prev.email || parsed.email || '',
-          password: prev.password || parsed.password || ''
+          password: prev.password || parsed.password || '',
+          confirmPassword: prev.confirmPassword || parsed.confirmPassword || ''
         }));
       } catch {}
     }
@@ -57,9 +58,10 @@ function Register() {
       localStorage.setItem('pendingRegister', JSON.stringify({
         username: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       }));
-      
+
       await dispatch(sendOTP({ username: formData.username, email: formData.email })).unwrap();
       Swal.fire({ icon: 'success', title: 'Thành công!', text: 'Mã OTP đã được gửi đến email của bạn' });
     } catch (error) {
@@ -87,9 +89,6 @@ function Register() {
         } catch {}
       }
     }
-
-    
-
     try {
       const result = await dispatch(registerWithOTP({
         username,

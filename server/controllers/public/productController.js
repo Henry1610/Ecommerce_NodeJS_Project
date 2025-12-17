@@ -115,11 +115,8 @@ export const getPublicProducts = async (req, res) => {
 export const getPublicProductBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
-        const { rating } = req.query;
 
-        const product = await Product.findOne({
-            slug,
-        })
+        const product = await Product.findOne({ slug })
             .populate('category', 'name slug')
             .populate('brand', 'name logo slug');
 
@@ -130,29 +127,26 @@ export const getPublicProductBySlug = async (req, res) => {
             });
         }
 
-        const reviewFilter = { product: product._id };
-        if (rating) {
-            reviewFilter.rating = Number(rating); 
-        }
-
-        const reviews = await Review.find(reviewFilter)
+        const reviews = await Review.find({ product: product._id })
             .populate('user', 'username avatar') 
             .sort({ createdAt: -1 })
-            .lean(); // Dùng .lean() để có thể chỉnh sửa object
+            .lean();
 
-        // Lấy tất cả admin responses cho các review này
+        // Lấy tất cả admin responses
         const reviewIds = reviews.map(review => review._id);
-        const adminResponses = await AdminReviewResponse.find({ review: { $in: reviewIds } })
-          .populate('admin', 'username email avatar')
-          .lean();
+        const adminResponses = await AdminReviewResponse.find({ 
+            review: { $in: reviewIds } 
+        })
+        .populate('admin', 'username email avatar')
+        .lean();
 
-        // Tạo map để dễ truy xuất
+        // Tạo map
         const responsesMap = adminResponses.reduce((acc, response) => {
             acc[response.review.toString()] = response;
             return acc;
         }, {});
 
-        // Gắn adminResponse vào từng review
+        // Gắn adminResponse
         const reviewsWithAdminResponse = reviews.map(review => ({
             ...review,
             adminResponse: responsesMap[review._id.toString()] || null
