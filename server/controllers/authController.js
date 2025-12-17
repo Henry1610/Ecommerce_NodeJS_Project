@@ -187,7 +187,7 @@ export const refreshToken = async (req, res) => {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
     // Tìm user và kiểm tra refresh token có trong database không
-    const user = await User.findById(decoded._id);
+    const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
