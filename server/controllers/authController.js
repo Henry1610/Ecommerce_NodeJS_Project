@@ -304,3 +304,11 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server', error: err.message });
   }
 };
+// GET /health
+export const healthCheck = (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+};
