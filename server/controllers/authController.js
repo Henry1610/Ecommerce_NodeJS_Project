@@ -1,46 +1,13 @@
 import User from '../models/User.js';
 import OTP from '../models/OTP.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
-import transporter from '../config/mailer.js';
+import {sendOTPEmail} from '../config/mailer.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
 // Tạo OTP ngẫu nhiên
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-// Gửi OTP qua email
-const sendOTPEmail = async (email, otp) => {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
-    to: email,
-    subject: 'Mã xác thực đăng ký tài khoản',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333; text-align: center;">Xác thực đăng ký tài khoản</h2>
-        <p>Xin chào!</p>
-        <p>Cảm ơn bạn đã đăng ký tài khoản. Vui lòng sử dụng mã OTP sau để hoàn tất quá trình đăng ký:</p>
-        <div style="background: #f8f9fa; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
-          <h1 style="color: #007bff; font-size: 32px; letter-spacing: 8px; margin: 0;">${otp}</h1>
-        </div>
-        <p><strong>Lưu ý:</strong></p>
-        <ul>
-          <li>Mã OTP có hiệu lực trong 5 phút</li>
-          <li>Không chia sẻ mã này với bất kỳ ai</li>
-          <li>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này</li>
-        </ul>
-        <p>Trân trọng,<br>Đội ngũ hỗ trợ</p>
-      </div>
-    `
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-
-  } catch (error) {
-    console.error("Email sending error:", error);
-  }
 };
 
 // Gửi OTP cho đăng ký
