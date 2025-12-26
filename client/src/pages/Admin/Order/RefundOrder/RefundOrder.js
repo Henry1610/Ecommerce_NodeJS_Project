@@ -180,6 +180,7 @@ const RefundOrder = () => {
 
                   <td style={{ padding: "12px 16px", textAlign: "center" }}>
                     <Link
+                    className='text-white'
                       to={`/admin/order/${order.orderNumber}`}
                       style={{
                         display: "inline-flex",

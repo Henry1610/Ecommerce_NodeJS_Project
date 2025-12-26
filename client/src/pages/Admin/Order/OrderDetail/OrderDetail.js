@@ -216,9 +216,6 @@ const OrderDetail = () => {
               )}
           </div>
         </div>
-
-
-
         <div className="position-relative" style={{ minHeight: "80px" }}>
           {/* Cancel Status Display */}
           {isCancelled && (
@@ -229,7 +226,6 @@ const OrderDetail = () => {
               </div>
             </div>
           )}
-
           {/* Progress Line Background */}
           <div
             className={`position-absolute ${isCancelled ? 'bg-danger bg-opacity-25' : 'bg-secondary bg-opacity-25'}`}
@@ -246,7 +242,7 @@ const OrderDetail = () => {
           {/* Active Progress Line */}
           {!isCancelled && (
             <div
-              className="position-absolute bg-success"
+              className="position-absolute bg-primary"
               style={{
                 top: "22px",
                 left: "22px",
@@ -273,7 +269,7 @@ const OrderDetail = () => {
                 circleClasses = "bg-white border-secondary border-opacity-50";
               } else if (isCompleted) {
                 iconColor = "text-white";
-                circleClasses = "bg-success border-success";
+                circleClasses = "bg-primary border-primary";
               } else if (isCurrent) {
                 iconColor = "text-primary";
                 circleClasses = "bg-white border-primary";
@@ -367,11 +363,11 @@ const OrderDetail = () => {
                 <div className="card-body">
                   <h6 className="border-bottom pb-2 fw-bold text-dark fs-6 mb-3"><i class="fa-solid fa-address-book"></i> Shipping Address</h6>
                   <div className="small text-secondary">
-                    <p className="mb-1">{selectedOrder?.shippingAddress.address}</p>
-                    <p className="mb-1">{selectedOrder?.shippingAddress.city}</p>
+                    <p className="mb-1"><span className="fw-semibold">Address:</span>{selectedOrder?.shippingAddress.address}</p>
+                    <p className="mb-1"><span className="fw-semibold">City:</span>{selectedOrder?.shippingAddress.city}</p>
                     <p className="mb-1"><span className="fw-semibold">Shipping Zone:</span> {selectedOrder?.shippingAddress.shippingZoneName}</p>
 
-                    <p className="mt-3"><span className="fw-semibold"><i class="fa-solid fa-phone"></i> Phone:</span> {selectedOrder?.shippingAddress.phoneNumber}</p>
+                    <p className="mb-1"><span className="fw-semibold">Phone:</span> {selectedOrder?.shippingAddress.phoneNumber}</p>
                   </div>
                 </div>
               </div>
@@ -421,39 +417,37 @@ const OrderDetail = () => {
                     <tr key={index} className="align-middle" style={{ transition: 'background 0.2s' }}>
                       <td className="text-muted small text-center" style={{ width: 36 }}>{index + 1}</td>
                       <td>
-  <div
-    style={{
-      width: 40,
-      height: 40,
-      borderRadius: 6,
-      overflow: 'hidden',
-      border: '1px solid #ddd',
-      backgroundColor: '#f8f9fa',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}
-  >
-    <img
-      src={
-        item.images && item.images.length > 0
-          ? item.images[0]
-          : item.image
-            ? item.image
-            : '/default-product.jpg'
-      }
-      alt={item.name}
-      style={{
-        width: '100%',
-        height: '100%',
-        objectFit: 'contain',
-        transition: 'transform 0.2s'
-      }}
-    />
-  </div>
-</td>
-
-
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 6,
+                            overflow: 'hidden',
+                            border: '1px solid #ddd',
+                            backgroundColor: '#f8f9fa',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <img
+                            src={
+                              item.images && item.images.length > 0
+                                ? item.images[0]
+                                : item.image
+                                  ? item.image
+                                  : '/default-product.jpg'
+                            }
+                            alt={item.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              transition: 'transform 0.2s'
+                            }}
+                          />
+                        </div>
+                      </td>
                       <td className="fw-semibold" style={{ minWidth: 160, maxWidth: 260, whiteSpace: 'normal', wordBreak: 'break-word' }}>{item.name}</td>
                       <td className="text-center fw-bold" style={{ fontSize: 15 }}>{item.quantity}</td>
                       <td className="text-end text-dark fw-bold" style={{ fontSize: 16 }}>{item.price.toLocaleString()}đ</td>
