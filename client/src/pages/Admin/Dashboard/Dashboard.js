@@ -204,11 +204,8 @@ const Dashboard = () => {
   return (
     <div style={{
       maxWidth: 1200,
-      margin: "40px auto",
-      fontFamily: "Inter, Arial, sans-serif",
-      background: "#f6f8fa",
-      minHeight: "100vh",
-      padding: "32px 32px"
+      margin: "0 auto",
+      fontFamily: "Inter, Arial, sans-serif"
     }}>
       {/* Box tổng quan */}
       <div className="row g-3 mb-4">

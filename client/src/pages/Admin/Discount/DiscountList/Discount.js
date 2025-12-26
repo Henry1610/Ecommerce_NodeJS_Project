@@ -59,7 +59,7 @@ const DiscountList = () => {
     };
 
     return (
-        <div className="container-fluid py-4" style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+        <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
                     {/* Header */}

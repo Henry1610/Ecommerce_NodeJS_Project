@@ -48,14 +48,28 @@ function AdminLayout({ children }) {
                     <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                 </div>
                 <div className="row">
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
                     </div>
-                    <div className="col-md-9">
-                        {children}
+                    <div className="col-md-10">
+                        <div className="admin-content-wrapper bg-white rounded-4 p-4 my-3 me-3">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </div>
+            <style>{`
+                .admin-content-wrapper {
+                    box-shadow: 0 4px 24px rgba(59,130,246,0.08);
+                    min-height: calc(100vh - 120px);
+                }
+                
+                @media (max-width: 991.98px) {
+                    .admin-content-wrapper {
+                        margin: 12px 0 !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 }

@@ -157,14 +157,13 @@ const OrderHistory = () => {
                   </p>
                   <Link 
                     to="/products" 
-                    className="btn text-white px-4 py-3 fw-semibold rounded-3 shadow-sm"
+                    className="btn btn-info text-white px-4 py-3 fw-semibold rounded-3 shadow-sm"
                     style={{
-                      backgroundColor: '#0ea5e9',
                       border: 'none',
                       transition: 'all 0.2s ease'
                     }}
-                    onMouseEnter={e => e.target.style.backgroundColor = '#0284c7'}
-                    onMouseLeave={e => e.target.style.backgroundColor = '#0ea5e9'}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                   >
                     <i className="bi bi-shop me-2"></i>
                     Mua sắm ngay

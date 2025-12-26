@@ -235,7 +235,7 @@ function ProductImages() {
                 {images.map((img, idx) => (
                     <SwiperSlide key={idx}>
                         <img
-                            src={img}
+                            src={img?.startsWith('http') ? img : `${process.env.REACT_APP_SERVER_URL}/${img}`}
                             alt={`Ảnh sản phẩm ${idx + 1}`}
                             className="img-fluid"
                             style={{
@@ -244,6 +244,9 @@ function ProductImages() {
                                 objectFit: 'contain',
                                 background: '#f8f9fa',
                                 borderRadius: 16,
+                            }}
+                            onError={(e) => {
+                                e.target.src = '/default-product.jpg';
                             }}
                         />
                     </SwiperSlide>

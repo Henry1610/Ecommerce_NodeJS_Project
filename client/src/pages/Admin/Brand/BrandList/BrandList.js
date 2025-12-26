@@ -122,60 +122,43 @@ const BrandList = () => {
 
     return (
         <div className="container-fluid py-4">
-            <div className="row">
+            <div className="row justify-content-center">
                 <div className="col-12">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h4 className="fw-bold">Brand List</h4>
-                            <h6 className="text-muted">Manage your Brand</h6>
-                        </div>
-                        <Link to="/admin/brand/add" className="btn btn-primary d-flex align-items-center">
-                            <i className="fas fa-plus me-2"></i>Add Brand
-                        </Link>
+                    {/* Header */}
+                    <div className="mb-4">
+                        <h1 className="h3 fw-bold text-dark mb-2">Quản lý thương hiệu</h1>
+                        <p className="text-muted mb-0">Danh sách và quản lý tất cả thương hiệu trong hệ thống</p>
                     </div>
 
-                    <div className="card shadow-sm">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div className="d-flex align-items-center">
-                                    <button
-                                        className="btn btn-filter btn-outline-primary me-2"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#filter_inputs"
-                                    >
-                                        <i className="fas fa-filter"></i>
-                                    </button>
-                                    <div className="input-group" style={{ maxWidth: '300px' }}>
+                    {/* Search Bar */}
+                    <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '12px' }}>
+                        <div className="card-body p-2">
+                            <div className="row">
+                                <div className="col-12 col-md-6 col-lg-5">
+                                    <div className="position-relative">
+                                        <i className="fas fa-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className="form-control form-control-md ps-5 border-2"
                                             placeholder="Tìm kiếm thương hiệu..."
                                             value={searchTerm}
                                             onChange={e => setSearchTerm(e.target.value)}
+                                            style={{ borderRadius: '10px' }}
                                         />
-                                        <button className="btn btn-searchset btn-primary" type="button">
-                                            <i className="fas fa-search"></i>
-                                        </button>
                                     </div>
                                 </div>
-                                <ul className="list-inline mb-0">
-                                    <li className="list-inline-item">
-                                        <Link to="#" data-bs-toggle="tooltip" title="PDF">
-                                            <i className="fas fa-file-pdf"></i>
-                                        </Link>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <Link to="#" data-bs-toggle="tooltip" title="Excel">
-                                            <i className="fas fa-file-excel"></i>
-                                        </Link>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <Link to="#" data-bs-toggle="tooltip" title="Print">
-                                            <i className="fas fa-print"></i>
-                                        </Link>
-                                    </li>
-                                </ul>
+                                <div className="col-12 col-md-6 col-lg-7 d-flex justify-content-end align-items-center mt-2 mt-md-0">
+                                    <Link to="/admin/brand/add" className="btn btn-primary d-flex align-items-center">
+                                        <i className="fas fa-plus me-2"></i>Thêm thương hiệu
+                                    </Link>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Main Table Card */}
+                    <div className="card border-0 shadow-sm" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+                        <div className="card-body">
 
                             <div className="collapse" id="filter_inputs">
                                 <div className="card mb-3">
@@ -206,10 +189,10 @@ const BrandList = () => {
                             </div>
 
                             <div className="table-responsive">
-                                <table className="table align-middle table-hover shadow-sm" style={{ background: '#fff', borderRadius: 16, overflow: 'hidden' }}>
+                                <table className="table align-middle mb-0">
                                     <thead style={{ background: '#f3f6fa', borderBottom: '2px solid #e0e7ef' }}>
-                                        <tr style={{ fontSize: 17, fontWeight: 700, color: '#2563eb' }}>
-                                            <th style={{ width: 40, border: 'none' }}>
+                                        <tr>
+                                            <th style={{ width: 40, border: 'none', padding: '12px 16px', fontWeight: 600 }}>
                                                 <input
                                                     type="checkbox"
                                                     id="select-all"
@@ -218,16 +201,16 @@ const BrandList = () => {
                                                     style={{ cursor: 'pointer' }}
                                                 />
                                             </th>
-                                            <th style={{ width: 90, border: 'none' }}>Logo</th>
-                                            <th style={{ border: 'none' }}>Tên thương hiệu</th>
-                                            <th style={{ border: 'none' }}>Mô tả</th>
-                                            <th style={{ width: 120, border: 'none' }}>Thao tác</th>
+                                            <th style={{ width: 90, border: 'none', padding: '12px 16px', fontWeight: 600 }}>Logo</th>
+                                            <th style={{ border: 'none', padding: '12px 16px', fontWeight: 600 }}>Tên thương hiệu</th>
+                                            <th style={{ border: 'none', padding: '12px 16px', fontWeight: 600 }}>Mô tả</th>
+                                            <th style={{ width: 120, border: 'none', padding: '12px 16px', fontWeight: 600 }}>Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredBrands.map(brand => (
-                                            <tr key={brand._id} className="align-middle" style={{ transition: 'box-shadow 0.2s, background 0.2s', border: 'none', borderRadius: 12, boxShadow: '0 1px 8px rgba(59,130,246,0.06)', marginBottom: 8, background: '#fff' }}>
-                                                <td style={{ border: 'none' }}>
+                                        {filteredBrands && filteredBrands.length > 0 ? filteredBrands.map(brand => (
+                                            <tr key={brand._id} className="align-middle border-bottom border-light hover-bg-light">
+                                                <td style={{ border: 'none', padding: '12px 16px' }}>
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedBrands.includes(brand._id)}
@@ -235,8 +218,8 @@ const BrandList = () => {
                                                         style={{ cursor: 'pointer' }}
                                                     />
                                                 </td>
-                                                <td style={{ border: 'none' }}>
-                                                    <div style={{ width: 100, height: 60, borderRadius: '12px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
+                                                <td style={{ border: 'none', padding: '12px 16px' }}>
+                                                    <div style={{ width: 80, height: 50, borderRadius: '8px', overflow: 'hidden', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
                                                         {brand.logo ? (
                                                             <img
                                                                 src={brand.logo.startsWith('http') ? brand.logo : `${API_BASE}/${brand.logo}`}
@@ -244,13 +227,13 @@ const BrandList = () => {
                                                                 style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }}
                                                             />
                                                         ) : (
-                                                            <i className="fas fa-image text-muted" style={{ fontSize: 28 }} title="No logo" />
+                                                            <i className="fas fa-image text-muted" style={{ fontSize: 24 }} title="No logo" />
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td style={{ fontWeight: 600, fontSize: 16, border: 'none' }}>{brand.name}</td>
-                                                <td style={{ color: '#555', fontSize: 15, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: 'none' }}>{brand.description || 'Không có mô tả'}</td>
-                                                <td style={{ border: 'none' }}>
+                                                <td style={{ fontWeight: 600, fontSize: 15, border: 'none', padding: '12px 16px' }}>{brand.name}</td>
+                                                <td style={{ color: '#555', fontSize: 14, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: 'none', padding: '12px 16px' }}>{brand.description || 'Không có mô tả'}</td>
+                                                <td style={{ border: 'none', padding: '12px 16px' }}>
                                                     <div className="d-flex gap-2 justify-content-center">
                                                         <Link to={`/admin/brand/edit/${brand._id}`} className="btn btn-sm" style={{ background: '#f3f6fa', color: '#2563eb', borderRadius: 8, border: 'none', boxShadow: '0 1px 4px rgba(59,130,246,0.06)' }} title="Sửa">
                                                             <i className="fas fa-edit"></i>
@@ -261,7 +244,14 @@ const BrandList = () => {
                                                     </div>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )) : (
+                                            <tr>
+                                                <td colSpan="5" className="text-center py-5">
+                                                    <i className="fas fa-tag text-muted mb-3" style={{ fontSize: '3rem', opacity: 0.3 }}></i>
+                                                    <p className="text-muted mb-0">Không có thương hiệu nào.</p>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -269,6 +259,11 @@ const BrandList = () => {
                     </div>
                 </div>
             </div>
+            <style>{`
+                .hover-bg-light:hover {
+                    background-color: #f8fafc !important;
+                }
+            `}</style>
         </div>
     );
 };

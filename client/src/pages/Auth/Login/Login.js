@@ -5,6 +5,7 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import '../auth.css';
 
 function Login() {
     const dispatch = useDispatch();
@@ -59,69 +60,41 @@ function Login() {
     }
 
     return (
-        <div className="login-bg" style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="login-card" style={{
-                background: '#fff',
-                borderRadius: 18,
-                boxShadow: '0 4px 32px rgba(59,130,246,0.10)',
-                padding: '40px 32px',
-                maxWidth: 400,
-                width: '100%',
-                margin: '32px 0',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <h2 style={{ fontWeight: 700, color: '#3b82f6', marginBottom: 18, fontSize: 28 }}>Đăng nhập</h2>
-                <form onSubmit={handleLogin} style={{ width: '100%' }}>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="email" className="form-label" style={{ fontWeight: 500 }}>Email</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaEnvelope style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+        <div className="auth-container">
+            <div className="auth-card">
+                <h2 className="auth-title">Đăng nhập</h2>
+                <form onSubmit={handleLogin} className="auth-form">
+                    <div className="mb-4">
+                        <label htmlFor="email" className="form-label fw-medium">Email</label>
+                        <div className="auth-input-wrapper">
+                            <FaEnvelope className="auth-input-icon" />
                             <input
                                 type="email"
-                                className="form-control"
+                                className="form-control auth-input"
                                 id="email"
                                 placeholder="Nhập email của bạn"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb'
-                                }}
                             />
                         </div>
                     </div>
-                    <div className="mb-4" style={{ position: 'relative' }}>
-                        <label htmlFor="password" className="form-label" style={{ fontWeight: 500 }}>Mật khẩu</label>
-                        <div style={{ position: 'relative' }}>
-                            <FaLock style={{ position: 'absolute', left: 14, top: 13, color: '#a0aec0', fontSize: 16 }} />
+                    <div className="mb-4">
+                        <label htmlFor="password" className="form-label fw-medium">Mật khẩu</label>
+                        <div className="auth-input-wrapper">
+                            <FaLock className="auth-input-icon" />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="form-control"
+                                className="form-control auth-input auth-input-password"
                                 id="password"
                                 placeholder="Nhập mật khẩu"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                style={{
-                                    paddingLeft: 38,
-                                    height: 44,
-                                    borderRadius: 10,
-                                    fontSize: 16,
-                                    border: '1px solid #e5e7eb',
-                                    background: '#f9fafb',
-                                    paddingRight: 38
-                                }}
                             />
                             <span
                                 onClick={() => setShowPassword((v) => !v)}
-                                style={{ position: 'absolute', right: 14, top: 10, cursor: 'pointer', color: '#a0aec0', fontSize: 18 }}
+                                className="auth-eye-icon"
                                 title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                             >
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -129,19 +102,15 @@ function Login() {
                         </div>
                     </div>
                     <div className="d-flex justify-content-end mb-3">
-                        <Link to="/reset-password" style={{ color: '#3b82f6', fontWeight: 500, fontSize: 15 }}>Quên mật khẩu?</Link>
+                        <Link to="/reset-password" className="fw-medium small" style={{ fontSize: 13 }}>Quên mật khẩu?</Link>
                     </div>
-                    <button type="submit" className="btn btn-primary w-100 fw-bold btn-info text-white" style={{
-                        border: 'none',
-                        borderRadius: 10,
-                        height: 44,
-                        fontSize: 17,
-                        marginBottom: 8
-                    }}>Đăng nhập</button>
+                    <button type="submit" className="btn btn-info w-100 fw-bold text-white auth-btn mb-2">
+                        Đăng nhập
+                    </button>
                 </form>
                 <div className="mt-3 text-center">
-                    <span style={{ color: '#6b7280', fontSize: 15 }}>Chưa có tài khoản? </span>
-                    <Link to="/register" style={{ color: '#3b82f6', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Đăng ký ngay</Link>
+                    <span className="auth-text-muted">Chưa có tài khoản? </span>
+                    <Link to="/register" className="auth-link">Đăng ký ngay</Link>
                 </div>
             </div>
         </div>

@@ -229,8 +229,18 @@ const AddProduct = () => {
                                     </div>
                                     <div className="col-12">
                                         <label className="form-label mb-1 small">Ảnh sản phẩm</label>
-                                        <div className="image-upload border rounded-3 p-2 bg-light d-flex align-items-center gap-3 flex-wrap">
-                                            <input multiple type="file" accept="image/*" onChange={handleFileChange} style={{ width: 120 }} />
+                                        <div className="image-upload border rounded-3 p-3 bg-light d-flex align-items-center gap-3 flex-wrap" style={{ minHeight: '80px' }}>
+                                            <label className="btn btn-outline-primary mb-0" style={{ cursor: 'pointer', width: 'auto', minWidth: '120px' }}>
+                                                <i className="fas fa-upload me-2"></i>Chọn ảnh
+                                                <input 
+                                                    multiple 
+                                                    type="file" 
+                                                    accept="image/*" 
+                                                    onChange={handleFileChange} 
+                                                    style={{ display: 'none' }}
+                                                    className="file-input"
+                                                />
+                                            </label>
                                             {previewImages.length > 0 && (
                                                 <div className="d-flex flex-wrap gap-2">
                                                     {previewImages.map((src, index) => (

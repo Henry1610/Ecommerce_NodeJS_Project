@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { refreshToken, setAuth, clearAuth } from '../redux/auth/authSlice';
+import { refreshToken, clearAuth } from '../redux/auth/authSlice';
 
 const useTokenManager = () => {
     const dispatch = useDispatch();
@@ -43,11 +43,17 @@ const useTokenManager = () => {
             const result = await dispatch(refreshToken()).unwrap();
             return result;
         } catch (error) {
-            console.error('Refresh token failed:', error);
-                               // Chỉ logout nếu chưa logout
-                   if (accessToken) {
-                       dispatch(clearAuth());
-                   }
+            // Chỉ log lỗi, không hiển thị toast cho lỗi "refresh token not found" 
+            // khi người dùng chưa đăng nhập (đây là hành vi bình thường)
+            if (error && error.includes('Refresh token not found')) {
+                console.log('No refresh token found - user not logged in');
+            } else {
+                console.error('Refresh token failed:', error);
+            }
+            // Chỉ logout nếu đã có accessToken trước đó
+            if (accessToken) {
+                dispatch(clearAuth());
+            }
             return null;
         } finally {
             setIsRefreshing(false);
@@ -94,8 +100,20 @@ const useTokenManager = () => {
                 return;
             }
 
-            // Nếu không có token hoặc token hết hạn, thử refresh 1 lần
-            if (!accessToken || isTokenExpired(accessToken)) {
+            // Nếu có token nhưng đã hết hạn, refresh ngay
+            if (accessToken && isTokenExpired(accessToken)) {
+                const result = await refreshTokenAction();
+                if (result) {
+                    scheduleTokenRefresh(result.accessToken);
+                }
+                setHasInitialized(true);
+                return;
+            }
+
+            // Nếu không có accessToken (reload trang), vẫn thử refresh từ cookie
+            // Nếu có refresh token cookie, sẽ lấy được accessToken mới
+            // Nếu không có, refreshTokenAction sẽ fail nhưng không hiển thị lỗi
+            if (!accessToken) {
                 const result = await refreshTokenAction();
                 if (result) {
                     scheduleTokenRefresh(result.accessToken);

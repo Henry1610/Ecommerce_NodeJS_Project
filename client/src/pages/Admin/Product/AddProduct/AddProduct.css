@@ -1,8 +1,7 @@
 .image-upload {
     position: relative;
-    text-align: center;
+    text-align: left;
     border: 2px dashed #ccc;
-    padding: 20px;
     border-radius: 5px;
 }
 
@@ -18,13 +17,11 @@
 }
 
 .image-upload input[type="file"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
+    display: none;
+}
+
+.image-upload label {
+    margin: 0;
 }
 
 

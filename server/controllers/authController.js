@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import OTP from '../models/OTP.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
-import {sendOTPEmail} from '../config/mailer.js';
+import {sendOTPEmail, sendResetPasswordEmail} from '../config/mailer.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
@@ -266,20 +266,10 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 phút
     await user.save();
-    // Gửi mail bằng nodemailer
+    // Gửi mail bằng resend
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Đặt lại mật khẩu tài khoản của bạn',
-      html: `
-        <p>Bạn vừa yêu cầu đặt lại mật khẩu.</p>
-        <p>Nhấn vào link dưới đây để đặt lại mật khẩu (có hiệu lực trong 15 phút):</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
-      `
-    });
-    res.json({ message: 'Đã gửi email đặt lại mật khẩu (nếu email tồn tại trong hệ thống)' });
+    await sendResetPasswordEmail(email, resetLink);
+    res.json({ message: 'Đã gửi email đặt lại mật khẩu' });
   } catch (err) {
     res.status(500).json({ message: 'Lỗi server', error: err.message });
   }

@@ -1,0 +1,128 @@
+/* Auth Pages Common Styles */
+.auth-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(59, 130, 246, 0.10);
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-title {
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 18px;
+  font-size: 28px;
+}
+
+.auth-form {
+  width: 100%;
+}
+
+.auth-input-wrapper {
+  position: relative;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 13px;
+  color: #a0aec0;
+  font-size: 16px;
+  z-index: 1;
+}
+
+.auth-input {
+  padding-left: 38px !important;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 16px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.auth-input-password {
+  padding-right: 38px !important;
+}
+
+.auth-eye-icon {
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  cursor: pointer;
+  color: #a0aec0;
+  font-size: 18px;
+  z-index: 2;
+}
+
+.auth-btn {
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  font-size: 17px;
+}
+
+.auth-link {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.auth-text-muted {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.auth-success-message {
+  text-align: center;
+  padding: 20px;
+  background: #d1fae5;
+  border-radius: 10px;
+  color: #065f46;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.auth-success-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.auth-success-subtitle {
+  font-size: 14px;
+}
+
+.auth-error-message {
+  color: #ef4444;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #fee2e2;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.auth-error-text {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.auth-input-error {
+  border-color: #ef4444 !important;
+}
+

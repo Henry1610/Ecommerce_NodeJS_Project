@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendOTP, registerWithOTP, clearOTPState } from '../../../redux/auth/authSlice';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { FaEnvelope, FaLock, FaUser, FaKey } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUser, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
+import '../auth.css';
 
 function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, otpSent  } = useSelector(state => state.auth);
+  const { loading, otpSent, accessToken, user } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -17,6 +18,8 @@ function Register() {
     confirmPassword: '',
     otp: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     // Khi chuyển sang bước OTP, nếu formData trống thì load từ localStorage
@@ -34,6 +37,17 @@ function Register() {
       } catch {}
     }
   }, []);
+
+  useEffect(() => {
+    // Redirect nếu đã đăng nhập
+    if (accessToken && user) {
+      if (user.role === "admin") {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [accessToken, user, navigate]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -100,7 +114,7 @@ function Register() {
       if (result) {
         // Dọn dữ liệu tạm
         localStorage.removeItem('pendingRegister');
-        Swal.fire({ icon: 'success', title: 'Đăng ký thành công!', text: 'Chào mừng bạn đến với chúng tôi!' });
+        dispatch(clearOTPState());
         setFormData({
           username: '',
           email: '',
@@ -108,7 +122,13 @@ function Register() {
           confirmPassword: '',
           otp: ''
         });
-        navigate('/');
+        Swal.fire({ icon: 'success', title: 'Đăng ký thành công!', text: 'Chào mừng bạn đến với chúng tôi!' });
+        // Redirect sau khi đăng ký thành công
+        if (result.user?.role === "admin") {
+          navigate('/admin/dashboard', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       }
     } catch (error) {
       Swal.fire({ icon: 'error', title: 'Lỗi!', text: error || 'Đăng ký thất bại' });
@@ -163,15 +183,13 @@ function Register() {
 
   const displayInfo = getDisplayInfo();
 
+  // Redirect nếu đã đăng nhập
+  if (accessToken && user) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
-    <div className="register-bg" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      background: '#fff'
-    }}>
+    <div className="auth-container px-3">
       <div className="container" style={{ maxWidth: 400 }}>
         <div className="row justify-content-center">
           <div className="col-12">
@@ -196,6 +214,7 @@ function Register() {
                           type="text"
                           name="username"
                           className="form-control border-start-0"
+                          placeholder="Nhập tên đăng nhập"
                           value={formData.username}
                           onChange={handleInputChange}
                           required
@@ -213,6 +232,7 @@ function Register() {
                           type="email"
                           name="email"
                           className="form-control border-start-0"
+                          placeholder="Nhập email của bạn"
                           value={formData.email}
                           onChange={handleInputChange}
                           required
@@ -222,43 +242,76 @@ function Register() {
 
                     <div className="mb-3">
                       <label className="form-label">Mật khẩu</label>
-                      <div className="input-group">
+                      <div className="input-group" style={{ position: 'relative' }}>
                         <span className="input-group-text bg-light border-end-0">
                           <FaLock className="text-muted" />
                         </span>
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           name="password"
                           className="form-control border-start-0"
+                          placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                           value={formData.password}
                           onChange={handleInputChange}
+                          style={{ paddingRight: '40px' }}
                           required
                         />
+                        <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          style={{
+                            position: 'absolute',
+                            right: '12px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            cursor: 'pointer',
+                            color: '#a0aec0',
+                            zIndex: 10
+                          }}
+                          title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
                       </div>
                     </div>
 
                     <div className="mb-4">
                       <label className="form-label">Xác nhận mật khẩu</label>
-                      <div className="input-group">
+                      <div className="input-group" style={{ position: 'relative' }}>
                         <span className="input-group-text bg-light border-end-0">
                           <FaLock className="text-muted" />
                         </span>
                         <input
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           name="confirmPassword"
                           className="form-control border-start-0"
+                          placeholder="Nhập lại mật khẩu"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
+                          style={{ paddingRight: '40px' }}
                           required
                         />
+                        <span
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          style={{
+                            position: 'absolute',
+                            right: '12px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            cursor: 'pointer',
+                            color: '#a0aec0',
+                            zIndex: 10
+                          }}
+                          title={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                        >
+                          {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      className="btn btn-info text-white w-100 fw-bold"
+                      className="btn btn-info text-white w-100 fw-bold auth-btn"
                       disabled={loading}
-                      style={{ borderRadius: 10, height: 44, border: 'none' }}
                     >
                       {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
                     </button>
@@ -296,9 +349,8 @@ function Register() {
 
                     <button
                       type="submit"
-                      className="btn btn-info text-white w-100 fw-bold mb-3"
+                      className="btn btn-info text-white w-100 fw-bold mb-3 auth-btn"
                       disabled={loading}
-                      style={{ borderRadius: 10, height: 44, border: 'none' }}
                     >
                       {loading ? 'Đang xác thực...' : 'Xác thực & Đăng ký'}
                     </button>

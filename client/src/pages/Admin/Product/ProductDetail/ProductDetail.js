@@ -174,10 +174,13 @@ const ProductDetail = () => {
                                 {product.images?.map((img, index) => (
                                     <SwiperSlide key={index}>
                                         <img
-                                            src={`${API_BASE}/uploads/products/${product._id}/${img}`}
+                                            src={img?.startsWith('http') ? img : `${API_BASE}/${img}`}
                                             alt={`${product.name} - Ảnh ${index + 1}`}
                                             className="img-fluid rounded mb-2"
                                             loading="lazy"
+                                            onError={(e) => {
+                                                e.target.src = '/default-product.jpg';
+                                            }}
                                         />
                                     </SwiperSlide>
                                 ))}
@@ -196,10 +199,13 @@ const ProductDetail = () => {
                                 {product.images?.map((img, index) => (
                                     <SwiperSlide key={index} className="cursor-pointer">
                                         <img
-                                            src={`${API_BASE}/uploads/products/${product._id}/${img}`}
+                                            src={img?.startsWith('http') ? img : `${API_BASE}/${img}`}
                                             alt={`${product.name} - Ảnh ${index + 1}`}
                                             className="img-fluid rounded"
                                             loading="lazy"
+                                            onError={(e) => {
+                                                e.target.src = '/default-product.jpg';
+                                            }}
                                         />
                                     </SwiperSlide>
                                 ))}
