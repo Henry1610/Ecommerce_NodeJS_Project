@@ -17,15 +17,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install backend dependencies
         working-directory: ./server
         run: npm install
 
       - name: Trigger Render deploy on main
-        if: github.ref == 'refs/heads/main'
-        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+  if: github.ref == 'refs/heads/main'
+  run: |
+    echo "Deploy hook URL: ${{ secrets.RENDER_DEPLOY_HOOK }}"
+    curl -v -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   frontend:
     name: Frontend Build & Deploy (Vercel)
@@ -38,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Install dependencies & Build
         working-directory: ./client
         run: |
@@ -62,4 +64,4 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+          vercel-args: "--prod"
