@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../auth.css';
-
+import FacebookButton from '../../../components/FacebookButton';
 function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -107,6 +107,16 @@ function Login() {
                     <button type="submit" className="btn btn-info w-100 fw-bold text-white auth-btn mb-2">
                         Đăng nhập
                     </button>
+                    <div className="d-flex align-items-center my-2">
+                        <div className="flex-grow-1 border-top"></div>
+
+                        <p className="mx-3 mb-0 text-muted fw-semibold" style={{ fontSize: "12px" }}>
+                            Hoặc    </p>
+
+                        <div className="flex-grow-1 border-top"></div>
+                    </div>
+                    <FacebookButton />
+
                 </form>
                 <div className="mt-3 text-center">
                     <span className="auth-text-muted">Chưa có tài khoản? </span>

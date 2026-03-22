@@ -15,7 +15,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <Provider store={store}>
-    <React.StrictMode>
       <App />
       <ToastContainer
         position="top-right"
@@ -25,7 +24,6 @@ root.render(
         pauseOnHover
         draggable
       />
-    </React.StrictMode>
   </Provider>
 );
 

@@ -1,13 +1,76 @@
 import User from '../models/User.js';
 import OTP from '../models/OTP.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
-import {sendOTPEmail, sendResetPasswordEmail} from '../config/mailer.js';
+import { sendOTPEmail, sendResetPasswordEmail } from '../config/mailer.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-
+import passport from 'passport';
 // Tạo OTP ngẫu nhiên
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+export const facebookCallback = (req, res, next) => {
+  passport.authenticate("facebook", async (err, authData, info) => {
+    if (err) {
+      console.error("Passport error:", err);
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
+    }
+    if (!authData.user) {
+
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=no_user`);
+    }
+    try {
+      const { user, tokens } = authData;
+
+      // Lưu vào session tạm (5 phút)
+      req.session.tempAuth = {
+        accessToken: tokens.accessToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          role: user.role,
+        }
+      };
+
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 1 * 24 * 60 * 60 * 1000 // 1 day
+      });
+
+      // Lưu refresh token vào DB để /api/auth/refresh-token hoạt động sau reload
+      await user.addRefreshToken(
+        tokens.refreshToken,
+        req.headers['user-agent'],
+        req.ip,
+        false
+      );
+
+      // Redirect về frontend callback page
+      res.redirect(
+        `${process.env.CLIENT_URL}/auth/callback`
+      );
+    } catch (error) {
+      console.error("Callback error:", error);
+      res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
+    }
+  })(req, res, next);
+};
+
+export const getSessionAuth = (req, res) => {
+  if (req.session.tempAuth) {
+    const { accessToken, user } = req.session.tempAuth;
+
+    // Xóa session tạm sau khi lấy dữ liệu
+    delete req.session.tempAuth;
+    res.json({ accessToken, user });
+  } else {
+    res.status(404).json({ message: 'No temporary auth data found' });
+  }
 };
 
 // Gửi OTP cho đăng ký
@@ -132,10 +195,19 @@ export const verifyOTPAndRegister = async (req, res) => {
 export const login = async function (req, res) {
   try {
     const { email, password, rememberMe } = req.body;
+    if (password == null || String(password).trim() === '') {
+      return res.status(400).json({ message: 'Vui lòng nhập mật khẩu' });
+    }
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
+    }
+
+    if (!user.password) {
+      return res.status(401).json({
+        message: 'Tài khoản này đăng nhập bằng mạng xã hội. Hãy dùng đăng nhập Facebook/Google hoặc đặt lại mật khẩu qua email.',
+      });
     }
 
     const isValidPassword = await user.isPasswordValid(password);

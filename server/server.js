@@ -1,4 +1,4 @@
- import express from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -9,16 +9,14 @@ import { stripeWebhook } from './controllers/user/paymentController.js';
 import { fileURLToPath } from 'url';
 import errorHandler from './middleware/errorHandler.js';
 import cookieParser from 'cookie-parser';
-
+import passport from 'passport';
+import './config/passport.js';
+import session from 'express-session';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-// Trust proxy for correct req.ip and secure cookies behind proxies
 app.set('trust proxy', true);
-
-
-
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const allowedOrigins = [
@@ -37,9 +35,20 @@ app.use(cors({
     credentials: true
 }));
 app.post('/api/users/payments/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
-
 app.use(express.json());
-app.use(cookieParser());    
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 5 * 60 * 1000,
+    },
+}));
+app.use(passport.initialize());
+app.use(cookieParser());
 
 connectDB();
 route(app);

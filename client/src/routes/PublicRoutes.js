@@ -9,9 +9,10 @@ import ResetPassword from '../pages/Auth/ResetPassword'
 import NewPassword from '../pages/Auth/ResetPassword/NewPassword'
 import AddressStore from '../pages/User/AddressStore';
 import ComparePage from '../pages/User/ComparePage';
-
+import  AuthCallback  from "../pages/Auth/AuthCallback/AuthCallback"
 const publicRoutes = [
     { path: "/about-us", component: AboutUs },
+    { path: "/auth/callback", component: AuthCallback },
     { path: "/product", component: Product },
     { path: "/product/:slug", component: ProductDetail },
     { path: "/contact", component: Contact },

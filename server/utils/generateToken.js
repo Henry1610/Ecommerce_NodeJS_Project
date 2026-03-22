@@ -13,4 +13,3 @@ const generateRefreshToken = (id, role, rememberMe = false) => {
 };
 
 export { generateAccessToken, generateRefreshToken };
-export default generateAccessToken;
