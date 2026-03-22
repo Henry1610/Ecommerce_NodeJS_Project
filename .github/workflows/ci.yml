@@ -26,7 +26,6 @@ jobs:
       - name: Trigger Render deploy on main
         if: github.ref == 'refs/heads/main'
         run: |
-          echo "Deploy hook URL: ${{ secrets.RENDER_DEPLOY_HOOK }}"
           curl -v -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   frontend:
