@@ -15,7 +15,6 @@ export async function getApplicableDiscounts(cart, userId) {
 
     for (const discount of discounts) {
         const cond = discount.conditions || {};
-
         // Tính tổng giá trị đơn hàng (chưa có discount)
         let cartTotal = 0;
         let totalQuantity = 0;
