@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import ProductCard from '../../../components/ProductCard/ProductCard';
+import { ProductSectionSkeleton } from '../../../components/Skeleton';
 import { fetchBrands } from '../../../redux/public/brandSlice';
 import axios from 'axios';
 import 'swiper/css';
@@ -43,7 +44,7 @@ function BrandProductSection() {
     const handleLoadMore = useCallback(() => { setDisplayCount(prevCount => prevCount + LOAD_MORE_COUNT); }, []);
 
     if (brandsLoading || !hasBrands) {
-        return <div className="py-3"><h2 className="fw-bold mb-3">Sản phẩm theo thương hiệu</h2><div className="text-center py-4"><div className="spinner-border" role="status"><span className="visually-hidden">Đang tải thương hiệu...</span></div></div></div>;
+        return <ProductSectionSkeleton mode="full" title="Sản phẩm theo thương hiệu" />;
     }
     return (
         <div className="py-3">
@@ -58,7 +59,7 @@ function BrandProductSection() {
                 </Swiper>
             </div>
             <div className="row g-3">
-                {loading ? <div className="col-12"><div className="text-center py-4"><div className="spinner-border" role="status"><span className="visually-hidden">Đang tải...</span></div></div></div> :
+                {loading ? <ProductSectionSkeleton mode="grid" /> :
                     !hasProducts ? <div className="col-12"><div className="text-center py-4"><p className="text-muted mb-0">Không tìm thấy sản phẩm phù hợp</p></div></div> :
                         displayedProducts.map((product) => (<div className="col-6 col-md-4 col-lg-3 col-xxl-3" key={product._id}><ProductCard product={product} /></div>))}
                 {hasProducts && hasMoreProducts && !loading && <div className="col-12"><div className="d-flex justify-content-center mt-4"><button type="button" className="btn btn-outline-info rounded-pill d-flex align-items-center gap-2 px-4 py-2" onClick={handleLoadMore}><strong>Xem thêm</strong><i className="fa-solid fa-circle-down"></i></button></div></div>}

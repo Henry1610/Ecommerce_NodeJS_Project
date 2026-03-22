@@ -1,0 +1,73 @@
+/* Trạng thái trống thống nhất mọi trang — chỉ đổi nội dung qua props */
+
+.empty-products-state__icon-wrap {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.empty-products-state__icon-wrap i {
+  font-size: 2rem;
+  line-height: 1;
+  color: #212529;
+}
+
+.empty-products-state__card {
+  max-width: 100%;
+}
+
+.empty-products-state__card .card-body {
+  padding: 2.5rem 1.5rem;
+}
+
+.empty-products-state__card--embedded .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 320px;
+}
+
+/* Chỉ nội dung — không card (trong khung trắng cha, vd. Profile) */
+.empty-products-state__plain {
+  padding: 0.5rem 0 1rem;
+}
+
+.empty-products-state__title {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .empty-products-state__title {
+    font-size: 1.5rem;
+  }
+}
+
+.empty-products-state__desc {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-products-state__action.btn {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

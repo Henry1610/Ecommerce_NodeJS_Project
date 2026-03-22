@@ -11,6 +11,7 @@ import { logout, clearAuth } from '../../../redux/auth/authSlice';
 import { clearUserProfile } from '../../../redux/user/userSlice';
 import { clearCompare } from '../../../redux/public/compareSlice';
 import { Link } from 'react-router-dom';
+import '../../../components/PageSectionHeading/PageSectionHeading.css';
 const tabs = [
   { key: 'account', label: 'Thông tin tài khoản', icon: 'fa-user' },
   { key: 'orders', label: 'Lịch sử đơn hàng', icon: 'fa-file-alt' },
@@ -68,13 +69,15 @@ const ProfileLayout = () => {
   };
 
   return (
-    <div className="container " style={{ minHeight: '80vh' }}>
-      <ol className="breadcrumb">
-        <li className="breadcrumb-item">
-          <Link to="/" className="text-decoration-none">Trang chủ</Link>
-        </li>
-        <li className="breadcrumb-item active" aria-current="page">Tài khoản</li>
-      </ol>
+    <div className="container py-4 border-top" style={{ minHeight: '80vh' }}>
+      <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+        <ol className="breadcrumb mb-0">
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none">Trang chủ</Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">Tài khoản</li>
+        </ol>
+      </nav>
       <div className="row justify-content-center">
         <div className="col-lg-3 mb-4 mb-lg-0">
           <div className="bg-white rounded-4 shadow-sm p-0 overflow-hidden" style={{ minWidth: 240 }}>

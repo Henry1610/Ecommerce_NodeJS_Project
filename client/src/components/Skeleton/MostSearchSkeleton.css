@@ -1,0 +1,6 @@
+.most-search-skeleton-pill {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}

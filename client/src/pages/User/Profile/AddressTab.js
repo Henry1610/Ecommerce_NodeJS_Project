@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSavedShippingAddresses } from '../../../redux/user/shippingAddressSlice';
+import EmptyProductsState, { EmptyStateSection } from '../../../components/EmptyProductsState';
 
 const AddressTab = () => {
   const dispatch = useDispatch();
@@ -15,11 +16,17 @@ const AddressTab = () => {
 
   if (!AddressSave || AddressSave.length === 0) {
     return (
-      <div className="text-center py-5">
-        <i className="fas fa-map-marker-alt mb-3" style={{ fontSize: 48, color: '#e0e7ef' }}></i>
-        <h5 className="text-muted">Bạn chưa có địa chỉ giao hàng nào</h5>
-        <p className="text-secondary">Hãy thêm địa chỉ để thuận tiện cho việc giao hàng!</p>
-      </div>
+      <EmptyStateSection>
+        <EmptyProductsState
+          plain
+          icon={<i className="fa-solid fa-location-dot" aria-hidden />}
+          title="Chưa có địa chỉ giao hàng"
+          description="Địa chỉ sẽ được lưu khi bạn đặt hàng. Mua sắm ngay để thêm địa chỉ cho lần sau!"
+          to="/product"
+          actionLabel="Mua sắm ngay"
+          actionIconClass="fa-solid fa-bag-shopping"
+        />
+      </EmptyStateSection>
     );
   }
 

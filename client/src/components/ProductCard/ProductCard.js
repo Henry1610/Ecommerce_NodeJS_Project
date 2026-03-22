@@ -280,7 +280,7 @@ function ProductCard({ product, compareEnabled }) {
                             ) : (
                                 <>
                                     <i className="fas fa-shopping-cart text-white"></i>
-                                    <span className="ms-1 d-none d-sm-inline text-white">Thêm vào giỏ</span>
+                                    <span className="ms-1 text-white">Thêm vào giỏ</span>
                                 </>
                             )}
                         </button>

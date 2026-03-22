@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { fetchWishlist, removeFromWishlist } from '../../../redux/user/wishlistSlice';
 import { addToCart } from '../../../redux/user/cartSlice';
+import { WishListSkeleton } from '../../../components/Skeleton';
+import EmptyProductsState from '../../../components/EmptyProductsState';
+import PageSectionHeading from '../../../components/PageSectionHeading';
 
 function WishList() {
     const dispatch = useDispatch();
@@ -44,20 +47,12 @@ function WishList() {
     };
 
     if (loading) {
-        return (
-            <div className="container py-3 py-md-5">
-                <div className="text-center">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        );
+        return <WishListSkeleton />;
     }
 
     if (error) {
         return (
-            <div className="container py-3 py-md-5">
+            <div className="container py-4 border-top">
                 <div className="alert alert-danger" role="alert">
                     {error}
                 </div>
@@ -66,10 +61,10 @@ function WishList() {
     }
 
     return (
-        <div className="container py-3 py-md-5 border-top">
+        <div className="container py-4 border-top">
             {/* Breadcrumb */}
-            <nav aria-label="breadcrumb" className="mb-3 mb-md-4">
-                <ol className="breadcrumb">
+            <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+                <ol className="breadcrumb mb-0">
                     <li className="breadcrumb-item">
                         <Link to="/" className="text-decoration-none">Trang chủ</Link>
                     </li>
@@ -78,23 +73,18 @@ function WishList() {
             </nav>
 
             {/* Page Header */}
-            <div className="row mb-3 mb-md-5">
-                <div className="col-12">
-                    <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
-                        <div className="d-flex align-items-center gap-2">
-                            <p className="mb-0 fw-semibold text-secondary fs-6 fs-md-5">
-                                {wishlist?.length || 0} sản phẩm trong danh sách yêu thích
-                            </p>
+            <div className="mb-4">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <PageSectionHeading
+                        title="Danh sách yêu thích"
+                        description="Xem và quản lý sản phẩm bạn đã lưu để mua sau"
+                    />
+                    {wishlist && wishlist.length > 0 && (
+                        <div className="badge bg-light text-dark fs-6 px-3 py-2 rounded-3">
+                            <i className="fa-solid fa-heart me-2" aria-hidden />
+                            {wishlist.length} sản phẩm
                         </div>
-
-                        {wishlist && wishlist.length > 0 && (
-                            <div>
-                                <span className="badge bg-info fs-6 px-3">
-                                    {wishlist.length} sản phẩm
-                                </span>
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -414,25 +404,19 @@ function WishList() {
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-5">
-                    <div className="card border-0 shadow-sm text-dark">
-                        <div className="card-body py-4 py-md-5">
-                            <div className="mb-4">
-                                <i className="fas fa-heart text-danger" style={{ fontSize: '3rem' }}></i>
-                            </div>
-                            <h3 className="text-muted mb-3 fw-bold fs-4 fs-md-3">Danh sách yêu thích trống</h3>
-                            <p className="text-muted mb-4 fs-6 fs-md-5">
-                                Bạn chưa có sản phẩm nào trong danh sách yêu thích.
-                                <br className="d-none d-md-block" />
-                                Hãy khám phá và thêm những sản phẩm bạn yêu thích!
-                            </p>
-                            <Link to="/product" className="btn btn-info text-white btn-lg">
-                                <i className="fas fa-shopping-bag me-2"></i>
-                                Mua sắm ngay
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+                <EmptyProductsState
+                    icon={<i className="fas fa-heart" aria-hidden />}
+                    title="Danh sách yêu thích trống"
+                    description={
+                        <>
+                            Bạn chưa có sản phẩm nào trong danh sách yêu thích.
+                            <br className="d-none d-md-block" /> Hãy khám phá và thêm những sản phẩm bạn yêu thích!
+                        </>
+                    }
+                    to="/product"
+                    actionLabel="Mua sắm ngay"
+                    actionIconClass="fas fa-shopping-bag"
+                />
             )}
         </div>
     );

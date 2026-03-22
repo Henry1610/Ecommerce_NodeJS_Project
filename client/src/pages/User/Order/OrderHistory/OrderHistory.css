@@ -1,3 +1,8 @@
+/* Gạch ngang full chiều ngang viewport (không chỉ theo max-width của .container) */
+.order-history-page {
+  border-top: 1px solid var(--bs-border-color, #dee2e6);
+}
+
 .btn-outline-info:hover {
   background-color: var(--bs-info) !important; /* nền xanh */
   color: #fff !important;                     /* chữ trắng */

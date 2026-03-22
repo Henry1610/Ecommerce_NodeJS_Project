@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyReviews } from '../../../redux/user/reviewSlice';
+import EmptyProductsState, { EmptyStateSection } from '../../../components/EmptyProductsState';
 
 const ReviewTab = () => {
   const dispatch = useDispatch();
@@ -18,11 +19,17 @@ const ReviewTab = () => {
   }
   if (myReviews.length === 0) {
     return (
-      <div className="text-center py-5">
-        <i className="fas fa-star-half-alt mb-3" style={{ fontSize: 48, color: '#e0e7ef' }}></i>
-        <h5 className="text-muted">Bạn chưa có đánh giá nào</h5>
-        <p className="text-secondary">Hãy mua hàng và để lại nhận xét cho sản phẩm nhé!</p>
-      </div>
+      <EmptyStateSection>
+        <EmptyProductsState
+          plain
+          icon={<i className="fa-solid fa-star-half-stroke" aria-hidden />}
+          title="Bạn chưa có đánh giá nào"
+          description="Hãy mua hàng và để lại nhận xét cho sản phẩm nhé!"
+          to="/product"
+          actionLabel="Xem sản phẩm"
+          actionIconClass="fa-solid fa-bag-shopping"
+        />
+      </EmptyStateSection>
     );
   }
 

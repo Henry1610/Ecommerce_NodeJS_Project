@@ -2,6 +2,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCompare, clearCompare } from '../../../redux/public/compareSlice';
 import { Link } from 'react-router-dom';
+import EmptyProductsState from '../../../components/EmptyProductsState';
+import PageSectionHeading from '../../../components/PageSectionHeading';
 import './ComparePage.css';
 const ComparePage = () => {
   const compareList = useSelector(state => state.public.compare.compareList);
@@ -15,38 +17,56 @@ const ComparePage = () => {
 
   if (compareList.length < 2) {
     return (
-      <div className="container py-5 text-center border-top" style={fontStyle}>
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <Link to="/" className="text-decoration-none">Trang chủ</Link>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">So sánh sản phẩm</li>
-        </ol>
-        <h2 className="fw-bold mb-3">So sánh sản phẩm</h2>
-        <p className="text-muted mb-4">Hãy chọn đủ 2 sản phẩm để so sánh!</p>
-        <Link to="/product" className="btn btn-info text-white">
-          Quay lại trang sản phẩm
-        </Link>
+      <div className="container py-4 border-top" style={fontStyle}>
+        <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+          <ol className="breadcrumb mb-0">
+            <li className="breadcrumb-item">
+              <Link to="/" className="text-decoration-none">Trang chủ</Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">So sánh sản phẩm</li>
+          </ol>
+        </nav>
+        <div className="mb-4">
+          <PageSectionHeading
+            title="So sánh sản phẩm"
+            description="Chọn tối đa 2 sản phẩm để đặt cạnh nhau và so sánh thông số"
+          />
+        </div>
+        <EmptyProductsState
+          icon={<i className="fa-solid fa-right-left" aria-hidden />}
+          title="Chưa đủ sản phẩm để so sánh"
+          description="Hãy chọn đủ 2 sản phẩm từ trang sản phẩm để bắt đầu so sánh."
+          to="/product"
+          actionLabel="Quay lại trang sản phẩm"
+          actionIconClass="fas fa-arrow-left"
+        />
       </div>
     );
   }
 
   return (
-    <div className="container py-5 border-top" style={fontStyle}>
-      <ol className="breadcrumb">
-        <li className="breadcrumb-item">
-          <Link to="/" className="text-decoration-none">Trang chủ</Link>
-        </li>
-        <li className="breadcrumb-item active" aria-current="page">So sánh sản phẩm</li>
-      </ol>
-      <h2 className="fw-bold mb-5 text-center" style={{ fontSize: 28 }}>So sánh sản phẩm</h2>
+    <div className="container py-4 border-top" style={fontStyle}>
+      <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+        <ol className="breadcrumb mb-0">
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none">Trang chủ</Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">So sánh sản phẩm</li>
+        </ol>
+      </nav>
+      <div className="mb-4">
+        <PageSectionHeading
+          title="So sánh sản phẩm"
+          description="Chọn tối đa 2 sản phẩm để đặt cạnh nhau và so sánh thông số"
+        />
+      </div>
       <div className="table-responsive shadow-sm rounded-4 overflow-hidden">
-        <table className="table align-middle text-center mb-0 compare-table"   style={{ background: '#fff', tableLayout: 'fixed', width: '100%' }}
+        <table className="table align-middle text-center mb-0 compare-table" style={{ background: '#fff', tableLayout: 'fixed', width: '100%' }}
         >
           <thead style={{ background: '#f1f5f9' }}>
             <tr>
-            <th className="d-none d-md-table-cell" style={{ width: 200 }}></th>
-            {compareList.map((product, idx) => (
+              <th className="d-none d-md-table-cell" style={{ width: 200 }}></th>
+              {compareList.map((product, idx) => (
                 <th key={product._id} style={{ minWidth: 220 }} className="border-start ">
                   <div className="d-flex flex-column align-items-center gap-2 py-3">
                     <img

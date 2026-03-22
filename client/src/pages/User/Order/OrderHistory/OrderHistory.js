@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyOrders } from '../../../../redux/user/orderSlice';
 import { Link } from 'react-router-dom';
 import formatDateTime from '../../../../untils/dateUtils';
+import EmptyProductsState from '../../../../components/EmptyProductsState';
+import PageSectionHeading from '../../../../components/PageSectionHeading';
 import './OrderHistory.css';
 
 const formatVND = (price) => {
@@ -71,12 +73,17 @@ const OrderHistory = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center py-5">
-        <div className="text-center">
-          <div className="spinner-border text-info mb-3" role="status" style={{ width: '2.5rem', height: '2.5rem' }}>
-            <span className="visually-hidden">Đang tải...</span>
+      <div className="order-history-page">
+        <div
+          className="container py-5 d-flex justify-content-center align-items-center"
+          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+        >
+          <div className="text-center">
+            <div className="spinner-border text-info mb-3" role="status" style={{ width: '2.5rem', height: '2.5rem' }}>
+              <span className="visually-hidden">Đang tải...</span>
+            </div>
+            <p className="text-muted fw-medium">Đang tải dữ liệu...</p>
           </div>
-          <p className="text-muted fw-medium">Đang tải dữ liệu...</p>
         </div>
       </div>
     );
@@ -84,48 +91,48 @@ const OrderHistory = () => {
 
   if (error) {
     return (
-      <div className="text-center py-5">
-        <div className="alert alert-danger border-0 shadow-sm rounded-3" role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          Lỗi: {error}
+      <div className="order-history-page">
+        <div
+          className="container py-5 text-center"
+          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+        >
+          <div className="alert alert-danger border-0 shadow-sm rounded-3" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            Lỗi: {error}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container py-4 border-top" 
-         style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="order-history-page">
+      <div
+        className="container py-4"
+        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+      >
       <div className="row">
         <div className="col-12">
           {/* Header */}
           <div className="mb-4">
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb mb-3">
+            <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+              <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <Link to="/" className="text-decoration-none" style={{ color: '#0ea5e9' }}>
+                  <Link to="/" className="text-decoration-none">
                     Trang chủ
                   </Link>
                 </li>
-                <li className="breadcrumb-item active fw-medium" aria-current="page" style={{ color: '#64748b' }}>
+                <li className="breadcrumb-item active" aria-current="page">
                   Lịch sử đơn hàng
                 </li>
               </ol>
             </nav>
             
             <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <div>
-                <h1 className="fw-bold mb-2" style={{ 
-                  fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-                  color: '#1e293b',
-                  letterSpacing: '-0.025em'
-                }}>
-                  Lịch sử đơn hàng
-                </h1>
-                <p className="text-muted mb-0" style={{ color: '#64748b' }}>
-                  Theo dõi và quản lý tất cả đơn hàng của bạn
-                </p>
-              </div>
+              <PageSectionHeading
+                title="Lịch sử đơn hàng"
+                description="Theo dõi và quản lý tất cả đơn hàng của bạn"
+              />
               {orders.length > 0 && (
                 <div className="badge bg-light text-dark fs-6 px-3 py-2 rounded-3">
                   <i className="bi bi-box-seam me-2"></i>
@@ -136,41 +143,14 @@ const OrderHistory = () => {
           </div>
 
           {orders.length === 0 ? (
-            <div className="row justify-content-center">
-              <div className="col-12 col-md-8 col-lg-6">
-                <div className="text-center py-5">
-                  <div className="mb-4">
-                    <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-                         style={{ 
-                           width: '80px', 
-                           height: '80px', 
-                           backgroundColor: '#f1f5f9' 
-                         }}>
-                      <i className="bi bi-inbox" style={{ fontSize: '2rem', color: '#0ea5e9' }}></i>
-                    </div>
-                  </div>
-                  <h4 className="text-muted mb-3 fw-bold" style={{ color: '#1e293b' }}>
-                    Chưa có đơn hàng nào
-                  </h4>
-                  <p className="text-secondary mb-4" style={{ color: '#64748b', lineHeight: '1.6' }}>
-                    Bạn chưa thực hiện đơn hàng nào. Hãy bắt đầu mua sắm ngay!
-                  </p>
-                  <Link 
-                    to="/products" 
-                    className="btn btn-info text-white px-4 py-3 fw-semibold rounded-3 shadow-sm"
-                    style={{
-                      border: 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
-                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                  >
-                    <i className="bi bi-shop me-2"></i>
-                    Mua sắm ngay
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <EmptyProductsState
+              icon={<i className="fa-solid fa-inbox" aria-hidden />}
+              title="Chưa có đơn hàng nào"
+              description="Bạn chưa thực hiện đơn hàng nào. Hãy bắt đầu mua sắm ngay!"
+              to="/products"
+              actionLabel="Mua sắm ngay"
+              actionIconClass="fa-solid fa-bag-shopping"
+            />
           ) : (
             <div className="bg-white rounded-4 shadow-sm overflow-hidden">
               {/* Table for larger screens */}
@@ -311,6 +291,7 @@ const OrderHistory = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import './Cart.css';
+import { Link } from 'react-router-dom';
 import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicShippingZones } from '../../../redux/public/shippingZoneSlice';
@@ -10,6 +10,9 @@ import { createCheckoutSession } from '../../../redux/user/paymentSlice';
 import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
 import VoucherCard from '../../../components/VourcherCard';
+import { CartSkeleton } from '../../../components/Skeleton';
+import EmptyProductsState from '../../../components/EmptyProductsState';
+import PageSectionHeading from '../../../components/PageSectionHeading';
 import { Modal } from 'bootstrap';
 import { MAX_STRIPE_AMOUNT } from '../../../config/constants';
 import Swal from 'sweetalert2';
@@ -362,22 +365,57 @@ function Cart() {
 
     // Early returns
     if (loading) {
-        return <div className="container py-5 text-center">Đang tải giỏ hàng...</div>;
+        return <CartSkeleton />;
     }
 
     if (!localCart || !localCart.items) {
         return (
-            <div className="container py-5">
-                <div className="alert alert-info">
-                    Giỏ hàng trống. <Link to="/products" className="alert-link">Tiếp tục mua sắm</Link>
-                </div>
+            <div className="container py-4 border-top">
+                <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+                    <ol className="breadcrumb mb-0">
+                        <li className="breadcrumb-item">
+                            <Link to="/" className="text-decoration-none">Trang chủ</Link>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+                    </ol>
+                </nav>
+                <EmptyProductsState
+                    icon={<i className="fa-solid fa-cart-shopping" aria-hidden />}
+                    title="Giỏ hàng trống"
+                    description="Bạn chưa có sản phẩm trong giỏ. Hãy thêm sản phẩm để tiếp tục đặt hàng."
+                    to="/products"
+                    actionLabel="Tiếp tục mua sắm"
+                    actionIconClass="fa-solid fa-bag-shopping"
+                />
             </div>
         );
     }
 
     // Main render
     return (
-        <div className="container py-5 ">
+        <div className="container py-4 border-top">
+            <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+                <ol className="breadcrumb mb-0">
+                    <li className="breadcrumb-item">
+                        <Link to="/" className="text-decoration-none">Trang chủ</Link>
+                    </li>
+                    <li className="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+                </ol>
+            </nav>
+            <div className="mb-4">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <PageSectionHeading
+                        title="Giỏ hàng"
+                        description="Xem sản phẩm, áp dụng khuyến mãi và hoàn tất đơn hàng"
+                    />
+                    {localCart.items.length > 0 && (
+                        <div className="badge bg-light text-dark fs-6 px-3 py-2 rounded-3">
+                            <i className="fa-solid fa-cart-shopping me-2" aria-hidden />
+                            {localCart.items.length} sản phẩm
+                        </div>
+                    )}
+                </div>
+            </div>
             <div className="row gy-4">
                 {/* Left - Cart Items */}
                 <div className="col-md-8">
@@ -434,14 +472,14 @@ function Cart() {
                             </div>
                         );
                     }) : (
-                        <div className="border rounded-4 text-center p-5 d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '300px' }}>
-                            <i className="fa-solid fa-cart-shopping fs-3"></i>
-                            <h4 className="fw-bold mb-2">Giỏ hàng trống</h4>
-                            <p className="text-muted mb-4">Hãy thoải mái lựa chọn sản phẩm bạn nhé</p>
-                            <button className="text-white px-4 py-2 rounded fw-bold bg-info border-0 ">
-                                Khám phá ngay
-                            </button>
-                        </div>
+                        <EmptyProductsState
+                            embedded
+                            icon={<i className="fa-solid fa-cart-shopping" aria-hidden />}
+                            title="Giỏ hàng trống"
+                            description="Hãy thoải mái lựa chọn sản phẩm bạn nhé"
+                            to="/products"
+                            actionLabel="Khám phá ngay"
+                        />
                     )}
 
                 </div>

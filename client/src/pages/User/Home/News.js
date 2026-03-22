@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { fetchNews } from "../../../untils/fetchNews";
 import { NewsSection } from "./NewsSection";
+import { NewsSkeleton } from "../../../components/Skeleton";
 import 'swiper/css';
 import './News.css'; // thêm file css riêng cho responsive
 
@@ -15,9 +16,22 @@ function News() {
     ];
     const [activeTabNews, setActiveTabNews] = useState(news[0].value);
     const [newsData, setNewsData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchNews(activeTabNews).then((data) => setNewsData(data.results || []));
+        let cancelled = false;
+        setLoading(true);
+        fetchNews(activeTabNews)
+            .then((data) => {
+                if (!cancelled) setNewsData(data?.results || []);
+            })
+            .catch(() => {
+                if (!cancelled) setNewsData([]);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [activeTabNews]);
 
     return (
@@ -40,10 +54,12 @@ function News() {
                     className="tab-swiper bg-light rounded-pill p-2"
                 >
                     {news.map((cat) => (
-                        <SwiperSlide key={cat.key} className="w-auto">
+                        <SwiperSlide key={cat.value} className="w-auto">
                             <button
+                                type="button"
                                 className={`tab-btn px-4 py-1 rounded-pill fw-bold ${activeTabNews === cat.value ? "active" : ""}`}
                                 onClick={() => setActiveTabNews(cat.value)}
+                                disabled={loading}
                             >
                                 {cat.label}
                             </button>
@@ -52,7 +68,7 @@ function News() {
                 </Swiper>
             </div>
 
-            <NewsSection articles={newsData} />
+            {loading ? <NewsSkeleton /> : <NewsSection articles={newsData} />}
 
         </div>
     );

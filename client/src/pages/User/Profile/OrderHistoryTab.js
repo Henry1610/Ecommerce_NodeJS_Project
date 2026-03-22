@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyOrders } from '../../../redux/user/orderSlice';
 import { Link } from 'react-router-dom';
 import formatDateTime from '../../../untils/dateUtils';
+import EmptyProductsState, { EmptyStateSection } from '../../../components/EmptyProductsState';
 
 const formatVND = (price) => {
   return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || '0 ₫';
@@ -96,18 +97,6 @@ const OrderHistoryTab = () => {
       <div className="row mb-4">
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-              <h1 className="fw-bold mb-1" style={{ 
-                fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
-                color: '#1e293b',
-                letterSpacing: '-0.025em'
-              }}>
-                Lịch sử đơn hàng
-              </h1>
-              <p className="text-muted mb-0 fs-6" style={{ color: '#64748b' }}>
-                Theo dõi và quản lý tất cả đơn hàng của bạn
-              </p>
-            </div>
             {orders.length > 0 && (
               <div className="d-flex align-items-center gap-3">
                 <div className="badge bg-light text-dark fs-6 px-3 py-2">
@@ -121,40 +110,17 @@ const OrderHistoryTab = () => {
       </div>
 
       {orders.length === 0 ? (
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-8 col-lg-6">
-            <div className="text-center py-5">
-              <div className="mb-4">
-                <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-                     style={{ 
-                       width: '80px', 
-                       height: '80px', 
-                       backgroundColor: '#f1f5f9' 
-                     }}>
-                  <i className="bi bi-inbox" style={{ fontSize: '2rem', color: '#0ea5e9' }}></i>
-                </div>
-              </div>
-              <h3 className="fw-bold mb-3" style={{ color: '#1e293b' }}>Chưa có đơn hàng nào</h3>
-              <p className="text-muted mb-4 fs-6" style={{ color: '#64748b', lineHeight: '1.6' }}>
-                Bạn chưa thực hiện đơn hàng nào. Khám phá các sản phẩm tuyệt vời và bắt đầu mua sắm ngay hôm nay!
-              </p>
-              <Link 
-                to="/products" 
-                className="btn text-white px-4 py-3 fw-semibold rounded-3 shadow-sm"
-                style={{
-                  backgroundColor: '#0ea5e9',
-                  border: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={e => e.target.style.backgroundColor = '#0284c7'}
-                onMouseLeave={e => e.target.style.backgroundColor = '#0ea5e9'}
-              >
-                <i className="bi bi-shop me-2"></i>
-                Khám phá sản phẩm
-              </Link>
-            </div>
-          </div>
-        </div>
+        <EmptyStateSection>
+          <EmptyProductsState
+            plain
+            icon={<i className="fa-solid fa-inbox" aria-hidden />}
+            title="Chưa có đơn hàng nào"
+            description="Bạn chưa thực hiện đơn hàng nào. Khám phá sản phẩm và bắt đầu mua sắm!"
+            to="/product"
+            actionLabel="Khám phá sản phẩm"
+            actionIconClass="fa-solid fa-bag-shopping"
+          />
+        </EmptyStateSection>
       ) : (
         <>
           {/* Desktop Table View */}

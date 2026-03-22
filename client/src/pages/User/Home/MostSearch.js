@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { MostSearchSkeleton } from '../../../components/Skeleton';
 import './MostSearch.css';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
@@ -24,9 +25,12 @@ function MostSearch() {
             <h1 className="most-search-title fw-bold d-flex justify-content-center align-items-center gap-2">
                 <span>Tìm kiếm nhiều nhất</span>
             </h1>
-            <div className="d-flex flex-wrap justify-content-center most-search-buttons">
+            <div
+                className="d-flex flex-wrap justify-content-center most-search-buttons"
+                aria-busy={loading}
+            >
                 {loading ? (
-                    <span>Đang tải...</span>
+                    <MostSearchSkeleton />
                 ) : products.length > 0 ? (
                     products.map((product, index) => (
                         <Link

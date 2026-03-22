@@ -8,8 +8,6 @@ import { fetchAdminProfile, resetAdminProfile } from '../../../../redux/admin/ad
 import { logout, clearAuth } from '../../../../redux/auth/authSlice';
 import Swal from 'sweetalert2';
 
-
-
 const Header = ({ onToggleSidebar }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const navigate = useNavigate();

@@ -14,6 +14,7 @@ import { addToWishlist, removeFromWishlist } from '../../../redux/user/wishlistS
 import { toast } from 'react-toastify';
 import { fetchReviewStats } from '../../../redux/public/reviewSlice';
 import "./ProductDetail.css";
+import '../../../components/PageSectionHeading/PageSectionHeading.css';
 import axios from 'axios';
 import RelatedProductItem from '../../../components/RelatedProductItem';
 import { likeOrUnlikeReview } from '../../../redux/public/productsSlice';
@@ -25,6 +26,24 @@ const SERVICES = [
     { icon: <i className="fa-solid fa-folder-closed"></i>, text: "Tư vấn tận tâm" },
     { icon: <i className="fa-solid fa-folder-closed"></i>, text: "Trung tâm khác" },
 ];
+
+function ProductDetailBreadcrumb({ lastLabel }) {
+    return (
+        <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+            <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                    <Link to="/" className="text-decoration-none">Trang chủ</Link>
+                </li>
+                <li className="breadcrumb-item">
+                    <Link to="/product" className="text-decoration-none">Sản phẩm</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">
+                    <span className="text-break">{lastLabel}</span>
+                </li>
+            </ol>
+        </nav>
+    );
+}
 
 function ProductDetail() {
     // State
@@ -144,30 +163,38 @@ function ProductDetail() {
     // Loading and error states
     if (loading) {
         return (
-            <div className="container py-5 text-center">
-                <div className="spinner-border text-warning" role="status"></div>
+            <div className="container py-4 border-top">
+                <ProductDetailBreadcrumb lastLabel="Đang tải…" />
+                <div className="text-center pt-4">
+                    <div className="spinner-border text-warning" role="status">
+                        <span className="visually-hidden">Đang tải…</span>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="container py-5 text-center text-danger">
-                Lỗi: {error}
+            <div className="container py-4 border-top">
+                <ProductDetailBreadcrumb lastLabel="Lỗi tải sản phẩm" />
+                <p className="text-center text-danger pt-4 mb-0">Lỗi: {error}</p>
             </div>
         );
     }
 
     if (!product) {
         return (
-            <div className="container py-5 text-center">
-                Sản phẩm không tồn tại
+            <div className="container py-4 border-top">
+                <ProductDetailBreadcrumb lastLabel="Không tìm thấy" />
+                <p className="text-center text-muted pt-4 mb-0">Sản phẩm không tồn tại</p>
             </div>
         );
     }
 
     return (
-        <div className="container-fluid px-3 px-lg-5 pb-5">
+        <div className="container-fluid px-3 px-lg-5 pt-4 pb-5 border-top">
+            <ProductDetailBreadcrumb lastLabel={product.name} />
             <div className="row g-4">
                 {/* Header mobile only */}
                 <div className="col-12 d-lg-none order-1">

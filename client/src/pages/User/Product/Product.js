@@ -8,6 +8,9 @@ import Select from 'react-select';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toggleCompare } from '../../../redux/public/compareSlice';
 import CompareBar from '../../../components/CompareBar/CompareBar';
+import { ProductSectionSkeleton } from '../../../components/Skeleton';
+import '../../../components/PageSectionHeading/PageSectionHeading.css';
+
 function Product() {
   const dispatch = useDispatch();
   const { products = [], loading, totalPages, currentPage } = useSelector((state) => state.public.publicProduct);
@@ -101,17 +104,19 @@ function Product() {
   );
 
   return (
-    <div className="container-fluid py-3">
-      <ol className="breadcrumb">
-        <li className="breadcrumb-item">
-          <Link to="/" className="text-decoration-none">Trang chủ</Link>
-        </li>
-        <li className="breadcrumb-item active" aria-current="page">Sản phẩm</li>
-      </ol>
+    <div className="container-fluid py-4 border-top">
+      <nav aria-label="breadcrumb" className="user-page-header__breadcrumb">
+        <ol className="breadcrumb mb-0">
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none">Trang chủ</Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">Sản phẩm</li>
+        </ol>
+      </nav>
 
       <div className="row">
         {/* Banner */}
-        <div class=" mb-5">
+        <div class=" mb-3">
           <div class="row">
             <div class="col-md-6 mb-3 rounded-4">
               <img src="https://imagor.owtg.one/unsafe/fit-in/1000x334/https://d28jzcg6y4v9j1.cloudfront.net/banners/bao-hanh-chinh-hang-phu-kien-6ww.jpg" alt="Bảo hành chính hãng" class="img-fluid rounded" />
@@ -318,24 +323,27 @@ function Product() {
         {/* Products Content */}
         <div className="col-md-9 col-lg-10  mt-2">
           {/* Results Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="mb-0 mt-2">
-              {loading ? 'Đang tải...' : `Hiển thị ${products?.length || 0} sản phẩm`}
-            </h5>
-            {!loading && products?.length > 0 && (
-              <small className="text-muted">
-                Trang {currentPage} / {totalPages}
-              </small>
-            )}
-          </div>
+          {!loading && (
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0 mt-2 text-muted fw-bold ">
+                Hiển thị {products?.length || 0} sản phẩm
+              </h5>
+              {products?.length > 0 && (
+                <small className="text-muted">
+                  Trang {currentPage} / {totalPages}
+                </small>
+              )}
+            </div>
+          )}
 
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Đang tải...</span>
-              </div>
-              <p className="mt-2 text-muted">Đang tải sản phẩm...</p>
-            </div>
+            <ProductSectionSkeleton
+              mode="grid"
+              fullWidthGrid={false}
+              gridCount={limit}
+              gridColumnClass="col-6 col-lg-4 col-xl-3"
+              showResultBar
+            />
           ) : products?.length === 0 ? (
             <div className="text-center py-5">
               <div className="mb-3">
@@ -361,7 +369,8 @@ function Product() {
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center align-items-center gap-3 mt-4 py-3">
                   <button
-                    className="btn btn-outline-info btn-sm d-flex align-items-center"
+                    type="button"
+                    className="btn btn-outline-dark btn-sm d-flex align-items-center"
                     onClick={handlePrev}
                     disabled={page <= 1}
                   >
@@ -370,13 +379,14 @@ function Product() {
                   </button>
 
                   <div className="pagination-info px-3">
-                    <span className="badge bg-info">
+                    <span className="badge rounded-pill bg-secondary text-white fw-semibold px-3 py-2">
                       {currentPage} / {totalPages}
                     </span>
                   </div>
 
                   <button
-                    className="btn btn-outline-info btn-sm d-flex align-items-center"
+                    type="button"
+                    className="btn btn-outline-dark btn-sm d-flex align-items-center"
                     onClick={handleNext}
                     disabled={page >= totalPages}
                   >
