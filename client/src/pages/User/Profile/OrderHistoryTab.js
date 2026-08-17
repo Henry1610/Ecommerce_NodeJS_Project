@@ -96,7 +96,7 @@ const OrderHistoryTab = () => {
       {/* Modern Header */}
       <div className="row mb-4">
         <div className="col-12">
-          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3"> 
             {orders.length > 0 && (
               <div className="d-flex align-items-center gap-3">
                 <div className="badge bg-light text-dark fs-6 px-3 py-2">
