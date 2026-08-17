@@ -70,5 +70,15 @@ productSchema.pre('save', function (next) {
 
     }
     next(); 
-})
+});
+
+// Index phục vụ GET /api/products/filter
+productSchema.index({ statusCurrent: 1, category: 1 });
+productSchema.index({ statusCurrent: 1, brand: 1 });
+productSchema.index({ statusCurrent: 1, price: 1 });
+productSchema.index({ statusCurrent: 1, ratings: -1 });
+productSchema.index({ statusCurrent: 1, discountPercent: 1 });
+productSchema.index({ statusCurrent: 1, _id: -1 });
+productSchema.index({ name: 'text' });
+
 export default mongoose.model('Product', productSchema);
