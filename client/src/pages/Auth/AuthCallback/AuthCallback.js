@@ -1,13 +1,17 @@
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getSessionAuth } from "../../../redux/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 
  const AuthCallback = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const handledRef = useRef(false);
 
     useEffect(() => {
+        if (handledRef.current) return;
+        handledRef.current = true;
+
         (async () => {
             try {
                 await dispatch(getSessionAuth()).unwrap();

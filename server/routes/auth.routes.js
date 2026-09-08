@@ -4,7 +4,10 @@ import passport from "passport";
 
 const router = express.Router();
 
-router.get("/facebook", passport.authenticate("facebook", { scope: ["email", "public_profile"] }));
+router.get("/facebook", passport.authenticate("facebook", {
+    scope: ["email", "public_profile"],
+    session: false,
+}));
 router.get("/facebook/callback", facebookCallback);
 router.get("/session-auth", getSessionAuth);
 router.post('/login', login);

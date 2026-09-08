@@ -10,54 +10,60 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+const isFacebookCodeReuseError = (err) =>
+  err?.code === 100 && err?.subcode === 36009
+  || err?.message?.includes('authorization code has been used');
+
 export const facebookCallback = (req, res, next) => {
-  passport.authenticate("facebook", async (err, authData, info) => {
+  passport.authenticate("facebook", { session: false }, (err, authData) => {
     if (err) {
+      if (isFacebookCodeReuseError(err) && req.session?.tempAuth) {
+        return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+      }
+
       console.error("Passport error:", err);
       return res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
     }
-    if (!authData.user) {
 
+    if (!authData?.user) {
       return res.redirect(`${process.env.CLIENT_URL}/login?error=no_user`);
     }
-    try {
-      const { user, tokens } = authData;
 
-      // Lưu vào session tạm (5 phút)
-      req.session.tempAuth = {
-        accessToken: tokens.accessToken,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          avatar: user.avatar,
-          role: user.role,
-        }
-      };
+    const { user, tokens } = authData;
 
-      res.cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 1 * 24 * 60 * 60 * 1000 // 1 day
-      });
+    req.session.tempAuth = {
+      accessToken: tokens.accessToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      }
+    };
 
-      // Lưu refresh token vào DB để /api/auth/refresh-token hoạt động sau reload
-      await user.addRefreshToken(
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 1 * 24 * 60 * 60 * 1000 // 1 day
+    });
+
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        console.error("Session save error:", saveErr);
+        return res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
+      }
+
+      user.addRefreshToken(
         tokens.refreshToken,
         req.headers['user-agent'],
         req.ip,
         false
-      );
+      ).catch((tokenErr) => console.error("Refresh token save error:", tokenErr));
 
-      // Redirect về frontend callback page
-      res.redirect(
-        `${process.env.CLIENT_URL}/auth/callback`
-      );
-    } catch (error) {
-      console.error("Callback error:", error);
-      res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
-    }
+      res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+    });
   })(req, res, next);
 };
 

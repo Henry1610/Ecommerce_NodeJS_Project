@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import User from '../models/User.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
-const callbackURL = `${process.env.SEVER_URL}/api/auth/facebook/callback`;
 dotenv.config();
+const callbackURL = `${process.env.SERVER_URL || process.env.SEVER_URL}/api/auth/facebook/callback`;
 
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_APP_ID,
