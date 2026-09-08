@@ -55,7 +55,6 @@ jobs:
       # Deploy Preview for non-main branches
       - name: Deploy to Vercel (preview on non-main)
         if: github.ref != 'refs/heads/main'
-        working-directory: ./client
         run: vercel --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -64,7 +63,6 @@ jobs:
       # Deploy Production for main branch
       - name: Deploy to Vercel (production on main)
         if: github.ref == 'refs/heads/main'
-        working-directory: ./client
         run: vercel --prod --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
